@@ -1,0 +1,663 @@
+# PlanTap — Implementation Tasks
+
+> **Granular checklist for development**  
+> **Legend**: `[ ]` = todo, `[/]` = in progress, `[x]` = done
+
+---
+
+# 📱 MOBILE APP TASKS
+
+## Phase 1: Foundation
+
+### 1.1 Monorepo Setup
+- [ ] Verify repo is a git repo + set branching conventions
+- [ ] Create root `package.json` with workspaces
+- [ ] Install Turborepo
+- [ ] Create `turbo.json` configuration
+- [ ] Create folder structure:
+  - [ ] `apps/mobile/`
+  - [ ] `apps/admin/`
+  - [ ] `apps/scraper/`
+  - [ ] `packages/backend/`
+  - [ ] `packages/shared/`
+- [ ] Configure shared TypeScript base config
+- [ ] Setup ESLint + Prettier (monorepo)
+- [ ] Create `.gitignore` files
+- [ ] Verify `turbo run build` works
+
+### 1.2 Mobile Project Init
+- [ ] `npx create-expo-app@latest apps/mobile --template tabs`
+- [ ] Upgrade to the latest stable Expo SDK if needed
+- [ ] Configure TypeScript strict mode
+- [ ] Remove default template content
+- [ ] Setup path aliases (`@/components`, etc.)
+- [ ] Install and configure Unistyles
+- [ ] Create theme tokens file (colors, spacing, typography)
+- [ ] Create dark/light theme variants
+- [ ] Verify Unistyles working
+
+### 1.3 Font Setup
+- [ ] Install expo-font
+- [ ] Download Baloo Bhaijaan 2 (Regular, Medium, Bold)
+- [ ] Add fonts to assets folder
+- [ ] Configure font loading in app entry
+- [ ] Create typography styles using font
+
+### 1.4 i18n Setup
+- [ ] Install react-i18next + i18next
+- [ ] Install expo-localization
+- [ ] Create `locales/ar.json`
+- [ ] Create `locales/en.json`
+- [ ] Configure i18n initialization
+- [ ] Create useTranslation hook wrapper
+- [ ] Add language detection (device locale)
+- [ ] Add language toggle hook
+- [ ] Verify translations working
+
+### 1.5 RTL Support
+- [ ] Configure RTL in app.json/app.config.js
+- [ ] Prefer built-in `I18nManager` + RTL-safe components (avoid extra deps unless required)
+- [ ] Create RTL-aware layout components
+- [ ] Create `useDirection()` hook (returns "rtl" | "ltr")
+- [ ] Test RTL layout on simulator
+
+### 1.6 Convex Setup
+- [ ] Create Convex project (convex.dev)
+- [ ] Install convex + @convex-dev/react-native
+- [ ] Copy Convex URL to environment
+- [ ] Configure ConvexProvider in app entry
+- [ ] Configure Convex auth to use Clerk JWT (token fetch + Convex auth config)
+- [ ] Create basic schema (packages/backend/convex/schema.ts)
+- [ ] Run `npx convex dev` and verify connection
+- [ ] Test basic query from mobile
+
+### 1.7 Clerk Setup
+- [ ] Create Clerk application (clerk.com)
+- [ ] Enable Google OAuth provider
+- [ ] Enable Apple OAuth provider
+- [ ] Install @clerk/clerk-expo
+- [ ] Create Clerk JWT template for Convex (mobile/admin Convex auth)
+- [ ] Add Clerk publishable key to env
+- [ ] Configure ClerkProvider in app entry
+- [ ] Create auth context hook
+- [ ] Test sign-in flow (basic)
+
+### 1.8 Navigation Shell
+- [ ] Setup Expo Router file structure
+- [ ] Create `app/_layout.tsx` (root layout)
+- [ ] Create `app/(tabs)/_layout.tsx` (tab layout)
+- [ ] Create tab screens (empty):
+  - [ ] `app/(tabs)/home.tsx`
+  - [ ] `app/(tabs)/map.tsx`
+  - [ ] `app/(tabs)/suggest.tsx`
+  - [ ] `app/(tabs)/community.tsx`
+  - [ ] `app/(tabs)/profile.tsx`
+- [ ] Configure tab bar icons
+- [ ] Implement RTL tab order switching
+- [ ] Create stack screens (empty):
+  - [ ] `app/event/[id].tsx`
+  - [ ] `app/plan/[id].tsx`
+  - [ ] `app/settings/index.tsx`
+  - [ ] `app/auth/sign-in.tsx`
+  - [ ] `app/onboarding/index.tsx`
+- [ ] Configure navigation options (headers, etc.)
+- [ ] Test navigation flow
+
+### 1.9 Local Storage
+- [ ] Install react-native-mmkv
+- [ ] Create storage helper utilities
+- [ ] Create keys constants
+- [ ] Test storage save/load
+
+### 1.10 State Management
+- [ ] Install zustand
+- [ ] Create UI state store (filters, toggles)
+- [ ] Create auth state store (user info cache)
+- [ ] Test store updates
+
+---
+
+## Phase 3: Core Screens
+
+### 3.1 Shared Components
+- [ ] `Button` (primary, secondary, outline, ghost)
+- [ ] `Card` (event card base)
+- [ ] `Badge` (price, distance, indoor/outdoor)
+- [ ] `Input` (text input with RTL support)
+- [ ] `SearchBar` (with filter button)
+- [ ] `BottomSheet` (reusable modal sheet)
+- [ ] `LoadingSkeleton` (content placeholders)
+- [ ] `EmptyState` (no results message)
+- [ ] `ErrorState` (error with retry)
+- [ ] `Avatar` (user avatar)
+- [ ] `IconButton` (icon-only button)
+- [ ] Verify all components RTL-compatible
+
+### 3.2 Onboarding Flow
+- [ ] Create onboarding navigator/flow
+- [ ] Welcome screen (app intro, continue button)
+- [ ] Interests screen (tag multi-select)
+- [ ] Dislikes screen (tag multi-select)
+- [ ] City screen (dropdown or search)
+- [ ] Location permission screen (request)
+- [ ] Progress indicator component
+- [ ] Back navigation between steps
+- [ ] Skip option (goes to home)
+- [ ] Save preferences to Convex
+- [ ] Cache completion flag in MMKV
+- [ ] Redirect logic (show if not completed)
+
+### 3.3 Home Tab
+- [ ] Create home screen layout
+- [ ] Implement search bar
+- [ ] Create horizontal section component
+- [ ] Create event poster card component
+- [ ] Implement sections:
+  - [ ] Tonight / This Weekend
+  - [ ] Near You (needs location)
+  - [ ] Trending in City
+  - [ ] Family Picks
+  - [ ] Upcoming Events
+- [ ] Integrate FlashList for horizontal scrolling
+- [ ] Add pull-to-refresh
+- [ ] Add loading skeletons
+- [ ] Add empty states per section
+- [ ] Implement filter modal
+- [ ] Connect to Convex queries
+
+### 3.4 Event Detail Screen
+- [ ] Create detail screen layout
+- [ ] Image gallery/carousel (Expo Image)
+- [ ] Title + description (locale-aware)
+- [ ] Tags/categories display
+- [ ] Price range badge
+- [ ] Indoor/outdoor badge
+- [ ] Family friendly badge
+- [ ] Operating hours (if activity)
+- [ ] "Book/Tickets" button → Linking to URL
+- [ ] "Directions" button → Google Maps intent
+- [ ] Favorite toggle (heart icon)
+- [ ] Share button
+- [ ] Back navigation
+- [ ] Connect to Convex query
+
+### 3.5 Map Tab
+- [ ] Install @rnmapbox/maps
+- [ ] Configure Mapbox token
+- [ ] Create map screen layout
+- [ ] Initialize map with user location
+- [ ] Create custom marker component
+- [ ] Fetch events for visible area
+- [ ] Render markers on map
+- [ ] Implement marker clustering
+- [ ] Create filter chip bar
+- [ ] Create bottom sheet preview on marker tap
+- [ ] "Search this area" button
+- [ ] My location button
+- [ ] Navigation to event detail on tap
+- [ ] Test performance with many markers
+
+### 3.6 Profile Tab
+- [ ] Create profile screen layout
+- [ ] User info section (avatar, name)
+- [ ] Saved plans section (FlashList)
+- [ ] Favorites section (collapsible)
+- [ ] Settings button
+- [ ] Sign out button
+- [ ] Connect to Convex queries
+
+### 3.7 Settings Screen
+- [ ] Create settings screen layout
+- [ ] Language toggle (Arabic/English)
+- [ ] Edit default preferences
+- [ ] Notification preferences toggle
+- [ ] About section (version, etc.)
+- [ ] Feedback form (submit to Convex)
+- [ ] Sign out confirmation
+- [ ] Back navigation
+
+---
+
+## Phase 4: Suggestion Engine
+
+### 4.1 Suggest Tab UI
+- [ ] Create suggest screen layout
+- [ ] Create constraint controls panel:
+  - [ ] Group type selector (solo/group/kids)
+  - [ ] Time range picker
+  - [ ] Budget slider (min/max)
+  - [ ] Radius slider
+  - [ ] Category/tag pills (multi-select)
+- [ ] "Generate Suggestions" button
+- [ ] Loading state for generation
+
+### 4.2 Suggestion Cards
+- [ ] Create suggestion card component
+- [ ] Event thumbnail image
+- [ ] Event title + brief details
+- [ ] "Add to Plan" button (green)
+- [ ] "Skip" button (gray)
+- [ ] "Favorite" button (heart)
+- [ ] Animation for card removal
+
+### 4.3 Plan Building UI
+- [ ] Create plan preview component (shows current stops)
+- [ ] Show stop count (X/5)
+- [ ] "Add Next Stop" button
+- [ ] Disable when 5 stops reached
+- [ ] "Confirm Plan" button
+- [ ] "Cancel" / reset button
+- [ ] Plan name input (optional)
+
+### 4.4 Integration
+- [ ] Connect to `suggest.getSuggestionDeck()` query
+- [ ] Handle empty results
+- [ ] Handle card selection (add to local state)
+- [ ] Handle skip (remove from deck)
+- [ ] Connect to `suggest.getNextStop()` for add next
+- [ ] Connect to `plans.createPlan()` mutation
+- [ ] Navigate to plan detail on confirm
+
+### 4.5 Plan Detail Screen
+- [ ] Create plan detail layout
+- [ ] Timeline view of stops (vertical list)
+- [ ] Stop item component:
+  - [ ] Event thumbnail
+  - [ ] Title + time
+  - [ ] Note field (editable)
+  - [ ] Navigate button
+  - [ ] Remove button (if owner)
+- [ ] Map preview with all stop markers
+- [ ] Share button
+- [ ] "Start Navigation" button
+- [ ] Edit mode toggle (reorder stops)
+- [ ] Delete plan button
+- [ ] Connect to Convex queries/mutations
+
+### 4.6 Sharing
+- [ ] Generate shareId on save
+- [ ] Create share modal
+- [ ] Copy link to clipboard
+- [ ] Native share sheet
+- [ ] Deep link configuration (app.json)
+- [ ] Handle incoming deep links
+- [ ] Read-only view for shared plans
+
+### 4.7 Notifications
+- [ ] Install expo-notifications
+- [ ] Configure notification permissions
+- [ ] Add optional plan start time (`startAt`) UI
+- [ ] If `startAt` set: schedule reminder at `startAt - 2h`
+- [ ] Handle notification tap → open plan
+- [ ] Cancel notification on plan delete
+
+---
+
+# 🖥️ ADMIN DASHBOARD TASKS
+
+## Phase 2: Admin Foundation
+
+### 2.1 Project Setup
+- [ ] Create `apps/admin` with Vite + React
+- [ ] Configure TypeScript
+- [ ] Install and configure Tailwind CSS
+- [ ] Setup path aliases
+- [ ] Install TanStack Router
+- [ ] Install TanStack Query
+- [ ] Configure Convex client
+- [ ] Create basic layout structure
+
+### 2.2 Clerk Admin Auth
+- [ ] Install @clerk/clerk-react
+- [ ] Configure Clerk provider
+- [ ] Create login page
+- [ ] Implement admin check (MVP: email allowlist; later: Clerk role/metadata)
+- [ ] Configure Convex client auth via Clerk JWT template
+- [ ] Protected route wrapper
+- [ ] Redirect non-admins
+
+### 2.3 Layout Components
+- [ ] Sidebar navigation component
+- [ ] Header with user info
+- [ ] Main content wrapper
+- [ ] Breadcrumb component
+- [ ] Mobile responsive sidebar
+
+---
+
+## Phase 5: Admin Features
+
+### 5.1 Events - Pending Queue
+- [ ] Create `/events/pending` page
+- [ ] Events table with pagination
+- [ ] Search input
+- [ ] Filter dropdowns (provider, city)
+- [ ] Row expand for preview
+- [ ] Quick approve/reject buttons
+- [ ] Bulk selection
+- [ ] Bulk approve/reject
+- [ ] Connect to Convex queries
+
+### 5.2 Events - Single Event
+- [ ] Create `/events/[id]` page
+- [ ] Full event edit form:
+  - [ ] Title (en/ar)
+  - [ ] Description (en/ar)
+  - [ ] Type (event/activity)
+  - [ ] Categories multi-select
+  - [ ] Tags multi-select
+  - [ ] Date/time pickers
+  - [ ] City dropdown
+  - [ ] Location (lat/lng/address)
+  - [ ] Price range inputs
+  - [ ] Indoor/outdoor select
+  - [ ] Family friendly toggle
+  - [ ] Booking URL input
+  - [ ] Phone input
+  - [ ] Operating hours inputs
+- [ ] Image upload to Convex storage
+- [ ] Image gallery management
+- [ ] Approve button
+- [ ] Reject button
+- [ ] Save changes button
+- [ ] Delete button (with confirm)
+- [ ] Audit history panel
+- [ ] Duplicate detection panel
+- [ ] Connect to Convex mutations
+
+### 5.3 Events - All Events
+- [ ] Create `/events` page
+- [ ] Events table (approved only by default)
+- [ ] Filter by status
+- [ ] Search
+- [ ] Edit button → goes to /events/[id]
+- [ ] Quick status toggle
+
+### 5.4 Import
+- [ ] Create `/import` page
+- [ ] CSV file upload
+- [ ] Column mapping UI
+- [ ] Preview table
+- [ ] Import button
+- [ ] Progress indicator
+- [ ] Error reporting
+- [ ] Success confirmation
+
+### 5.5 Users
+- [ ] Create `/users` page
+- [ ] Users table with pagination
+- [ ] Search by name/email
+- [ ] View user details (expand or modal)
+- [ ] Ban button
+- [ ] Unban button
+- [ ] View user's plans/favorites
+
+### 5.6 Reports (Optional MVP)
+- [ ] Create `/reports` page
+- [ ] Reports table
+- [ ] Filter by status
+- [ ] Filter by type
+- [ ] Report detail view
+- [ ] Link to reported content
+- [ ] Resolve button
+- [ ] Dismiss button
+- [ ] Notes field
+
+### 5.7 Feedback
+- [ ] Create `/feedback` page
+- [ ] Feedback inbox list
+- [ ] Status filter
+- [ ] Mark as read
+- [ ] Mark as closed
+- [ ] Reply option (optional)
+
+### 5.8 Cities
+- [ ] Create `/cities` page
+- [ ] Cities table
+- [ ] Add city form
+- [ ] Edit city
+- [ ] Toggle active status
+- [ ] Event count per city
+
+### 5.9 Dashboard Home
+- [ ] Create `/` (dashboard) page
+- [ ] Stats cards:
+  - [ ] Pending events count
+  - [ ] Total approved events
+  - [ ] Total users
+  - [ ] Open reports
+- [ ] Recent activity feed
+- [ ] Quick action buttons
+
+---
+
+# 🕷️ SCRAPER TASKS
+
+## Phase 6: Scraper
+
+### 6.1 Project Setup
+- [ ] Create `apps/scraper` folder
+- [ ] Initialize Node.js project
+- [ ] Configure TypeScript
+- [ ] Install Playwright
+- [ ] Install node-cron (or similar)
+- [ ] Setup Convex HTTP client
+- [ ] Create environment config
+- [ ] Setup logging (pino or winston)
+
+### 6.2 Architecture
+- [ ] Create `src/index.ts` entry point
+- [ ] Create base scraper class
+- [ ] Create normalizer module
+- [ ] Create Convex client wrapper
+- [ ] Create error handler
+- [ ] Create rate limiter utility
+
+### 6.3 Scraper Implementation
+- [ ] Research Saudi event websites to scrape
+- [ ] Document target site structures
+- [ ] Implement scraper for site 1
+- [ ] Implement scraper for site 2
+- [ ] Implement scraper for site 3 (optional)
+- [ ] Image downloading
+- [ ] Image upload to Convex storage
+- [ ] Data normalization to event schema
+- [ ] Compute `cellId` from lat/lng during normalization
+- [ ] Confidence scoring
+- [ ] Duplicate detection (by URL)
+- [ ] Push to Convex as pending
+
+### 6.4 API Ingestion (Optional)
+- [ ] Research Visit Saudi API availability
+- [ ] Implement Visit Saudi ingestion (if available)
+- [ ] Research Ticketmaster Saudi coverage
+- [ ] Implement Ticketmaster ingestion (if available)
+- [ ] Research Eventbrite Saudi coverage
+- [ ] Implement Eventbrite ingestion (if available)
+- [ ] Avoid paid APIs for MVP (e.g., Google Places)
+
+### 6.5 Scheduling
+- [ ] Configure cron schedule (daily)
+- [ ] Create run script
+- [ ] Error handling and retries
+- [ ] Logging to file
+
+### 6.6 Deployment
+- [ ] Research no-cost scheduling/hosting options that run Playwright (e.g., GitHub Actions cron)
+- [ ] Create deployment config
+- [ ] Setup environment variables
+- [ ] Deploy and test
+- [ ] Setup monitoring/alerts
+
+---
+
+# 📦 BACKEND TASKS (packages/backend)
+
+## Phase 2: Convex Schema & Functions
+
+### Schema
+- [ ] Create `schema.ts` with all tables:
+  - [ ] `users` table with indexes
+  - [ ] `events` table with indexes
+  - [ ] `plans` table with indexes
+  - [ ] `favorites` table with indexes
+  - [ ] `feedback` table
+  - [ ] `reports` table
+  - [ ] `cities` table
+  - [ ] `adminActions` table
+- [ ] Add MVP-required fields/defaults:
+  - [ ] `events.cellId` (derived from lat/lng)
+  - [ ] `events.favoritesCount` (default 0)
+  - [ ] `plans.startAt?` (optional; required only if reminders enabled)
+- [ ] Add/verify indexes:
+  - [ ] `events` by `(city, cellId)`
+  - [ ] `favorites` by `(userId, eventId)` (unique lookup)
+- [ ] Export types
+
+### User Functions
+- [ ] `users.ts`:
+  - [ ] `getMe()` query
+  - [ ] `ensureMe()` mutation (create user if missing)
+  - [ ] `updatePreferences()` mutation
+  - [ ] `updateDefaults()` mutation
+  - [ ] `updateLocale()` mutation
+- [ ] `http.ts`:
+  - [ ] POST `/clerk-webhook` action for user upsert
+
+### Event Functions
+- [ ] `events.ts`:
+  - [ ] `getById()` query
+  - [ ] `listHomeFeed()` query
+  - [ ] `search()` query
+  - [ ] `listNearby()` query
+  - [ ] Ensure radius/nearby queries prefilter via `(city, cellId)`
+
+### Plan Functions
+- [ ] `plans.ts`:
+  - [ ] `createPlan()` mutation
+  - [ ] `getPlan()` query
+  - [ ] `listMyPlans()` query
+  - [ ] `updatePlan()` mutation
+  - [ ] `deletePlan()` mutation
+  - [ ] `generateShareId()` mutation
+  - [ ] `getByShareId()` query
+
+### Favorite Functions
+- [ ] `favorites.ts`:
+  - [ ] `toggle()` mutation
+  - [ ] Maintain `events.favoritesCount` (increment/decrement, never negative)
+  - [ ] `listMyFavorites()` query
+  - [ ] `isFavorite()` query
+
+### Suggestion Engine
+- [ ] `suggest.ts`:
+  - [ ] `getSuggestionDeck()` query
+  - [ ] `getNextStop()` query
+  - [ ] Scoring algorithm implementation
+
+### Admin Functions
+- [ ] `admin.ts`:
+  - [ ] `listPendingEvents()` query
+  - [ ] `approveEvent()` mutation
+  - [ ] `rejectEvent()` mutation
+  - [ ] `updateEvent()` mutation
+  - [ ] `createEvent()` mutation
+  - [ ] Ensure admin mutations compute `events.cellId` from lat/lng
+  - [ ] `deleteEvent()` mutation
+  - [ ] `mergeEvents()` mutation
+  - [ ] `bulkImportCSV()` action
+  - [ ] `listUsers()` query
+  - [ ] `banUser()` mutation
+  - [ ] `unbanUser()` mutation
+  - [ ] `listReports()` query
+  - [ ] `resolveReport()` mutation
+  - [ ] `listCities()` query
+  - [ ] `upsertCity()` mutation
+  - [ ] `listFeedback()` query
+  - [ ] `closeFeedback()` mutation
+
+### HTTP Endpoints
+- [ ] `http.ts`:
+  - [ ] POST `/clerk-webhook`
+  - [ ] POST `/ingest-event` (for scraper)
+- [ ] Enforce endpoint auth:
+  - [ ] Verify Clerk webhook signatures + replay protection
+  - [ ] Require shared secret/HMAC on `/ingest-event`
+
+### File Storage
+- [ ] Configure Convex file storage
+- [ ] Create `storage.ts`:
+  - [ ] `generateUploadUrl()` mutation
+  - [ ] `getImageUrl()` query
+
+---
+
+# 📦 SHARED PACKAGE TASKS (packages/shared)
+
+### Types
+- [ ] Create `types/user.ts`
+- [ ] Create `types/event.ts`
+- [ ] Create `types/plan.ts`
+- [ ] Create `types/city.ts`
+- [ ] Create `types/index.ts` (re-exports)
+
+### Constants
+- [ ] Create `constants/categories.ts` (with ar/en)
+- [ ] Create `constants/tags.ts` (with ar/en)
+- [ ] Create `constants/defaults.ts`
+- [ ] Create `constants/index.ts`
+
+### Utilities
+- [ ] Create `utils/distance.ts` (haversine)
+- [ ] Create `utils/format.ts` (date, price, locale-aware)
+- [ ] Create `utils/validation.ts`
+- [ ] Create `utils/index.ts`
+
+---
+
+# ✅ TESTING & POLISH
+
+### Mobile Testing
+- [ ] Test auth flow end-to-end
+- [ ] Test onboarding flow
+- [ ] Test home tab loading
+- [ ] Test event detail screen
+- [ ] Test map with markers
+- [ ] Test suggestion flow
+- [ ] Test plan creation
+- [ ] Test plan sharing
+- [ ] Test notifications
+- [ ] Test RTL layout (Arabic)
+- [ ] Test on iOS device
+- [ ] Test on Android device
+
+### Admin Testing
+- [ ] Test admin login
+- [ ] Test event approval flow
+- [ ] Test CSV import
+- [ ] Test user management
+- [ ] Test reports/feedback
+
+### Scraper Testing
+- [ ] Test manual run
+- [ ] Test scheduled run
+- [ ] Verify events appear in admin queue
+
+### Performance
+- [ ] Profile mobile app (Flipper)
+- [ ] Optimize slow queries
+- [ ] Verify map clustering
+- [ ] Verify FlashList performance
+
+### Final Polish
+- [ ] Fix any UI inconsistencies
+- [ ] Add loading states everywhere
+- [ ] Add error handling everywhere
+- [ ] Review accessibility
+- [ ] Final RTL review
+- [ ] App icon + splash screen
+- [ ] Build release candidates
+
+---
+
+*Total tasks: ~350 items across all packages*
