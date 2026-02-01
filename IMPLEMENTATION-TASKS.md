@@ -11,32 +11,32 @@
 
 ### 1.1 Monorepo Setup
 - [ ] Verify clean branching strategy + CI hooks
-- [ ] Create root `package.json` with workspaces
-- [ ] Install Turborepo
-- [ ] Create `turbo.json` configuration
-- [ ] Create folder structure:
-  - [ ] `apps/mobile/`
-  - [ ] `apps/admin/`
-  - [ ] `apps/scraper/`
-  - [ ] `packages/backend/`
-  - [ ] `packages/shared/`
+- [x] Create root `package.json` with workspaces
+- [x] Install Turborepo
+- [x] Create `turbo.json` configuration
+- [x] Create folder structure:
+  - [x] `apps/mobile/`
+  - [x] `apps/website/`
+  - [x] `apps/scraper/`
+  - [x] `packages/backend/`
+  - [x] `packages/shared/`
 - [ ] Configure shared TypeScript base config
-- [ ] Setup Oxlint (fast linting)
+- [x] Setup Oxlint (fast linting)
 - [ ] Setup Oxfmt (formatting)
 - [ ] Configure tsc --noEmit scripts (type checking)
 - [ ] Create `.gitignore` files
 - [ ] Verify `turbo run build` works
 
 ### 1.2 Mobile Project Init
-- [ ] `npx create-expo-app@latest apps/mobile --template tabs`
-- [ ] Upgrade to the latest stable Expo SDK if needed
-- [ ] Configure TypeScript strict mode
-- [ ] Remove default template content
+- [x] `corepack pnpm dlx create-expo-app@latest apps/mobile --template tabs`
+- [x] Upgrade to the latest stable Expo SDK if needed
+- [x] Configure TypeScript strict mode
+- [x] Remove default template content
 - [ ] Setup path aliases (`@/components`, etc.)
-- [ ] Install and configure Unistyles
-- [ ] Create theme tokens file (colors, spacing, typography)
-- [ ] Create dark/light theme variants
-- [ ] Verify Unistyles working
+- [x] Install and configure Unistyles
+- [x] Create theme tokens file (colors, spacing, typography)
+- [x] Create dark/light theme variants
+- [x] Verify Unistyles working
 - [ ] Disable support for iPad and Android Tablets 
 - [ ] add react-native-fast-squircle and https://github.com/enzomanuelmangano/pressto
 
@@ -48,31 +48,31 @@
 - [ ] Create typography styles using font
 
 ### 1.4 i18n Setup
-- [ ] Install react-i18next + i18next
-- [ ] Install expo-localization
-- [ ] Create `locales/ar.json`
-- [ ] Create `locales/en.json`
-- [ ] Configure i18n initialization
+- [x] Install react-i18next + i18next
+- [x] Install expo-localization
+- [x] Create `locales/ar.json`
+- [x] Create `locales/en.json`
+- [x] Configure i18n initialization
 - [ ] Create useTranslation hook wrapper
-- [ ] Add language detection (device locale)
+- [x] Add language detection (device locale)
 - [ ] Add language toggle hook
 - [ ] Verify translations working
 
 ### 1.5 RTL Support
-- [ ] Configure RTL in app.json/app.config.js
-- [ ] Prefer built-in `I18nManager` + RTL-safe components (avoid extra deps unless required)
+- [x] Configure RTL in app.json/app.config.js
+- [x] Prefer built-in `I18nManager` + RTL-safe components (avoid extra deps unless required)
 - [ ] Create RTL-aware layout components
-- [ ] Create `useDirection()` hook (returns "rtl" | "ltr")
+- [x] Create `useDirection()` hook (returns "rtl" | "ltr")
 - [ ] Test RTL layout on simulator
 
 ### 1.6 Convex Setup
-- [ ] Create Convex project (convex.dev)
+- [x] Create Convex project (convex.dev)
 - [ ] Install convex + @convex-dev/react-native
-- [ ] Copy Convex URL to environment
+- [x] Copy Convex URL to environment
 - [ ] Configure ConvexProvider in app entry
 - [ ] Configure Convex auth to use Clerk JWT (token fetch + Convex auth config)
 - [ ] Create basic schema (packages/backend/convex/schema.ts)
-- [ ] Run `npx convex dev` and verify connection
+- [x] Run `corepack pnpm -C packages/backend dev` and verify connection
 - [ ] Test basic query from mobile
 
 ### 1.7 Clerk Setup
@@ -93,9 +93,9 @@
 - [ ] Test error reporting
 
 ### 1.8 Navigation Shell
-- [ ] Setup Expo Router file structure
-- [ ] Create `app/_layout.tsx` (root layout)
-- [ ] Create `app/(tabs)/_layout.tsx` (tab layout)
+- [x] Setup Expo Router file structure
+- [x] Create `app/_layout.tsx` (root layout)
+- [x] Create `app/(tabs)/_layout.tsx` (tab layout)
 - [ ] Create tab screens (empty):
   - [ ] `app/(tabs)/home.tsx`
   - [ ] `app/(tabs)/map.tsx`
@@ -605,11 +605,11 @@
 # 📦 SHARED PACKAGE TASKS (packages/shared)
 
 ### Types
-- [ ] Create `types/user.ts`
-- [ ] Create `types/event.ts`
-- [ ] Create `types/plan.ts`
+- [x] Create `types/user.ts`
+- [x] Create `types/event.ts`
+- [x] Create `types/plan.ts`
 - [ ] Create `types/city.ts`
-- [ ] Create `types/index.ts` (re-exports)
+- [x] Create `types/index.ts` (re-exports)
 
 ### Constants
 - [ ] Create `constants/categories.ts` (with ar/en)

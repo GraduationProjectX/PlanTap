@@ -1,0 +1,30 @@
+{
+  "common": {
+    "appName": "PlanTap",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "done": "Done",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip"
+  },
+  "tabs": {
+    "home": "Home",
+    "map": "Map",
+    "plan": "Plan",
+    "community": "Community",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Discover",
+    "search": "Search events...",
+    "tonight": "Tonight",
+    "thisWeekend": "This Weekend",
+    "nearYou": "Near You",
+    "trending": "Trending",
+    "upcoming": "Upcoming"
+  }
+}

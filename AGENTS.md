@@ -1,31 +1,19 @@
-## Plan Mode [ NEVER EDIT THESE INSTRUCTIONS ]
+# PlanTap Agent Guide
 
-- Make the plan extremely concise. Sacrifice grammar for the sake of concision.
-- At the end of each plan, give me a list of unresolved questions to answer, if any.
-- Check @docs and @My-UI-Design folder for skills for your related Task.
+PlanTap is a monorepo for an Expo (React Native) mobile app and a Convex backend.
 
+## Essentials
 
-### 
-I want you to refactor my AGENTS.md file to follow progressive disclosure principles.
+- Package manager: pnpm (via Corepack). Prefer `corepack pnpm ...`.
+- Install deps: `corepack pnpm install`
+- Run all dev tasks (turbo): `corepack pnpm run dev`
+- Mobile: `corepack pnpm --filter mobile dev -- -c`, `corepack pnpm --filter mobile android`
+- Backend: `corepack pnpm --filter backend dev`
+- If install warns about ignored build scripts: `corepack pnpm approve-builds` then `corepack pnpm rebuild --pending`
 
-Follow these steps:
+## More docs
 
-1. **Find contradictions**: Identify any instructions that conflict with each other. For each contradiction, ask me which version I want to keep.
-
-2. **Identify the essentials**: Extract only what belongs in the root AGENTS.md:
-   - One-sentence project description
-   - Package manager (if not npm)
-   - Non-standard build/typecheck commands
-   - Anything truly relevant to every single task
-
-3. **Group the rest**: Organize remaining instructions into logical categories (e.g., TypeScript conventions, testing patterns, API design, Git workflow). For each group, create a separate markdown file.
-
-4. **Create the file structure**: Output:
-   - A minimal root AGENTS.md with markdown links to the separate files
-   - Each separate file with its relevant instructions
-   - A suggested docs/ folder structure
-
-5. **Flag for deletion**: Identify any instructions that are:
-   - Redundant (the agent already knows this)
-   - Too vague to be actionable
-   - Overly obvious (like "write clean code")
+- docs/agents/planning.md
+- docs/agents/dependencies.md
+- docs/agents/mobile.md
+- docs/agents/backend.md

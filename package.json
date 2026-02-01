@@ -1,5 +1,37 @@
 {
-  "dependencies": {
-    "skills": "^1.0.18"
+  "name": "plantap",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxlint": "^1.42.0",
+    "turbo": "^2.8.1",
+    "typescript": "~5.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-test-renderer": "19.1.0"
+    },
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "browser-tabs-lock",
+      "bufferutil",
+      "core-js",
+      "dtrace-provider",
+      "esbuild",
+      "utf-8-validate"
+    ]
   }
 }

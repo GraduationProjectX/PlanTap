@@ -1,0 +1,16 @@
+{
+  "name": "@plantap/shared",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "oxlint --deny-warnings -c ../../.oxlintrc.json --ignore-path ../../.eslintignore .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./types/index.ts"
+  }
+}

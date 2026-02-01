@@ -736,7 +736,7 @@ apps/scraper/
 
 ### Convex Functions (packages/backend)
 ```bash
-npx convex dev --once  # Type check
+corepack pnpm -C packages/backend exec convex dev --once  # Type check
 ```
 - Test suggestion algorithm with mock data
 - Test auth middleware
@@ -745,8 +745,8 @@ npx convex dev --once  # Type check
 ### Mobile (apps/mobile)
 ```bash
 cd apps/mobile
-npx expo run:ios --simulator
-npx expo run:android --emulator
+corepack pnpm ios -- --simulator
+corepack pnpm android -- --emulator
 ```
 - Manual testing on devices
 - RTL layout verification
@@ -754,8 +754,8 @@ npx expo run:android --emulator
 ### Admin (apps/admin)
 ```bash
 cd apps/admin
-npm run build  # Type check + build
-npm run dev    # Visual testing
+corepack pnpm run build  # Type check + build
+corepack pnpm run dev    # Visual testing
 ```
 
 ## Manual Testing Checklist
