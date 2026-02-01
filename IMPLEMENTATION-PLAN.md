@@ -1,11 +1,289 @@
 # PlanTap — Implementation Plan
 
-> **Timeline**: 5 months  
-> **Team**: 2-3 developers (full-stack, no split)  
-> **Budget**: $0 (free tiers only)
+> **Graduation Project** — React Native + Expo + Convex + Clerk  
+> **Target**: Saudi Arabia locals   
 
 ---
-
+## ✅ Finalized Decisions
+| Decision | Choice |
+|----------|--------|
+| Monorepo Tool | **Turborepo** |
+| Selection UI | **Buttons** (Add to Plan / Skip) — no swipe gestures |
+| Primary Language | **Arabic-first** with **auto-detection** (ar/en based on device) |
+| RTL Support | **Full RTL** when Arabic (tabs reversed, layouts mirrored) |
+| Font | **Baloo Bhaijaan 2** (mobile) / **DM Sans** (UI design) |
+| Offline Mode | **No** |
+| Max Plan Stops | **5** |
+| Manual Plan Creation | **Post-MVP** |
+| Component Library (Mobile) | **None** — Unistyles only |
+| Admin UI Kit | **shadcn/ui (optional)** + Tailwind (admin only) |
+| Clerk → Convex Sync | **Webhooks** |
+| HTTP Endpoint Auth | **Clerk signature verify** (webhook) + **shared secret** (ingest) |
+| Image Storage | **Convex File Storage** |
+| Cities | **Dynamic** — from database (scraped/API) |
+| Map Provider | **Mapbox** (<300 users expected) |
+| Geo Query Strategy | **City-first + grid cell index** (radius/viewport queries via `cellId`) | (For faster queries instead of reading the whole database)
+| Analytics | **PostHog** |
+| Scraper | **MVP: manual/local runs** → **Post-MVP: hosted automation** | 
+---
+## ⚠️ Non-Negotiables (Implementation Guardrails)
+> [!CAUTION]
+> These rules must be followed strictly to avoid security issues and performance problems.
+1. **No unauthenticated writes**: All Convex HTTP endpoints must verify signatures/secrets.
+2. **Geo features must not rely on full-table scans**: Use indexed prefiltering (`city` + `cellId`).
+3. **$0 budget**: MVP must not incur charges; any feature requiring a paid plan is Post-MVP.
+4. **Webhook security**: `/clerk-webhook` must verify Clerk signature headers + reject old timestamps (replay protection).
+5. **Ingest security**: `/ingest-event` requires a shared secret (header or HMAC) stored in Convex env.
+---
+## 🏗️ Architecture Overview
+```
+plantap/
+├── apps/
+│   ├── mobile/          # Expo React Native app
+│   ├── admin/           # React admin dashboard
+│   └── scraper/         # Playwright scraper
+├── packages/
+│   ├── backend/         # Convex functions + schema
+│   │   └── convex/      # Convex source files
+│   │       ├── schema.ts
+│   │       ├── _generated/
+│   │       └── ...
+│   └── shared/          # Shared types, utils, constants
+├── turbo.json
+└── package.json
+```
+### Convex Workspace Layout
+- Convex project root: `packages/backend`
+- Convex source: `packages/backend/convex/`
+- Generated API/types: `packages/backend/convex/_generated/`
+- Run Convex commands from `packages/backend` (or via turbo scripts)
+- Mobile/admin import generated `api` from `@plantap/backend`
+---
+## 📱 Tech Stack
+### Mobile App
+- Expo (latest stable SDK) + Expo Router
+- TypeScript (strict mode)
+- Clerk (Google/Apple auth)
+- Convex (backend)
+- Zustand (UI state)
+- MMKV (local cache)
+- Mapbox Maps
+- Unistyles (styling)
+- FlashList (lists)
+- Moti + Reanimated (animations)
+- Expo Image
+- Expo Notifications
+- react-i18next (Arabic/English)
+### Admin Dashboard
+- React + Vite
+- TanStack Router + Query
+- Convex client
+- Clerk web auth
+- Tailwind CSS + shadcn/ui (optional)
+### Scraper
+- Node.js + TypeScript
+- Playwright
+- Convex HTTP client
+- MVP: manual/local runs
+- Post-MVP: hosted automation (GitHub Actions cron)
+---
+## 📊 Data Model
+### `users`
+```typescript
+{
+  clerkUserId: string
+  displayName: string
+  avatarUrl?: string
+  locale: "ar" | "en"
+  city?: string
+  preferences: { likedTags: string[]; dislikedTags: string[] }
+  defaults: {
+    budgetMin?: number
+    budgetMax?: number
+    radiusKm?: number
+    groupType?: "solo" | "group" | "kids"
+    indoorOutdoor?: "indoor" | "outdoor" | "mixed" | "any"
+  }
+  pushToken?: string
+  onboardingCompletedAt?: number
+  lastActiveAt?: number
+  createdAt: number
+}
+```
+### `events`
+```typescript
+{
+  title: string
+  titleAr?: string
+  descriptionShort?: string
+  descriptionShortAr?: string
+  type: "event" | "activity"
+  categories: string[]
+  tags: string[]
+  startAt?: number
+  endAt?: number
+  city: string
+  location: { lat: number; lng: number; address?: string; addressAr?: string }
+  cellId: string                    // Derived grid cell for geo queries
+  priceMin?: number
+  priceMax?: number
+  indoorOutdoor: "indoor" | "outdoor" | "mixed" | "unknown"
+  familyFriendly?: boolean
+  bookingRequired?: boolean
+  bookingUrl?: string
+  phone?: string
+  operatingHours?: { day: number; open: string; close: string }[]
+  duration?: number                 // Estimated minutes
+  provider: "visitsaudi" | "ticketmaster" | "eventbrite" | "places" | "scraped" | "manual"
+  providerUrl?: string
+  images: Id<"_storage">[]          // Convex storage IDs
+  favoritesCount: number            // Maintained by toggle (default 0)
+  status: "pending" | "approved" | "rejected"
+  audit: {
+    createdBy?: string
+    reviewedBy?: string
+    reviewedAt?: number
+    sourceUrl?: string
+    confidence?: number
+  }
+  updatedAt: number
+}
+```
+> [!NOTE]
+> **Geo indexing**: Compute `cellId` at ingestion from `location.lat/lng` using ~2.5km grid cells.
+> Formula: `cellId = "${floor(lat/0.02)}:${floor(lng/0.02)}"`
+> Index events by `(city, cellId)` for radius/viewport queries.
+### `plans`
+```typescript
+{
+  userId: Id<"users">
+  title: string
+  status: "draft" | "saved" | "completed"
+  stops: { eventId: Id<"events">; note?: string; order: number }[]
+  startAt?: number                  // User-selected, for reminders
+  constraintsSnapshot: {
+    budgetMin?: number
+    budgetMax?: number
+    radiusKm?: number
+    city?: string
+    groupType?: string
+    indoorOutdoor?: string
+    timeStart?: number
+    timeEnd?: number
+    tags?: string[]
+  }
+  startLocation?: { lat: number; lng: number }
+  shareId: string
+  createdAt: number
+}
+```
+### `favorites`
+```typescript
+{
+  userId: Id<"users">
+  eventId: Id<"events">
+  createdAt: number
+}
+// Index: (userId, eventId) for unique lookup
+```
+### `feedback`
+```typescript
+{
+  userId?: Id<"users">              // Allow anonymous
+  message: string
+  status: "open" | "closed"
+  createdAt: number
+}
+```
+### `reports`
+```typescript
+{
+  reporterUserId: Id<"users">
+  targetType: "event" | "user" | "plan"
+  targetId: string
+  reason: string
+  details?: object
+  status: "open" | "resolved" | "dismissed"
+  createdAt: number
+}
+```
+### `cities`
+```typescript
+{
+  name: string                      // English
+  nameAr: string                    // Arabic
+  region?: string                   // Saudi region
+  lat: number
+  lng: number
+  active: boolean
+}
+```
+### `adminActions`
+```typescript
+{
+  adminUserId: Id<"users">
+  action: "approve" | "reject" | "edit" | "ban" | "merge" | "import"
+  targetType: "event" | "user" | "report"
+  targetId: string
+  details?: object
+  createdAt: number
+}
+```
+---
+## 🔐 Auth Flow (Clerk Webhooks)
+```
+1. User signs in via Clerk (mobile)
+2. Clerk triggers webhook → Convex HTTP endpoint
+3. Convex creates/updates user record
+4. Mobile app syncs user data via Convex query
+5. Session management handled by Clerk SDK
+```
+**Convex auth integration:**
+- Use Clerk JWTs to authenticate Convex requests (JWT template + JWKS)
+- In Convex functions, `identity.subject` = `clerkUserId`
+- Webhook handles profile/locale updates
+- Client-side backstop: `users.ensureMe()` in case webhook is delayed
+**Localization precedence:**
+- User override in Settings wins
+- Otherwise, device locale is used
+**Admin authorization (MVP):**
+- Hardcoded email allowlist (fastest for MVP)
+- Post-MVP: Clerk Organizations/roles
+---
+## 🎯 Suggestion Engine Algorithm
+### Inputs
+- Location (required)
+- Time range (optional)
+- Budget range (optional)
+- Radius (optional)
+- Group type: solo | group | kids
+- Indoor/Outdoor preference
+- Required tags / Excluded tags
+### Algorithm [WIP]
+```
+1. FILTER (hard requirements):
+   - city matches OR within radiusKm of user location
+   - status = "approved"
+   - if event: startAt within time range
+   - if activity: always included
+   - budget within range OR priceMax = null
+2. SCORE (soft ranking):
+   - +20 points: tag matches user preferences
+   - +15 points: category matches
+   - +10 points: family friendly (if groupType = "kids")
+   - +10 points: indoor/outdoor match
+   - +5 points: per 10 favorites count
+   - -5 points: same category as previous stop (diversity)
+   - +distance penalty: closer = higher score
+3. RETURN top 10 (we are showing 3 only, but in case the users skips most of them. we should return 20) scored events (excluding already selected)
+```
+### "Add Next Stop"
+- Same algorithm but:
+  - Exclude already-selected eventIds
+  - Prefer events near last stop's location
+  - Enforce max 5 stops
+---
+ 
 ## Phase Overview
 
 | Phase | Focus |
@@ -42,7 +320,7 @@
 
 ### 1.3 Clerk Authentication
 - Install @clerk/clerk-expo
-- Configure Google Sign-In
+- Configure Google Sign-rIn
 - Configure Apple Sign-In
 - Configure Clerk JWT template for Convex (token used by Convex clients)
 - Create auth context
@@ -86,7 +364,6 @@
   - Tonight / This Weekend
   - Near You (location-based)
   - Trending in City
-  - Family Picks
   - Upcoming Events
 - Event card component (poster + badges)
 - FlashList for performance
@@ -136,7 +413,7 @@
 
 ## Phase 4: Suggestion Engine + Plans
 
-### 4.1 Suggest Tab UI
+### 4.1 Suggest/Plan Tab UI
 - Constraint controls panel:
   - Group type selector (solo/group/kids)
   - Time range picker

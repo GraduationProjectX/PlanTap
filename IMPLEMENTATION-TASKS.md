@@ -10,7 +10,7 @@
 ## Phase 1: Foundation
 
 ### 1.1 Monorepo Setup
-- [ ] Verify repo is a git repo + set branching conventions
+- [ ] Verify clean branching strategy + CI hooks
 - [ ] Create root `package.json` with workspaces
 - [ ] Install Turborepo
 - [ ] Create `turbo.json` configuration
@@ -21,7 +21,9 @@
   - [ ] `packages/backend/`
   - [ ] `packages/shared/`
 - [ ] Configure shared TypeScript base config
-- [ ] Setup ESLint + Prettier (monorepo)
+- [ ] Setup Oxlint (fast linting)
+- [ ] Setup Oxfmt (formatting)
+- [ ] Configure tsc --noEmit scripts (type checking)
 - [ ] Create `.gitignore` files
 - [ ] Verify `turbo run build` works
 
@@ -35,6 +37,8 @@
 - [ ] Create theme tokens file (colors, spacing, typography)
 - [ ] Create dark/light theme variants
 - [ ] Verify Unistyles working
+- [ ] Disable support for iPad and Android Tablets 
+- [ ] add react-native-fast-squircle and https://github.com/enzomanuelmangano/pressto
 
 ### 1.3 Font Setup
 - [ ] Install expo-font
@@ -81,6 +85,12 @@
 - [ ] Configure ClerkProvider in app entry
 - [ ] Create auth context hook
 - [ ] Test sign-in flow (basic)
+
+### 1.7.5 Sentry Setup
+- [ ] Create Sentry project (sentry.io)
+- [ ] Install @sentry/react-native
+- [ ] Configure Sentry in app entry
+- [ ] Test error reporting
 
 ### 1.8 Navigation Shell
 - [ ] Setup Expo Router file structure
@@ -134,6 +144,7 @@
 - [ ] Verify all components RTL-compatible
 
 ### 3.2 Onboarding Flow
+- [ ] Check react-native-onboarding 
 - [ ] Create onboarding navigator/flow
 - [ ] Welcome screen (app intro, continue button)
 - [ ] Interests screen (tag multi-select)
@@ -498,20 +509,19 @@
 ### Schema
 - [ ] Create `schema.ts` with all tables:
   - [ ] `users` table with indexes
-  - [ ] `events` table with indexes
-  - [ ] `plans` table with indexes
+  - [ ] `events` table with indexes (including `cellId`, `favoritesCount`)
+  - [ ] `plans` table with indexes (including optional `startAt` for reminders)
   - [ ] `favorites` table with indexes
   - [ ] `feedback` table
   - [ ] `reports` table
   - [ ] `cities` table
   - [ ] `adminActions` table
-- [ ] Add MVP-required fields/defaults:
-  - [ ] `events.cellId` (derived from lat/lng)
-  - [ ] `events.favoritesCount` (default 0)
-  - [ ] `plans.startAt?` (optional; required only if reminders enabled)
-- [ ] Add/verify indexes:
-  - [ ] `events` by `(city, cellId)`
-  - [ ] `favorites` by `(userId, eventId)` (unique lookup)
+- [ ] Geo indexing:
+  - [ ] Compute `cellId` at ingestion: `"${floor(lat/0.02)}:${floor(lng/0.02)}"`
+  - [ ] Index events by `(city, cellId)` for radius/viewport queries
+- [ ] Favorites counter:
+  - [ ] `events.favoritesCount` (default 0, maintained by toggle mutation)
+  - [ ] Index favorites by `(userId, eventId)` for unique lookup
 - [ ] Export types
 
 ### User Functions
@@ -618,6 +628,7 @@
 # ✅ TESTING & POLISH
 
 ### Mobile Testing
+- [ ] Check Maestro and https://github.com/bamlab/flashlight
 - [ ] Test auth flow end-to-end
 - [ ] Test onboarding flow
 - [ ] Test home tab loading
@@ -643,13 +654,18 @@
 - [ ] Test scheduled run
 - [ ] Verify events appear in admin queue
 
+### Securty
+- [ ] Security Scanner https://www.rnsec.dev and deep research on how to make API/Website/App secure and safe.
+
 ### Performance
+- [ ] Expo Atlas
 - [ ] Profile mobile app (Flipper)
 - [ ] Optimize slow queries
 - [ ] Verify map clustering
 - [ ] Verify FlashList performance
 
 ### Final Polish
+- [ ] Check react-native-screen-transitions
 - [ ] Fix any UI inconsistencies
 - [ ] Add loading states everywhere
 - [ ] Add error handling everywhere
