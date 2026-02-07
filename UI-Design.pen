@@ -3,199 +3,295 @@
   "children": [
     {
       "type": "frame",
-      "id": "h2FAe",
+      "id": "RNh1j",
       "x": 0,
       "y": 0,
-      "name": "Login Screen",
+      "name": "Home Screen",
       "width": 390,
       "height": 844,
-      "fill": "#FFFFFF",
-      "layout": "vertical",
-      "padding": [
-        60,
-        24,
-        40,
-        24
-      ],
+      "fill": "#FAFAFA",
+      "layout": "none",
       "children": [
         {
           "type": "frame",
-          "id": "tKjMs",
-          "name": "Logo Container",
-          "width": "fill_container",
+          "id": "DwGpY",
+          "x": 0,
+          "y": 0,
+          "name": "ContentWrapper",
+          "width": 390,
+          "height": 844,
           "layout": "vertical",
-          "gap": 16,
-          "alignItems": "center",
+          "gap": 24,
+          "padding": 20,
           "children": [
             {
               "type": "frame",
-              "id": "XywxN",
-              "name": "Logo Icon",
-              "width": 80,
-              "height": 80,
-              "fill": "#facc15",
-              "cornerRadius": 16,
-              "stroke": {
-                "thickness": 3
-              },
-              "layout": "vertical",
-              "justifyContent": "center",
-              "alignItems": "center",
+              "id": "gXZAX",
+              "name": "Header",
+              "width": 350,
+              "height": 50,
+              "layout": "none",
               "children": [
                 {
-                  "type": "icon_font",
-                  "id": "M3Q2v",
-                  "name": "calendarIcon",
+                  "type": "text",
+                  "id": "6TfOW",
+                  "x": 0,
+                  "y": 0,
+                  "name": "App Name",
+                  "fill": "#000000",
+                  "content": "PlanTap",
+                  "fontFamily": "Outfit",
+                  "fontSize": 24,
+                  "fontWeight": "800"
+                },
+                {
+                  "type": "frame",
+                  "id": "8amOY",
+                  "x": 93,
+                  "y": 0,
+                  "name": "Profile",
                   "width": 40,
                   "height": 40,
-                  "iconFontFamily": "lucide",
-                  "fill": "#000000"
+                  "fill": "#FFFFFF",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "FwD7E",
+                      "name": "profileIcon",
+                      "fill": "#000000",
+                      "content": ":)",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "pOhEL",
+              "name": "SearchBar",
+              "width": 350,
+              "height": 48,
+              "fill": "#FFFFFF",
+              "layout": "none",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "n8ghp",
+                  "x": 0,
+                  "y": 0,
+                  "name": "searchText",
+                  "opacity": 0.5,
+                  "fill": "#000000",
+                  "content": "SEARCH EVENTS...",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
                 }
               ]
             },
             {
               "type": "text",
-              "id": "dJKh9",
-              "name": "logoText",
+              "id": "E6QeA",
+              "name": "discoverTitle",
               "fill": "#000000",
-              "content": "PlanTap",
-              "fontFamily": "DM Sans",
-              "fontSize": 32,
-              "fontWeight": "bold",
-              "letterSpacing": -0.5
+              "content": "DISCOVER",
+              "fontFamily": "Outfit",
+              "fontSize": 16,
+              "fontWeight": "800"
+            },
+            {
+              "type": "frame",
+              "id": "xURRL",
+              "name": "catScroll",
+              "width": 350,
+              "height": 40,
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "uHnvR",
+                  "name": "cat1",
+                  "width": 100,
+                  "height": 40,
+                  "fill": "#0066FF",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aEURx",
+                      "name": "cat1Text",
+                      "fill": "#FFFFFF",
+                      "content": "MUSIC",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wzUKT",
+                  "name": "cat2",
+                  "width": 100,
+                  "height": 40,
+                  "fill": "#FFFFFF",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "snMvH",
+                      "name": "cat2Text",
+                      "fill": "#000000",
+                      "content": "ART",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "YPLyd",
+                  "name": "cat3",
+                  "width": 100,
+                  "height": 40,
+                  "fill": "#FFFFFF",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LWKhy",
+                      "name": "cat3Text",
+                      "fill": "#000000",
+                      "content": "FOOD",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "text",
-              "id": "LwfFY",
-              "name": "tagline",
-              "fill": "#6B7280",
-              "content": "Discover Amazing Events",
-              "fontFamily": "DM Sans",
+              "id": "XuBic",
+              "name": "trendingTitle",
+              "fill": "#000000",
+              "content": "TRENDING",
+              "fontFamily": "Outfit",
               "fontSize": 16,
-              "fontWeight": "normal"
+              "fontWeight": "800"
+            },
+            {
+              "type": "frame",
+              "id": "cwuAC",
+              "name": "card1",
+              "width": 350,
+              "height": 220,
+              "fill": "#FFFFFF",
+              "layout": "none",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "nUkhp",
+                  "x": 0,
+                  "y": 0,
+                  "name": "cardImg",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "callmeyash",
+                    "link": "https://unsplash.com/@callmeyash",
+                    "author": "Yash Jeebaun"
+                  },
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "https://images.unsplash.com/photo-1762294049200-608cf4fe13cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAyMTY0Mzl8&ixlib=rb-4.1.0&q=80&w=1080",
+                    "mode": "fill"
+                  },
+                  "width": 350,
+                  "height": 140
+                },
+                {
+                  "type": "text",
+                  "id": "5CIFu",
+                  "x": 16,
+                  "y": 160,
+                  "name": "cardTitle",
+                  "fill": "#000000",
+                  "content": "Riyadh Season Opening",
+                  "fontFamily": "Outfit",
+                  "fontSize": 18,
+                  "fontWeight": "800"
+                },
+                {
+                  "type": "text",
+                  "id": "KK382",
+                  "x": 16,
+                  "y": 190,
+                  "name": "cardMeta",
+                  "fill": "#666666",
+                  "content": "OCT 28 • RIYADH BLVD",
+                  "fontFamily": "JetBrains Mono",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
             }
           ]
         },
         {
           "type": "frame",
-          "id": "BS7zL",
-          "name": "Spacer",
-          "width": "fill_container",
-          "height": 40
-        },
-        {
-          "type": "text",
-          "id": "sgw2D",
-          "name": "welcomeText",
-          "fill": "#000000",
-          "content": "Welcome Back!",
-          "textAlign": "center",
-          "fontFamily": "DM Sans",
-          "fontSize": 28,
-          "fontWeight": "semibold",
-          "letterSpacing": -0.3
-        },
-        {
-          "type": "frame",
-          "id": "o3pmT",
-          "name": "Spacer 2",
-          "width": "fill_container",
-          "height": 32
-        },
-        {
-          "type": "frame",
-          "id": "lBJgP",
-          "name": "Form Container",
-          "width": "fill_container",
-          "layout": "vertical",
-          "gap": 16,
+          "id": "4AyuW",
+          "x": 20,
+          "y": 760,
+          "name": "NavBar",
+          "width": 350,
+          "height": 62,
+          "fill": "#FFFFFF",
+          "gap": 60,
+          "justifyContent": "center",
+          "alignItems": "center",
           "children": [
             {
-              "type": "frame",
-              "id": "Qq00h",
-              "name": "Email Input",
-              "width": "fill_container",
-              "height": 56,
-              "fill": "#FFFFFF",
-              "cornerRadius": 12,
-              "stroke": {
-                "thickness": 1
-              },
-              "gap": 12,
-              "padding": [
-                0,
-                16
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "sWzik",
-                  "name": "emailIcon",
-                  "width": 20,
-                  "height": 20,
-                  "iconFontFamily": "lucide",
-                  "fill": "#6B7280"
-                },
-                {
-                  "type": "text",
-                  "id": "EbXkz",
-                  "name": "emailPlaceholder",
-                  "fill": "#9CA3AF",
-                  "content": "you@example.com",
-                  "fontFamily": "DM Sans",
-                  "fontSize": 16,
-                  "fontWeight": "normal"
-                }
-              ]
+              "type": "text",
+              "id": "CoQCj",
+              "name": "nav1",
+              "fill": "#000000",
+              "content": "HOME",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "normal"
             },
             {
-              "type": "frame",
-              "id": "VtNa2",
-              "name": "Password Input",
-              "width": "fill_container",
-              "height": 56,
-              "fill": "#FFFFFF",
-              "cornerRadius": 12,
-              "stroke": {
-                "thickness": 1
-              },
-              "gap": 12,
-              "padding": [
-                0,
-                16
-              ],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "J3GnL",
-                  "name": "lockIcon",
-                  "width": 20,
-                  "height": 20,
-                  "iconFontFamily": "lucide",
-                  "fill": "#6B7280"
-                },
-                {
-                  "type": "text",
-                  "id": "uzp7R",
-                  "name": "passwordPlaceholder",
-                  "fill": "#9CA3AF",
-                  "content": "••••••••",
-                  "fontFamily": "DM Sans",
-                  "fontSize": 16,
-                  "fontWeight": "normal"
-                },
-                {
-                  "type": "icon_font",
-                  "id": "riPrI",
-                  "name": "eyeIcon",
-                  "width": 20,
-                  "height": 20,
-                  "iconFontFamily": "lucide",
-                  "fill": "#6B7280"
-                }
-              ]
+              "type": "text",
+              "id": "2nGMO",
+              "name": "nav2",
+              "opacity": 0.5,
+              "fill": "#000000",
+              "content": "MAP",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "ew2Rt",
+              "name": "nav3",
+              "opacity": 0.5,
+              "fill": "#000000",
+              "content": "SAVED",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 12,
+              "fontWeight": "normal"
             }
           ]
         }
@@ -203,53 +299,33 @@
     }
   ],
   "variables": {
-    "accent": {
+    "action-primary": {
       "type": "color",
-      "value": "#facc15"
+      "value": "#0066FF"
     },
-    "accent-dark": {
+    "bg-canvas": {
       "type": "color",
-      "value": "#EAB308"
+      "value": "#FAFAFA"
     },
-    "bg-primary": {
+    "bg-surface": {
       "type": "color",
       "value": "#FFFFFF"
     },
-    "bg-secondary": {
-      "type": "color",
-      "value": "#F9FAFB"
-    },
-    "bg-tertiary": {
-      "type": "color",
-      "value": "#F3F4F6"
-    },
-    "border": {
+    "border-primary": {
       "type": "color",
       "value": "#000000"
     },
-    "border-soft": {
-      "type": "color",
-      "value": "#E5E7EB"
+    "font-display": {
+      "type": "string",
+      "value": "Outfit"
     },
-    "error": {
-      "type": "color",
-      "value": "#EF4444"
-    },
-    "success": {
-      "type": "color",
-      "value": "#22C55E"
+    "font-mono": {
+      "type": "string",
+      "value": "JetBrains Mono"
     },
     "text-primary": {
       "type": "color",
       "value": "#000000"
-    },
-    "text-secondary": {
-      "type": "color",
-      "value": "#374151"
-    },
-    "text-tertiary": {
-      "type": "color",
-      "value": "#6B7280"
     }
   }
 }

@@ -15,8 +15,8 @@
 | Offline Mode | **No** |
 | Max Plan Stops | **5** |
 | Manual Plan Creation | **Post-MVP** |
-| Component Library (Mobile) | **None** — Unistyles only |
-| Admin UI Kit | **shadcn/ui (optional)** + Tailwind (admin only) |
+| Component Library (Mobile) | **HeroUI Native** |
+| Admin UI Kit | **HeroUI Web/ui**  |
 | Clerk → Convex Sync | **Webhooks** |
 | HTTP Endpoint Auth | **Clerk signature verify** (webhook) + **shared secret** (ingest) |
 | Image Storage | **Convex File Storage** |
@@ -79,7 +79,7 @@ plantap/
 - TanStack Router + Query
 - Convex client
 - Clerk web auth
-- Tailwind CSS + shadcn/ui (optional)
+- Tailwind CSS + HeroUI Web/ui (optional)
 ### Scraper
 - Node.js + TypeScript
 - Playwright
@@ -477,7 +477,7 @@ plantap/
 ### 2.1 Project Setup
 - Create `apps/admin` with Vite + React
 - Configure TypeScript
-- Setup Tailwind CSS + shadcn/ui (admin only, optional)
+- Setup Tailwind CSS + HeroUI Web/ui (admin only, optional)
 - Configure Convex client
 - Setup TanStack Router
 - Setup TanStack Query

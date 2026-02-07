@@ -676,4 +676,4 @@
 
 ---
 
-*Total tasks: ~350 items across all packages*
+*Total : ~350 tasks across all apps*

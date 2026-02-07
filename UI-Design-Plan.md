@@ -1,29 +1,11 @@
 # PlanTap — UI Design Plan
 
 > **Design System for Pencil Extension**  
-> **Theme**: White Background + Black + #facc15 (Yellow) — Soft Neobrutalism  
-> **Font**: DM Sans (English)  
-> **Inspiration**: Merging neobrutalism aesthetics with smooth, polished UI
+
 
 ---
 
-## 📸 Reference Images
-
-The design merges two distinct styles:
-
-````carousel
-![PlanTap Neobrutalism Reference](./uploaded_media_0_1769524147117.png)
-<!-- slide -->
-![Forest App Smooth Reference](./uploaded_media_1_1769524147117.png)
-````
-
-| Image 1 (Neobrutalism) | Image 2 (Smooth/Polished) |
-|------------------------|---------------------------|
-| Bold black borders | Smooth rounded corners |
-| Yellow (#facc15) accent | Clean card shadows |
-| Flat yellow buttons | Refined typography |
-| Playful icon treatment | Elegant list items |
-| High contrast | Subtle depth |
+  |
 
 **Design Goal**: Combine the **bold, playful energy** of neobrutalism with the **refined smoothness** of modern mobile UI.
 
