@@ -10,6 +10,7 @@
 ## Phase 1: Foundation
 
 ### 1.1 Monorepo Setup
+
 - [ ] Verify clean branching strategy + CI hooks
 - [x] Create root `package.json` with workspaces
 - [x] Install Turborepo
@@ -20,27 +21,29 @@
   - [x] `apps/scraper/`
   - [x] `packages/backend/`
   - [x] `packages/shared/`
-- [ ] Configure shared TypeScript base config
+- [x] Configure shared TypeScript base config
 - [x] Setup Oxlint (fast linting)
-- [ ] Setup Oxfmt (formatting)
-- [ ] Configure tsc --noEmit scripts (type checking)
-- [ ] Create `.gitignore` files
-- [ ] Verify `turbo run build` works
+- [x] Setup Oxfmt (formatting)
+- [x] Configure tsc --noEmit scripts (type checking)
+- [x] Create `.gitignore` files
+- [x] Verify `turbo run build` works
 
 ### 1.2 Mobile Project Init
+
 - [x] `corepack pnpm dlx create-expo-app@latest apps/mobile --template tabs`
 - [x] Upgrade to the latest stable Expo SDK if needed
 - [x] Configure TypeScript strict mode
 - [x] Remove default template content
-- [ ] Setup path aliases (`@/components`, etc.)
+- [X] Setup path aliases (`@/components`, etc.)
 - [x] Install and configure Unistyles
 - [x] Create theme tokens file (colors, spacing, typography)
 - [x] Create dark/light theme variants
 - [x] Verify Unistyles working
-- [ ] Disable support for iPad and Android Tablets 
+- [x] Disable support for iPad and Android Tablets
 - [ ] add react-native-fast-squircle and https://github.com/enzomanuelmangano/pressto
 
 ### 1.3 Font Setup
+
 - [ ] Install expo-font
 - [ ] Download Baloo Bhaijaan 2 (Regular, Medium, Bold)
 - [ ] Add fonts to assets folder
@@ -48,6 +51,7 @@
 - [ ] Create typography styles using font
 
 ### 1.4 i18n Setup
+
 - [x] Install react-i18next + i18next
 - [x] Install expo-localization
 - [x] Create `locales/ar.json`
@@ -59,6 +63,7 @@
 - [ ] Verify translations working
 
 ### 1.5 RTL Support
+
 - [x] Configure RTL in app.json/app.config.js
 - [x] Prefer built-in `I18nManager` + RTL-safe components (avoid extra deps unless required)
 - [ ] Create RTL-aware layout components
@@ -66,6 +71,7 @@
 - [ ] Test RTL layout on simulator
 
 ### 1.6 Convex Setup
+
 - [x] Create Convex project (convex.dev)
 - [ ] Install convex + @convex-dev/react-native
 - [x] Copy Convex URL to environment
@@ -76,6 +82,7 @@
 - [ ] Test basic query from mobile
 
 ### 1.7 Clerk Setup
+
 - [ ] Create Clerk application (clerk.com)
 - [ ] Enable Google OAuth provider
 - [ ] Enable Apple OAuth provider
@@ -87,12 +94,14 @@
 - [ ] Test sign-in flow (basic)
 
 ### 1.7.5 Sentry Setup
+
 - [ ] Create Sentry project (sentry.io)
 - [ ] Install @sentry/react-native
 - [ ] Configure Sentry in app entry
 - [ ] Test error reporting
 
 ### 1.8 Navigation Shell
+
 - [x] Setup Expo Router file structure
 - [x] Create `app/_layout.tsx` (root layout)
 - [x] Create `app/(tabs)/_layout.tsx` (tab layout)
@@ -114,12 +123,14 @@
 - [ ] Test navigation flow
 
 ### 1.9 Local Storage
+
 - [ ] Install react-native-mmkv
 - [ ] Create storage helper utilities
 - [ ] Create keys constants
 - [ ] Test storage save/load
 
 ### 1.10 State Management
+
 - [ ] Install zustand
 - [ ] Create UI state store (filters, toggles)
 - [ ] Create auth state store (user info cache)
@@ -130,6 +141,7 @@
 ## Phase 3: Core Screens
 
 ### 3.1 Shared Components
+
 - [ ] `Button` (primary, secondary, outline, ghost)
 - [ ] `Card` (event card base)
 - [ ] `Badge` (price, distance, indoor/outdoor)
@@ -144,7 +156,8 @@
 - [ ] Verify all components RTL-compatible
 
 ### 3.2 Onboarding Flow
-- [ ] Check react-native-onboarding 
+
+- [ ] Check react-native-onboarding
 - [ ] Create onboarding navigator/flow
 - [ ] Welcome screen (app intro, continue button)
 - [ ] Interests screen (tag multi-select)
@@ -159,6 +172,7 @@
 - [ ] Redirect logic (show if not completed)
 
 ### 3.3 Home Tab
+
 - [ ] Create home screen layout
 - [ ] Implement search bar
 - [ ] Create horizontal section component
@@ -177,6 +191,7 @@
 - [ ] Connect to Convex queries
 
 ### 3.4 Event Detail Screen
+
 - [ ] Create detail screen layout
 - [ ] Image gallery/carousel (Expo Image)
 - [ ] Title + description (locale-aware)
@@ -193,6 +208,7 @@
 - [ ] Connect to Convex query
 
 ### 3.5 Map Tab
+
 - [ ] Install @rnmapbox/maps
 - [ ] Configure Mapbox token
 - [ ] Create map screen layout
@@ -209,6 +225,7 @@
 - [ ] Test performance with many markers
 
 ### 3.6 Profile Tab
+
 - [ ] Create profile screen layout
 - [ ] User info section (avatar, name)
 - [ ] Saved plans section (FlashList)
@@ -218,6 +235,7 @@
 - [ ] Connect to Convex queries
 
 ### 3.7 Settings Screen
+
 - [ ] Create settings screen layout
 - [ ] Language toggle (Arabic/English)
 - [ ] Edit default preferences
@@ -232,6 +250,7 @@
 ## Phase 4: Suggestion Engine
 
 ### 4.1 Suggest Tab UI
+
 - [ ] Create suggest screen layout
 - [ ] Create constraint controls panel:
   - [ ] Group type selector (solo/group/kids)
@@ -243,6 +262,7 @@
 - [ ] Loading state for generation
 
 ### 4.2 Suggestion Cards
+
 - [ ] Create suggestion card component
 - [ ] Event thumbnail image
 - [ ] Event title + brief details
@@ -252,6 +272,7 @@
 - [ ] Animation for card removal
 
 ### 4.3 Plan Building UI
+
 - [ ] Create plan preview component (shows current stops)
 - [ ] Show stop count (X/5)
 - [ ] "Add Next Stop" button
@@ -261,6 +282,7 @@
 - [ ] Plan name input (optional)
 
 ### 4.4 Integration
+
 - [ ] Connect to `suggest.getSuggestionDeck()` query
 - [ ] Handle empty results
 - [ ] Handle card selection (add to local state)
@@ -270,6 +292,7 @@
 - [ ] Navigate to plan detail on confirm
 
 ### 4.5 Plan Detail Screen
+
 - [ ] Create plan detail layout
 - [ ] Timeline view of stops (vertical list)
 - [ ] Stop item component:
@@ -286,6 +309,7 @@
 - [ ] Connect to Convex queries/mutations
 
 ### 4.6 Sharing
+
 - [ ] Generate shareId on save
 - [ ] Create share modal
 - [ ] Copy link to clipboard
@@ -295,6 +319,7 @@
 - [ ] Read-only view for shared plans
 
 ### 4.7 Notifications
+
 - [ ] Install expo-notifications
 - [ ] Configure notification permissions
 - [ ] Add optional plan start time (`startAt`) UI
@@ -309,6 +334,7 @@
 ## Phase 2: Admin Foundation
 
 ### 2.1 Project Setup
+
 - [ ] Create `apps/admin` with Vite + React
 - [ ] Configure TypeScript
 - [ ] Install and configure Tailwind CSS
@@ -319,6 +345,7 @@
 - [ ] Create basic layout structure
 
 ### 2.2 Clerk Admin Auth
+
 - [ ] Install @clerk/clerk-react
 - [ ] Configure Clerk provider
 - [ ] Create login page
@@ -328,6 +355,7 @@
 - [ ] Redirect non-admins
 
 ### 2.3 Layout Components
+
 - [ ] Sidebar navigation component
 - [ ] Header with user info
 - [ ] Main content wrapper
@@ -339,6 +367,7 @@
 ## Phase 5: Admin Features
 
 ### 5.1 Events - Pending Queue
+
 - [ ] Create `/events/pending` page
 - [ ] Events table with pagination
 - [ ] Search input
@@ -350,6 +379,7 @@
 - [ ] Connect to Convex queries
 
 ### 5.2 Events - Single Event
+
 - [ ] Create `/events/[id]` page
 - [ ] Full event edit form:
   - [ ] Title (en/ar)
@@ -377,6 +407,7 @@
 - [ ] Connect to Convex mutations
 
 ### 5.3 Events - All Events
+
 - [ ] Create `/events` page
 - [ ] Events table (approved only by default)
 - [ ] Filter by status
@@ -385,6 +416,7 @@
 - [ ] Quick status toggle
 
 ### 5.4 Import
+
 - [ ] Create `/import` page
 - [ ] CSV file upload
 - [ ] Column mapping UI
@@ -395,6 +427,7 @@
 - [ ] Success confirmation
 
 ### 5.5 Users
+
 - [ ] Create `/users` page
 - [ ] Users table with pagination
 - [ ] Search by name/email
@@ -404,6 +437,7 @@
 - [ ] View user's plans/favorites
 
 ### 5.6 Reports (Optional MVP)
+
 - [ ] Create `/reports` page
 - [ ] Reports table
 - [ ] Filter by status
@@ -415,6 +449,7 @@
 - [ ] Notes field
 
 ### 5.7 Feedback
+
 - [ ] Create `/feedback` page
 - [ ] Feedback inbox list
 - [ ] Status filter
@@ -423,6 +458,7 @@
 - [ ] Reply option (optional)
 
 ### 5.8 Cities
+
 - [ ] Create `/cities` page
 - [ ] Cities table
 - [ ] Add city form
@@ -431,6 +467,7 @@
 - [ ] Event count per city
 
 ### 5.9 Dashboard Home
+
 - [ ] Create `/` (dashboard) page
 - [ ] Stats cards:
   - [ ] Pending events count
@@ -447,6 +484,7 @@
 ## Phase 6: Scraper
 
 ### 6.1 Project Setup
+
 - [ ] Create `apps/scraper` folder
 - [ ] Initialize Node.js project
 - [ ] Configure TypeScript
@@ -457,6 +495,7 @@
 - [ ] Setup logging (pino or winston)
 
 ### 6.2 Architecture
+
 - [ ] Create `src/index.ts` entry point
 - [ ] Create base scraper class
 - [ ] Create normalizer module
@@ -465,6 +504,7 @@
 - [ ] Create rate limiter utility
 
 ### 6.3 Scraper Implementation
+
 - [ ] Research Saudi event websites to scrape
 - [ ] Document target site structures
 - [ ] Implement scraper for site 1
@@ -479,6 +519,7 @@
 - [ ] Push to Convex as pending
 
 ### 6.4 API Ingestion (Optional)
+
 - [ ] Research Visit Saudi API availability
 - [ ] Implement Visit Saudi ingestion (if available)
 - [ ] Research Ticketmaster Saudi coverage
@@ -488,12 +529,14 @@
 - [ ] Avoid paid APIs for MVP (e.g., Google Places)
 
 ### 6.5 Scheduling
+
 - [ ] Configure cron schedule (daily)
 - [ ] Create run script
 - [ ] Error handling and retries
 - [ ] Logging to file
 
 ### 6.6 Deployment
+
 - [ ] Research no-cost scheduling/hosting options that run Playwright (e.g., GitHub Actions cron)
 - [ ] Create deployment config
 - [ ] Setup environment variables
@@ -507,6 +550,7 @@
 ## Phase 2: Convex Schema & Functions
 
 ### Schema
+
 - [ ] Create `schema.ts` with all tables:
   - [ ] `users` table with indexes
   - [ ] `events` table with indexes (including `cellId`, `favoritesCount`)
@@ -525,6 +569,7 @@
 - [ ] Export types
 
 ### User Functions
+
 - [ ] `users.ts`:
   - [ ] `getMe()` query
   - [ ] `ensureMe()` mutation (create user if missing)
@@ -535,6 +580,7 @@
   - [ ] POST `/clerk-webhook` action for user upsert
 
 ### Event Functions
+
 - [ ] `events.ts`:
   - [ ] `getById()` query
   - [ ] `listHomeFeed()` query
@@ -543,6 +589,7 @@
   - [ ] Ensure radius/nearby queries prefilter via `(city, cellId)`
 
 ### Plan Functions
+
 - [ ] `plans.ts`:
   - [ ] `createPlan()` mutation
   - [ ] `getPlan()` query
@@ -553,6 +600,7 @@
   - [ ] `getByShareId()` query
 
 ### Favorite Functions
+
 - [ ] `favorites.ts`:
   - [ ] `toggle()` mutation
   - [ ] Maintain `events.favoritesCount` (increment/decrement, never negative)
@@ -560,12 +608,14 @@
   - [ ] `isFavorite()` query
 
 ### Suggestion Engine
+
 - [ ] `suggest.ts`:
   - [ ] `getSuggestionDeck()` query
   - [ ] `getNextStop()` query
   - [ ] Scoring algorithm implementation
 
 ### Admin Functions
+
 - [ ] `admin.ts`:
   - [ ] `listPendingEvents()` query
   - [ ] `approveEvent()` mutation
@@ -587,6 +637,7 @@
   - [ ] `closeFeedback()` mutation
 
 ### HTTP Endpoints
+
 - [ ] `http.ts`:
   - [ ] POST `/clerk-webhook`
   - [ ] POST `/ingest-event` (for scraper)
@@ -595,6 +646,7 @@
   - [ ] Require shared secret/HMAC on `/ingest-event`
 
 ### File Storage
+
 - [ ] Configure Convex file storage
 - [ ] Create `storage.ts`:
   - [ ] `generateUploadUrl()` mutation
@@ -605,6 +657,7 @@
 # 📦 SHARED PACKAGE TASKS (packages/shared)
 
 ### Types
+
 - [x] Create `types/user.ts`
 - [x] Create `types/event.ts`
 - [x] Create `types/plan.ts`
@@ -612,12 +665,14 @@
 - [x] Create `types/index.ts` (re-exports)
 
 ### Constants
+
 - [ ] Create `constants/categories.ts` (with ar/en)
 - [ ] Create `constants/tags.ts` (with ar/en)
 - [ ] Create `constants/defaults.ts`
 - [ ] Create `constants/index.ts`
 
 ### Utilities
+
 - [ ] Create `utils/distance.ts` (haversine)
 - [ ] Create `utils/format.ts` (date, price, locale-aware)
 - [ ] Create `utils/validation.ts`
@@ -628,6 +683,7 @@
 # ✅ TESTING & POLISH
 
 ### Mobile Testing
+
 - [ ] Check Maestro and https://github.com/bamlab/flashlight
 - [ ] Test auth flow end-to-end
 - [ ] Test onboarding flow
@@ -643,6 +699,7 @@
 - [ ] Test on Android device
 
 ### Admin Testing
+
 - [ ] Test admin login
 - [ ] Test event approval flow
 - [ ] Test CSV import
@@ -650,14 +707,17 @@
 - [ ] Test reports/feedback
 
 ### Scraper Testing
+
 - [ ] Test manual run
 - [ ] Test scheduled run
 - [ ] Verify events appear in admin queue
 
 ### Securty
+
 - [ ] Security Scanner https://www.rnsec.dev and deep research on how to make API/Website/App secure and safe.
 
 ### Performance
+
 - [ ] Expo Atlas
 - [ ] Profile mobile app (Flipper)
 - [ ] Optimize slow queries
@@ -665,6 +725,7 @@
 - [ ] Verify FlashList performance
 
 ### Final Polish
+
 - [ ] Check react-native-screen-transitions
 - [ ] Fix any UI inconsistencies
 - [ ] Add loading states everywhere
@@ -676,4 +737,4 @@
 
 ---
 
-*Total : ~350 tasks across all apps*
+_Total : ~350 tasks across all apps_

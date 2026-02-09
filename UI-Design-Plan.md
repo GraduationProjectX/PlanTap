@@ -1,11 +1,10 @@
 # PlanTap — UI Design Plan
 
-> **Design System for Pencil Extension**  
-
+> **Design System for Pencil Extension**
 
 ---
 
-  |
+|
 
 **Design Goal**: Combine the **bold, playful energy** of neobrutalism with the **refined smoothness** of modern mobile UI.
 
@@ -15,56 +14,56 @@
 
 ### Color Palette
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--bg-primary` | `#FFFFFF` | Main background |
-| `--bg-secondary` | `#F9FAFB` | Card backgrounds, sections |
-| `--bg-tertiary` | `#F3F4F6` | Pressed states, dividers |
-| `--accent` | `#facc15` | Primary action, highlights |
-| `--accent-dark` | `#EAB308` | Accent hover/pressed |
-| `--text-primary` | `#000000` | Headlines, primary text |
-| `--text-secondary` | `#374151` | Body text, descriptions |
-| `--text-tertiary` | `#6B7280` | Captions, placeholders |
-| `--border` | `#000000` | Neobrutalist borders (2-3px) |
-| `--border-soft` | `#E5E7EB` | Subtle dividers |
-| `--success` | `#22C55E` | Success states |
-| `--error` | `#EF4444` | Error states |
-| `--shadow-neo` | `0 4px 0 #000` | Neobrutalist button shadow |
-| `--shadow-soft` | `0 4px 12px rgba(0,0,0,0.08)` | Smooth cards |
+| Token              | Value                         | Usage                        |
+| ------------------ | ----------------------------- | ---------------------------- |
+| `--bg-primary`     | `#FFFFFF`                     | Main background              |
+| `--bg-secondary`   | `#F9FAFB`                     | Card backgrounds, sections   |
+| `--bg-tertiary`    | `#F3F4F6`                     | Pressed states, dividers     |
+| `--accent`         | `#facc15`                     | Primary action, highlights   |
+| `--accent-dark`    | `#EAB308`                     | Accent hover/pressed         |
+| `--text-primary`   | `#000000`                     | Headlines, primary text      |
+| `--text-secondary` | `#374151`                     | Body text, descriptions      |
+| `--text-tertiary`  | `#6B7280`                     | Captions, placeholders       |
+| `--border`         | `#000000`                     | Neobrutalist borders (2-3px) |
+| `--border-soft`    | `#E5E7EB`                     | Subtle dividers              |
+| `--success`        | `#22C55E`                     | Success states               |
+| `--error`          | `#EF4444`                     | Error states                 |
+| `--shadow-neo`     | `0 4px 0 #000`                | Neobrutalist button shadow   |
+| `--shadow-soft`    | `0 4px 12px rgba(0,0,0,0.08)` | Smooth cards                 |
 
 ### Typography (DM Sans)
 
-| Token | Style | Usage |
-|-------|-------|-------|
-| `--heading-1` | 32px / Bold / -0.5 tracking | Screen titles |
+| Token         | Style                           | Usage           |
+| ------------- | ------------------------------- | --------------- |
+| `--heading-1` | 32px / Bold / -0.5 tracking     | Screen titles   |
 | `--heading-2` | 24px / SemiBold / -0.3 tracking | Section headers |
-| `--heading-3` | 20px / SemiBold | Card titles |
-| `--body` | 16px / Regular | Body text |
-| `--body-sm` | 14px / Regular | Secondary text |
-| `--caption` | 12px / Medium | Labels, badges |
-| `--button` | 16px / SemiBold / uppercase | Button text |
+| `--heading-3` | 20px / SemiBold                 | Card titles     |
+| `--body`      | 16px / Regular                  | Body text       |
+| `--body-sm`   | 14px / Regular                  | Secondary text  |
+| `--caption`   | 12px / Medium                   | Labels, badges  |
+| `--button`    | 16px / SemiBold / uppercase     | Button text     |
 
 ### Spacing
 
-| Token | Value |
-|-------|-------|
-| `--space-xs` | 4px |
-| `--space-sm` | 8px |
-| `--space-md` | 16px |
-| `--space-lg` | 24px |
-| `--space-xl` | 32px |
-| `--space-2xl` | 48px |
+| Token         | Value |
+| ------------- | ----- |
+| `--space-xs`  | 4px   |
+| `--space-sm`  | 8px   |
+| `--space-md`  | 16px  |
+| `--space-lg`  | 24px  |
+| `--space-xl`  | 32px  |
+| `--space-2xl` | 48px  |
 
 ### Border Radius
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--radius-none` | 0px | Neobrutalist elements |
-| `--radius-sm` | 8px | Small chips, tags |
-| `--radius-md` | 12px | Cards, inputs |
-| `--radius-lg` | 16px | Large cards, modals |
-| `--radius-xl` | 24px | Bottom sheets |
-| `--radius-full` | 9999px | Pills, avatars |
+| Token           | Value  | Usage                 |
+| --------------- | ------ | --------------------- |
+| `--radius-none` | 0px    | Neobrutalist elements |
+| `--radius-sm`   | 8px    | Small chips, tags     |
+| `--radius-md`   | 12px   | Cards, inputs         |
+| `--radius-lg`   | 16px   | Large cards, modals   |
+| `--radius-xl`   | 24px   | Bottom sheets         |
+| `--radius-full` | 9999px | Pills, avatars        |
 
 ---
 
@@ -305,6 +304,7 @@
 ### S1. Splash Screen
 
 **Layout**:
+
 - Centered PlanTap logo (calendar icon + text)
 - Yellow icon background
 - White screen background
@@ -315,24 +315,28 @@
 ### S2. Onboarding Flow
 
 **Screen 2a: Welcome**
+
 - Large headline: "Discover Amazing Events"
 - Subtext: "Plan your perfect day in Saudi Arabia"
 - Yellow Get Started button (neo style)
 - Skip text link
 
 **Screen 2b: Interests**
+
 - Headline: "What do you love?"
 - Grid of category chips (neo style, multi-select)
 - Yellow Continue button
 - Categories: Music, Sports, Art, Food, Family, Outdoor, etc.
 
 **Screen 2c: City Selection**
+
 - Headline: "Where are you?"
 - List of cities (radio selection)
 - Each city: Name + event count badge
 - Yellow Continue button
 
 **Screen 2d: Permissions**
+
 - Location permission request
 - Notification permission request
 - Clear explanations of benefits
@@ -343,6 +347,7 @@
 ### S3. Login / Sign In
 
 **Layout (from reference image)**:
+
 - PlanTap logo at top (yellow calendar icon)
 - "Discover Amazing Events" tagline
 - "Welcome Back!" headline
@@ -360,6 +365,7 @@
 ### S4. Home Tab
 
 **Layout**:
+
 - Search bar at top (with filter button)
 - Horizontal scrolling sections:
   - "Tonight" / "This Weekend"
@@ -371,6 +377,7 @@
 - Pull to refresh
 
 **Section Header**:
+
 ```
 Tonight in Riyadh                   See All >
 ```
@@ -380,6 +387,7 @@ Tonight in Riyadh                   See All >
 ### S5. Map Tab
 
 **Layout**:
+
 - Full-screen Mapbox map
 - Floating filter chips at top
 - Yellow markers with category icons
@@ -388,6 +396,7 @@ Tonight in Riyadh                   See All >
 - "Search this area" button
 
 **Bottom Preview**:
+
 ```
         ━━━━━━━
 ┌─────────────────────────────────────────┐
@@ -407,6 +416,7 @@ Tonight in Riyadh                   See All >
 **Layout**:
 
 **Top Section - Constraints Panel**:
+
 ```
 ┌─────────────────────────────────────────┐
 │  Group:   [Solo] [Group] [Kids]         │
@@ -420,6 +430,7 @@ Tonight in Riyadh                   See All >
 ```
 
 **Generate Button** (Full-width neo yellow):
+
 ```
 ┌─────────────────────────────────────────┐
 │           ✨ GENERATE SUGGESTIONS       │
@@ -428,11 +439,13 @@ Tonight in Riyadh                   See All >
 ```
 
 **Suggestion Cards** (Stack of 3):
+
 - Large event card
 - Action buttons: Skip | Add to Plan
 - Swipe disabled (buttons only)
 
 **Current Plan Preview** (Bottom):
+
 ```
 ┌─────────────────────────────────────────┐
 │  Your Plan (2/5 stops)                  │
@@ -449,6 +462,7 @@ Tonight in Riyadh                   See All >
 ### S7. Event Detail Screen
 
 **Layout**:
+
 - Image gallery (horizontal scroll, full width)
 - Title + description
 - Info row: Location · Price · Duration
@@ -461,6 +475,7 @@ Tonight in Riyadh                   See All >
 - Primary action: "Book Tickets" or "Get Directions"
 
 **Image Gallery**:
+
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
@@ -475,6 +490,7 @@ Tonight in Riyadh                   See All >
 ### S8. Plan Detail Screen
 
 **Layout**:
+
 - Plan title (editable)
 - Map preview (all stops marked)
 - Timeline view of stops:
@@ -500,6 +516,7 @@ Tonight in Riyadh                   See All >
 ### S9. Profile Tab
 
 **Layout**:
+
 - User avatar (large, centered)
 - Display name
 - My Plans section (FlashList)
@@ -508,6 +525,7 @@ Tonight in Riyadh                   See All >
 - Sign out button
 
 **Plan Card**:
+
 ```
 ┌─────────────────────────────────────────┐
 │  Weekend Adventure          3 stops     │
@@ -520,6 +538,7 @@ Tonight in Riyadh                   See All >
 ### S10. Settings Screen
 
 **Layout** (List items, smooth style):
+
 - Language: Arabic / English toggle
 - Edit Preferences
 - Notifications toggle
@@ -533,6 +552,7 @@ Tonight in Riyadh                   See All >
 ### S11. Community Tab (Placeholder)
 
 **Layout**:
+
 - "Coming Soon" message
 - Illustration/animation
 - Grayed out state
@@ -544,15 +564,15 @@ Tonight in Riyadh                   See All >
 
 ### Micro-interactions
 
-| Element | Animation |
-|---------|-----------|
-| Button Press | translateY(2px), shadow shrinks |
-| Card Tap | scale(0.98) → scale(1) |
-| Tab Switch | Fade + slide |
-| Favorite Toggle | Heart bounce + fill |
-| Like/Skip | Card slides out + next slides in |
-| Map Marker | Bounce on appear |
-| Bottom Sheet | Spring physics drag |
+| Element         | Animation                        |
+| --------------- | -------------------------------- |
+| Button Press    | translateY(2px), shadow shrinks  |
+| Card Tap        | scale(0.98) → scale(1)           |
+| Tab Switch      | Fade + slide                     |
+| Favorite Toggle | Heart bounce + fill              |
+| Like/Skip       | Card slides out + next slides in |
+| Map Marker      | Bounce on appear                 |
+| Bottom Sheet    | Spring physics drag              |
 
 ### Page Transitions
 
@@ -577,7 +597,7 @@ Tonight in Riyadh                   See All >
 
 - [ ] White background as base
 - [ ] DM Sans font applied
-- [ ] Yellow (#facc15) accent used appropriately  
+- [ ] Yellow (#facc15) accent used appropriately
 - [ ] Neo-style borders on interactive elements
 - [ ] Smooth shadows on cards
 - [ ] Proper spacing tokens
@@ -599,4 +619,4 @@ When designing in Pencil, follow this structure:
 
 ---
 
-*Ready for Pencil Extension implementation.*
+_Ready for Pencil Extension implementation._

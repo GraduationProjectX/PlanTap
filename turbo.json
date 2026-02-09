@@ -15,6 +15,12 @@
     },
     "typecheck": {
       "outputs": []
+    },
+    "format": {
+      "outputs": []
+    },
+    "format:check": {
+      "outputs": []
     }
   }
 }

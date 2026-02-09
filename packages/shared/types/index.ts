@@ -43,5 +43,3 @@ export interface WeekSchedule {
 export type Language = "ar" | "en";
 
 export type ThemeMode = "light" | "dark" | "system";
-
- 

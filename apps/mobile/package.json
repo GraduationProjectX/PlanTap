@@ -1,15 +1,19 @@
 {
   "name": "mobile",
-  "main": "index.ts",
   "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
   "scripts": {
     "dev": "expo start --dev-client",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "prebuild": "expo prebuild",
+    "expo:prebuild": "expo prebuild",
     "web": "expo start --web",
+    "build": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/.turbo-stamp','');console.log('No build step configured for apps/mobile yet')\"",
     "lint": "oxlint --deny-warnings --react-plugin -c ../../.oxlintrc.json --ignore-path ../../.eslintignore .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -56,6 +60,5 @@
     "eas-cli": "^16.32.0",
     "react-test-renderer": "19.1.0",
     "typescript": "~5.9.2"
-  },
-  "private": true
+  }
 }

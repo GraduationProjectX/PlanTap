@@ -6,12 +6,12 @@
 
 Before you begin, ensure you have the following installed:
 
-| Tool | Version | Download Link |
-|------|---------|---------------|
-| **Node.js** | 20[must be 20 exactly] | [nodejs.org](https://nodejs.org/) |
-| **pnpm** | 10+ (via Corepack) | [pnpm.io](https://pnpm.io/) |
-| **Android Studio** | Latest | [developer.android.com](https://developer.android.com/studio) |
-| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
+| Tool               | Version                | Download Link                                                 |
+| ------------------ | ---------------------- | ------------------------------------------------------------- |
+| **Node.js**        | 20[must be 20 exactly] | [nodejs.org](https://nodejs.org/)                             |
+| **pnpm**           | 10+ (via Corepack)     | [pnpm.io](https://pnpm.io/)                                   |
+| **Android Studio** | Latest                 | [developer.android.com](https://developer.android.com/studio) |
+| **Git**            | Latest                 | [git-scm.com](https://git-scm.com/)                           |
 
 > pnpm is managed via Corepack (ships with Node). In this repo you can always use `corepack pnpm ...`.
 
@@ -83,22 +83,22 @@ PlanTap/
 
 Run these from the **root** directory:
 
-| Command | Description |
-|---------|-------------|
-| `corepack pnpm install` | Install all dependencies |
-| `corepack pnpm run dev` | Start all development servers |
-| `corepack pnpm run build` | Build all packages |
-| `corepack pnpm run lint` | Lint all packages |
-| `corepack pnpm run typecheck` | Type-check all packages |
+| Command                       | Description                   |
+| ----------------------------- | ----------------------------- |
+| `corepack pnpm install`       | Install all dependencies      |
+| `corepack pnpm run dev`       | Start all development servers |
+| `corepack pnpm run build`     | Build all packages            |
+| `corepack pnpm run lint`      | Lint all packages             |
+| `corepack pnpm run typecheck` | Type-check all packages       |
 
 Run these from `apps/mobile/`:
 
-| Command | Description |
-|---------|-------------|
-| `corepack pnpm dev` | Start Metro for Dev Client |
-| `corepack pnpm android` | Run on Android emulator/device |
-| `corepack pnpm ios` | Run on iOS simulator (Mac only) |
-| `corepack pnpm start` | Start Metro bundler only |
+| Command                 | Description                     |
+| ----------------------- | ------------------------------- |
+| `corepack pnpm dev`     | Start Metro for Dev Client      |
+| `corepack pnpm android` | Run on Android emulator/device  |
+| `corepack pnpm ios`     | Run on iOS simulator (Mac only) |
+| `corepack pnpm start`   | Start Metro bundler only        |
 
 ---
 
@@ -129,7 +129,6 @@ corepack pnpm android
 1. Open Android Studio
 2. Start an emulator from Device Manager
 3. Verify with: `adb devices` (should show your emulator)
-
 
 ## 📝 License
 

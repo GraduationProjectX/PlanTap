@@ -1,7 +1,7 @@
 {
   "name": "plantap",
+  "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@10.28.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -11,15 +11,24 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
+  "dependencies": {
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
   "devDependencies": {
     "@types/bun": "latest",
+    "oxfmt": "^0.28.0",
     "oxlint": "^1.42.0",
     "turbo": "^2.8.1",
     "typescript": "~5.9.2"
   },
+  "packageManager": "pnpm@10.28.2",
   "pnpm": {
     "overrides": {
       "react": "19.1.0",
@@ -35,11 +44,5 @@
       "esbuild",
       "utf-8-validate"
     ]
-  },
-  "version": "1.0.0",
-  "dependencies": {
-    "expo": "~54.0.33",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
   }
 }

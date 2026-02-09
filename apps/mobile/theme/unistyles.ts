@@ -41,12 +41,12 @@ const tokens = {
   },
 } as const;
 
-// Light theme colors 
+// Light theme colors
 const lightTheme = {
   ...tokens,
   colors: {
     // Brand
-    primary: "#6366F1", 
+    primary: "#6366F1",
     primaryLight: "#818CF8",
     primaryDark: "#4F46E5",
 

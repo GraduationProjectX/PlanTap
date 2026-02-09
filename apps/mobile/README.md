@@ -24,6 +24,7 @@ corepack pnpm android
 ### Hot Reload
 
 The app auto-reloads when you save files. If something breaks:
+
 - Press `r` in the terminal to reload
 - Press `m` for the dev menu
 
@@ -49,10 +50,15 @@ mobile/
 ### Adding New Screens
 
 Create a new file in `app/`:
+
 ```tsx
 // app/profile.tsx
 export default function ProfileScreen() {
-  return <View><Text>Profile</Text></View>;
+  return (
+    <View>
+      <Text>Profile</Text>
+    </View>
+  );
 }
 ```
 
@@ -62,12 +68,13 @@ Navigate to it: `<Link href="/profile">Go to Profile</Link>`
 
 1. Add keys to `locales/ar.json` and `locales/en.json`
 2. Use in components:
+
 ```tsx
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 function MyComponent() {
   const { t } = useTranslation();
-  return <Text>{t('myKey')}</Text>;
+  return <Text>{t("myKey")}</Text>;
 }
 ```
 
