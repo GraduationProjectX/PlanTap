@@ -46,3 +46,16 @@ pnpm-debug.log*
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# Expo (root)
+.expo/
+
+# Prevent accidental npm lockfile commits (pnpm repo)
+package-lock.json
+
+# Generated native folders at repo root (mobile lives in apps/mobile)
+/android/
+/ios/
+
+# Expo config generated accidentally at repo root
+/app.json
