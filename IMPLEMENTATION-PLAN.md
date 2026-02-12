@@ -19,8 +19,8 @@
 | Manual Plan Creation       | **Post-MVP**                                                            |
 | Component Library (Mobile) | **HeroUI Native**                                                       |
 | Admin UI Kit               | **HeroUI Web/ui**                                                       |
-| Clerk → Convex Sync        | **Webhooks**                                                            |
-| HTTP Endpoint Auth         | **Clerk signature verify** (webhook) + **shared secret** (ingest)       |
+| Clerk Auth Setup           | **Official Expo quickstart only**                                       |
+| HTTP Endpoint Auth         | **Shared secret** (ingest)                                              |
 | Image Storage              | **Convex File Storage**                                                 |
 | Cities                     | **Dynamic** — from database (scraped/API)                               |
 | Map Provider               | **Mapbox** (<300 users expected)                                        |
@@ -38,8 +38,7 @@
 1. **No unauthenticated writes**: All Convex HTTP endpoints must verify signatures/secrets.
 2. **Geo features must not rely on full-table scans**: Use indexed prefiltering (`city` + `cellId`).
 3. **$0 budget**: MVP must not incur charges; any feature requiring a paid plan is Post-MVP.
-4. **Webhook security**: `/clerk-webhook` must verify Clerk signature headers + reject old timestamps (replay protection).
-5. **Ingest security**: `/ingest-event` requires a shared secret (header or HMAC) stored in Convex env.
+4. **Ingest security**: `/ingest-event` requires a shared secret (header or HMAC) stored in Convex env.
 
 ---
 
@@ -270,22 +269,22 @@ plantap/
 
 ---
 
-## 🔐 Auth Flow (Clerk Webhooks)
+## 🔐 Auth Flow (Clerk Expo Quickstart)
 
 ```
 1. User signs in via Clerk (mobile)
-2. Clerk triggers webhook → Convex HTTP endpoint
-3. Convex creates/updates user record
-4. Mobile app syncs user data via Convex query
-5. Session management handled by Clerk SDK
+2. Clerk creates and stores session token in secure token cache
+3. Expo Router route groups guard access (`(auth)` and `(public)`)
+4. Signed-in users access public screens
+5. Signed-out users are redirected to sign-in
 ```
 
-**Convex auth integration:**
+**Auth integration notes:**
 
-- Use Clerk JWTs to authenticate Convex requests (JWT template + JWKS)
-- In Convex functions, `identity.subject` = `clerkUserId`
-- Webhook handles profile/locale updates
-- Client-side backstop: `users.ensureMe()` in case webhook is delayed
+- Use `ClerkProvider` in root layout with `tokenCache`.
+- Use `useAuth()` route guards in group layouts.
+- Keep auth flow in mobile app scope only.
+- Avoid extra sync flows unless explicitly needed.
   **Localization precedence:**
 - User override in Settings wins
 - Otherwise, device locale is used
@@ -368,7 +367,6 @@ plantap/
 
 - Install @convex-dev/react-native
 - Configure Convex client
-- Wire Convex auth to Clerk session (fetch Clerk JWT for Convex)
 - Setup environment variables
 - Create shared types in `packages/shared`
 
@@ -377,8 +375,7 @@ plantap/
 - Install @clerk/clerk-expo
 - Configure Google Sign-rIn
 - Configure Apple Sign-In
-- Configure Clerk JWT template for Convex (token used by Convex clients)
-- Create auth context
+- Configure `ClerkProvider` + `tokenCache` in root layout
 - Build sign-in screen
 - Handle auth state persistence
 
@@ -396,7 +393,7 @@ plantap/
   - `/event/[id]`
   - `/plan/[id]`
   - `/settings`
-  - `/auth/sign-in`
+  - `/(auth)/sign-in`
   - `/onboarding`
 
 ---
@@ -554,7 +551,6 @@ plantap/
 
 - Clerk web integration
 - Admin access control: email allowlist (MVP) → Clerk roles/metadata (later)
-- Use the same Clerk JWT template for Convex client auth
 - Protected routes
 - Login page
 - Redirect if not admin
@@ -730,9 +726,7 @@ apps/scraper/
 
 ### User Functions
 
-- `users.upsertFromClerk()` — HTTP action for webhook
 - `users.getMe()` — get current user
-- `users.ensureMe()` — backstop create user if webhook delayed
 - `users.updatePreferences()`
 - `users.updateDefaults()`
 - `users.updateLocale()`
@@ -786,12 +780,10 @@ apps/scraper/
 
 ### HTTP Endpoints
 
-- `POST /clerk-webhook` — Clerk user sync
 - `POST /ingest-event` — Scraper event push
 
 **Security requirements (must-have):**
 
-- `/clerk-webhook`: verify Clerk signature headers + reject old timestamps (replay protection).
 - `/ingest-event`: require a shared secret (header or HMAC) stored in Convex env; rate limit by source.
 
 ---

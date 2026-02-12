@@ -33,7 +33,8 @@ The app auto-reloads when you save files. If something breaks:
 ```
 mobile/
 ├── app/              # Screens (Expo Router file-based routing)
-│   ├── (tabs)/       # Tab navigation screens
+│   ├── (auth)/       # Guest-only routes (sign-in)
+│   ├── (public)/     # Signed-in routes
 │   ├── _layout.tsx   # Root layout with providers
 │   └── +not-found.tsx
 ├── components/       # Reusable UI components
@@ -46,6 +47,8 @@ mobile/
 ├── rtl.ts            # RTL layout utilities
 └── app.json          # Expo configuration
 ```
+
+See `ROUTING.md` for a detailed explanation of the `(auth)` + `(public)` route architecture.
 
 ### Adding New Screens
 

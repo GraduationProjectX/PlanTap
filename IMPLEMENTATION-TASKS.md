@@ -76,7 +76,6 @@
 - [ ] Install convex + @convex-dev/react-native
 - [x] Copy Convex URL to environment
 - [ ] Configure ConvexProvider in app entry
-- [ ] Configure Convex auth to use Clerk JWT (token fetch + Convex auth config)
 - [ ] Create basic schema (packages/backend/convex/schema.ts)
 - [x] Run `corepack pnpm -C packages/backend dev` and verify connection
 - [ ] Test basic query from mobile
@@ -87,10 +86,8 @@
 - [ ] Enable Google OAuth provider
 - [ ] Enable Apple OAuth provider
 - [ ] Install @clerk/clerk-expo
-- [ ] Create Clerk JWT template for Convex (mobile/admin Convex auth)
 - [ ] Add Clerk publishable key to env
-- [ ] Configure ClerkProvider in app entry
-- [ ] Create auth context hook
+- [ ] Configure `ClerkProvider` + `tokenCache` in app entry
 - [ ] Test sign-in flow (basic)
 
 ### 1.7.5 Sentry Setup
@@ -104,7 +101,8 @@
 
 - [x] Setup Expo Router file structure
 - [x] Create `app/_layout.tsx` (root layout)
-- [x] Create `app/(tabs)/_layout.tsx` (tab layout)
+- [x] Create `app/(auth)/_layout.tsx` (auth route guard)
+- [x] Create `app/(public)/_layout.tsx` (public route guard)
 - [ ] Create tab screens (empty):
   - [ ] `app/(tabs)/home.tsx`
   - [ ] `app/(tabs)/map.tsx`
@@ -117,7 +115,7 @@
   - [ ] `app/event/[id].tsx`
   - [ ] `app/plan/[id].tsx`
   - [ ] `app/settings/index.tsx`
-  - [ ] `app/auth/sign-in.tsx`
+  - [x] `app/(auth)/sign-in.tsx`
   - [ ] `app/onboarding/index.tsx`
 - [ ] Configure navigation options (headers, etc.)
 - [ ] Test navigation flow
@@ -350,7 +348,6 @@
 - [ ] Configure Clerk provider
 - [ ] Create login page
 - [ ] Implement admin check (MVP: email allowlist; later: Clerk role/metadata)
-- [ ] Configure Convex client auth via Clerk JWT template
 - [ ] Protected route wrapper
 - [ ] Redirect non-admins
 
@@ -572,12 +569,9 @@
 
 - [ ] `users.ts`:
   - [ ] `getMe()` query
-  - [ ] `ensureMe()` mutation (create user if missing)
   - [ ] `updatePreferences()` mutation
   - [ ] `updateDefaults()` mutation
   - [ ] `updateLocale()` mutation
-- [ ] `http.ts`:
-  - [ ] POST `/clerk-webhook` action for user upsert
 
 ### Event Functions
 
@@ -639,10 +633,8 @@
 ### HTTP Endpoints
 
 - [ ] `http.ts`:
-  - [ ] POST `/clerk-webhook`
   - [ ] POST `/ingest-event` (for scraper)
 - [ ] Enforce endpoint auth:
-  - [ ] Verify Clerk webhook signatures + replay protection
   - [ ] Require shared secret/HMAC on `/ingest-event`
 
 ### File Storage

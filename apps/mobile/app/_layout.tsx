@@ -16,6 +16,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "react-native";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import { ConvexProviderWithClerk } from "convex/react-clerk"
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { convex } from "@/lib/convex";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -23,7 +27,7 @@ export {
 } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "(tabs)",
+  initialRouteName: "(public)",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -54,12 +58,23 @@ export default function RootLayout() {
     return null;
   }
 
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY");
+  }
+
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(public)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="+not-found" options={{ headerShown: true }} />
+          </Stack>
+        </ConvexProviderWithClerk>
+      </ClerkProvider>
     </ThemeProvider>
   );
 }

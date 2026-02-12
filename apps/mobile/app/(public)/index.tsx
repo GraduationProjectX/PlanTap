@@ -1,16 +1,15 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useTranslation } from "react-i18next";
-import { useDirection } from "@/rtl";
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
-  const { textAlign } = useDirection();
-
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { textAlign }]}>{t("home.title")}</Text>
-      <Text style={[styles.subtitle, { textAlign }]}>{t("common.appName")}</Text>
+      <Text selectable style={styles.title}>
+        Welcome to PlanTap
+      </Text>
+      <Text selectable style={styles.subtitle}>
+        This is your authenticated public area.
+      </Text>
     </View>
   );
 }
@@ -22,16 +21,18 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     backgroundColor: theme.colors.background,
     padding: theme.spacing.lg,
+    gap: theme.spacing.sm,
   },
   title: {
     fontSize: theme.font.size.display,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
+    textAlign: "center",
   },
   subtitle: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.regular,
     color: theme.colors.textSecondary,
+    textAlign: "center",
   },
 }));
