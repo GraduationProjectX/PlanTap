@@ -1,9 +1,9 @@
-# Expo Router structure: `(auth)` + `(public)`
+# Expo Router structure: `(auth)` + `(main)`
 
-This app now uses two top-level route groups:
+This app uses protected route groups with Clerk auth state:
 
-- `(auth)`: screens for users who are not signed in.
-- `(public)`: screens for users who are signed in.
+- `(auth)`: screens for signed-out users.
+- `(main)`: the signed-in app shell.
 
 Route groups are organizational folders and are not part of the URL path.
 
@@ -16,50 +16,55 @@ app/
   (auth)/
     _layout.tsx
     sign-in.tsx
-  (public)/
+  (main)/
     _layout.tsx
-    index.tsx
+    (tabs)/
+      _layout.tsx
+      index.tsx
+      map.tsx
+      suggest.tsx
+      community.tsx
+      profile.tsx
+    event/
+      [id].tsx
+    plan/
+      [id].tsx
+    settings/
+      index.tsx
 ```
 
 ## Why this structure
 
-### 1) Clear access boundaries
+### 1) Root-level guards (Expo Router best practice)
 
-- `(auth)` handles guest-only screens.
-- `(public)` handles signed-in screens.
-- Each group has its own `_layout.tsx`, so access control is centralized and consistent.
+`app/_layout.tsx` uses `Stack.Protected`:
 
-### 2) Predictable redirects with Clerk
+- `guard={isSignedIn}` for `(main)`
+- `guard={!isSignedIn}` for `(auth)`
 
-- In `app/(auth)/_layout.tsx`:
-  - If the user is signed in, redirect to `/`.
-  - If not signed in, allow auth screens.
-- In `app/(public)/_layout.tsx`:
-  - If the user is not signed in, redirect to `/(auth)/sign-in`.
-  - If signed in, allow public screens.
+This keeps auth rules in one place and avoids repeated redirect logic inside each screen.
 
-This means deep links and app restarts always land in the correct area for the current auth state.
+### 2) Clear navigator ownership
 
-### 3) Root layout stays focused on app-wide concerns
+- `app/(main)/_layout.tsx` owns signed-in stack routes.
+- `app/(main)/(tabs)/_layout.tsx` owns bottom tabs.
+- Detail screens (`event/[id]`, `plan/[id]`, `settings/index`) live next to tabs in the same signed-in stack.
 
-`app/_layout.tsx` now only does global setup:
+### 3) Stable tab IA while features are in progress
 
-- Providers (theme + Clerk).
-- Font/splash setup.
-- Registering top-level stacks: `(public)`, `(auth)`, and `+not-found`.
-
-This keeps auth logic out of the root and prevents the root layout from becoming a "god file."
+- `community` tab is visible but disabled for now.
+- Users can see planned information architecture without entering unfinished flows.
 
 ## Navigation flow
 
 1. App boots through `app/_layout.tsx`.
-2. Router enters `(public)` by default.
-3. `(public)` layout checks auth:
-   - Not signed in -> redirect to `/(auth)/sign-in`.
-   - Signed in -> render public screens.
-4. If a signed-in user opens an auth screen, `(auth)` layout redirects them back to `/`.
+2. Clerk auth state resolves.
+3. If signed out, only `(auth)` routes are available.
+4. If signed in, only `(main)` routes are available.
+5. Tabs are rendered inside `(main)/(tabs)`.
 
 ## Practical rule of thumb
 
-- Put auth-state checks in group layouts, not in every screen.
-- Keep screens simple; keep routing/guard logic close to the navigator that owns them.
+- Keep access control in protected layouts, not individual screens.
+- Use route groups for semantics: `(auth)` for guest flow, `(main)` for authenticated shell.
+- Use nested layouts to model navigator hierarchy (stack -> tabs -> screen).

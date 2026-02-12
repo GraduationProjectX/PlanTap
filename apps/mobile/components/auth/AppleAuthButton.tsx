@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useOAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 const AppleAuthButton = () => {
   const router = useRouter();
@@ -30,10 +30,10 @@ const AppleAuthButton = () => {
   };
 
   return (
-    <TouchableOpacity disabled={isLoading} onPress={handlePress} style={styles.appleButton}>
+    <Pressable disabled={isLoading} onPress={handlePress} style={styles.appleButton}>
       <Ionicons name="logo-apple" size={18} color="#fff" />
       <Text style={styles.appleButtonText}>{isLoading ? "Signing in..." : "Sign in with Apple"}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

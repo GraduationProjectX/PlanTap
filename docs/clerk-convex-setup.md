@@ -66,7 +66,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(public)" />
+          <Stack.Screen name="(main)" />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="+not-found" options={{ headerShown: true }} />
         </Stack>
@@ -80,7 +80,7 @@ export default function RootLayout() {
 
 ## 5) Route groups
 
-Use route groups to protect screens.
+Use route groups plus root-level protected routes.
 
 ```text
 app/
@@ -89,40 +89,44 @@ app/
   (auth)/
     _layout.tsx
     sign-in.tsx
-  (public)/
+  (main)/
     _layout.tsx
-    index.tsx
+    (tabs)/
+      _layout.tsx
+      index.tsx
+```
+
+### `app/_layout.tsx` (protected routes)
+
+```tsx
+import { useAuth } from "@clerk/clerk-expo";
+import { Stack } from "expo-router";
+
+function RootNavigator() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) return null;
+
+  return (
+    <Stack>
+      <Stack.Protected guard={isSignedIn}>
+        <Stack.Screen name="(main)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!isSignedIn}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+    </Stack>
+  );
+}
 ```
 
 ### `app/(auth)/_layout.tsx`
 
 ```tsx
-import { useAuth } from "@clerk/clerk-expo";
-import { Redirect, Stack } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function AuthRoutesLayout() {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  if (!isLoaded) return null;
-  if (isSignedIn) return <Redirect href="/" />;
-
-  return <Stack />;
-}
-```
-
-### `app/(public)/_layout.tsx`
-
-```tsx
-import { useAuth } from "@clerk/clerk-expo";
-import { Redirect, Stack } from "expo-router";
-
-export default function PublicRoutesLayout() {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  if (!isLoaded) return null;
-  if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
-
-  return <Stack />;
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
 ```
 
@@ -142,7 +146,7 @@ Key points:
 
 ## 7) Sign out
 
-Use `useClerk()` and call `signOut()` from any public screen (profile/settings).
+Use `useClerk()` and call `signOut()` from any signed-in screen (profile/settings).
 
 ```tsx
 const { signOut } = useClerk();

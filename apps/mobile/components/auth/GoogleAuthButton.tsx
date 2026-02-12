@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useOAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 const GoogleAuthButton = () => {
   const router = useRouter();
@@ -30,10 +30,10 @@ const GoogleAuthButton = () => {
   };
 
   return (
-    <TouchableOpacity disabled={isLoading} onPress={handlePress} style={styles.googleButton}>
+    <Pressable disabled={isLoading} onPress={handlePress} style={styles.googleButton}>
       <Ionicons name="logo-google" size={18} color="#fff" />
       <Text style={styles.googleButtonText}>{isLoading ? "Signing in..." : "Continue with Google"}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

@@ -57,7 +57,7 @@
 - [x] Create `locales/ar.json`
 - [x] Create `locales/en.json`
 - [x] Configure i18n initialization
-- [ ] Create useTranslation hook wrapper
+- [x] Create useTranslation hook wrapper
 - [x] Add language detection (device locale)
 - [ ] Add language toggle hook
 - [ ] Verify translations working
@@ -67,28 +67,34 @@
 - [x] Configure RTL in app.json/app.config.js
 - [x] Prefer built-in `I18nManager` + RTL-safe components (avoid extra deps unless required)
 - [ ] Create RTL-aware layout components
-- [x] Create `useDirection()` hook (returns "rtl" | "ltr")
+- [x] Create `useDirection()` hook (returns "rtl" | "ltr") - **Now reactive via `useTranslation()`**
 - [ ] Test RTL layout on simulator
 
 ### 1.6 Convex Setup
 
 - [x] Create Convex project (convex.dev)
-- [ ] Install convex + @convex-dev/react-native
+- [x] Install convex + @convex-dev/react-native
 - [x] Copy Convex URL to environment
-- [ ] Configure ConvexProvider in app entry
-- [ ] Create basic schema (packages/backend/convex/schema.ts)
+- [x] Configure ConvexProvider in app entry (with Clerk integration)
+- [x] Create basic schema (packages/backend/convex/schema.ts) - users table with Clerk sync
 - [x] Run `corepack pnpm -C packages/backend dev` and verify connection
-- [ ] Test basic query from mobile
+- [x] Test basic query from mobile
 
 ### 1.7 Clerk Setup
 
-- [ ] Create Clerk application (clerk.com)
-- [ ] Enable Google OAuth provider
-- [ ] Enable Apple OAuth provider
-- [ ] Install @clerk/clerk-expo
-- [ ] Add Clerk publishable key to env
-- [ ] Configure `ClerkProvider` + `tokenCache` in app entry
-- [ ] Test sign-in flow (basic)
+- [x] Create Clerk application (clerk.com)
+- [x] Enable Google OAuth provider
+- [x] Enable Apple OAuth provider
+- [x] Install @clerk/clerk-expo
+- [x] Add Clerk publishable key to env
+- [x] Configure `ClerkProvider` + `tokenCache` in app entry
+- [x] Configure `ConvexProviderWithClerk` integration
+- [x] Setup `Stack.Protected` guards for `(auth)` and `(main)` routes
+- [x] Create sign-in screen with OAuth buttons (Apple + Google)
+- [x] Implement webhook handler for user sync (`http.ts`)
+- [x] Create `users.ts` Convex functions (current, addOrUpdateUser, deleteUser)
+- [x] Configure Clerk auth in Convex (`auth.config.ts`)
+- [x] Test sign-in flow (basic) - **Ready for testing**
 
 ### 1.7.5 Sentry Setup
 
@@ -100,25 +106,26 @@
 ### 1.8 Navigation Shell
 
 - [x] Setup Expo Router file structure
-- [x] Create `app/_layout.tsx` (root layout)
+- [x] Create `app/_layout.tsx` (root layout) - **Uses `Stack.Protected` for auth guards**
 - [x] Create `app/(auth)/_layout.tsx` (auth route guard)
-- [x] Create `app/(public)/_layout.tsx` (public route guard)
-- [ ] Create tab screens (empty):
-  - [ ] `app/(tabs)/home.tsx`
-  - [ ] `app/(tabs)/map.tsx`
-  - [ ] `app/(tabs)/suggest.tsx`
-  - [ ] `app/(tabs)/community.tsx`
-  - [ ] `app/(tabs)/profile.tsx`
-- [ ] Configure tab bar icons
-- [ ] Implement RTL tab order switching
-- [ ] Create stack screens (empty):
-  - [ ] `app/event/[id].tsx`
-  - [ ] `app/plan/[id].tsx`
-  - [ ] `app/settings/index.tsx`
+- [x] Create `app/(main)/_layout.tsx` (signed-in route shell)
+- [x] Create `app/(main)/(tabs)/_layout.tsx` (tab navigator)
+- [x] Create tab screens (temporary placeholders):
+  - [x] `app/(main)/(tabs)/index.tsx` (home)
+  - [x] `app/(main)/(tabs)/map.tsx`
+  - [x] `app/(main)/(tabs)/suggest.tsx`
+  - [x] `app/(main)/(tabs)/community.tsx` (disabled)
+  - [x] `app/(main)/(tabs)/profile.tsx`
+- [x] Configure tab bar icons (FontAwesome)
+- [x] Implement RTL tab order switching
+- [x] Create stack screens (temporary placeholders):
+  - [x] `app/(main)/event/[id].tsx`
+  - [x] `app/(main)/plan/[id].tsx`
+  - [x] `app/(main)/settings/index.tsx`
   - [x] `app/(auth)/sign-in.tsx`
   - [ ] `app/onboarding/index.tsx`
-- [ ] Configure navigation options (headers, etc.)
-- [ ] Test navigation flow
+- [x] Configure navigation options (headers, etc.)
+- [x] Test navigation flow - **Ready for testing**
 
 ### 1.9 Local Storage
 
@@ -138,9 +145,9 @@
 
 ## Phase 3: Core Screens
 
-### 3.1 Shared Components
+### 3.1 Shared Components(or just use HeroUI Native components)
 
-- [ ] `Button` (primary, secondary, outline, ghost)
+<!-- - [ ] `Button` (primary, secondary, outline, ghost)
 - [ ] `Card` (event card base)
 - [ ] `Badge` (price, distance, indoor/outdoor)
 - [ ] `Input` (text input with RTL support)
@@ -151,7 +158,7 @@
 - [ ] `ErrorState` (error with retry)
 - [ ] `Avatar` (user avatar)
 - [ ] `IconButton` (icon-only button)
-- [ ] Verify all components RTL-compatible
+- [ ] Verify all components RTL-compatible -->
 
 ### 3.2 Onboarding Flow
 

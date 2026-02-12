@@ -34,7 +34,8 @@ The app auto-reloads when you save files. If something breaks:
 mobile/
 ├── app/              # Screens (Expo Router file-based routing)
 │   ├── (auth)/       # Guest-only routes (sign-in)
-│   ├── (public)/     # Signed-in routes
+│   ├── (main)/       # Signed-in routes
+│   │   ├── (tabs)/   # Bottom tabs navigator
 │   ├── _layout.tsx   # Root layout with providers
 │   └── +not-found.tsx
 ├── components/       # Reusable UI components
@@ -48,24 +49,24 @@ mobile/
 └── app.json          # Expo configuration
 ```
 
-See `ROUTING.md` for a detailed explanation of the `(auth)` + `(public)` route architecture.
+See `ROUTING.md` for a detailed explanation of the `(auth)` + `(main)` route architecture.
 
 ### Adding New Screens
 
-Create a new file in `app/`:
+Create a new file in the route group that owns it (`(main)` or `(auth)`):
 
 ```tsx
-// app/profile.tsx
-export default function ProfileScreen() {
+// app/(main)/settings/notifications.tsx
+export default function NotificationsScreen() {
   return (
     <View>
-      <Text>Profile</Text>
+      <Text>Notifications</Text>
     </View>
   );
 }
 ```
 
-Navigate to it: `<Link href="/profile">Go to Profile</Link>`
+Navigate to it with a path that excludes route groups.
 
 ### Adding Translations
 

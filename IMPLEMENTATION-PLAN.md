@@ -274,7 +274,7 @@ plantap/
 ```
 1. User signs in via Clerk (mobile)
 2. Clerk creates and stores session token in secure token cache
-3. Expo Router route groups guard access (`(auth)` and `(public)`)
+3. Expo Router route groups guard access (`(auth)` and `(main)`)
 4. Signed-in users access public screens
 5. Signed-out users are redirected to sign-in
 ```

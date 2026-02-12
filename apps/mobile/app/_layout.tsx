@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "react-native";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
-import { ConvexProviderWithClerk } from "convex/react-clerk"
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { convex } from "@/lib/convex";
 
@@ -27,7 +27,7 @@ export {
 } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "(public)",
+  initialRouteName: "(main)",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -38,7 +38,7 @@ export default function RootLayout() {
 
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
-    // TODO: Download Baloo Bhaijaan 2 from Google Fonts and uncomment:
+    // TODO: Download Baloo Bhaijaan 2  or any other font from Google Fonts and uncomment:
     // "BalooBhaijaan2-Regular": require("../assets/fonts/BalooBhaijaan2-Regular.ttf"),
     // "BalooBhaijaan2-Medium": require("../assets/fonts/BalooBhaijaan2-Medium.ttf"),
     // "BalooBhaijaan2-Bold": require("../assets/fonts/BalooBhaijaan2-Bold.ttf"),
@@ -47,12 +47,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -63,18 +57,41 @@ export default function RootLayout() {
     throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY");
   }
 
-
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(public)" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="+not-found" options={{ headerShown: true }} />
-          </Stack>
+          <RootNavigator />
         </ConvexProviderWithClerk>
       </ClerkProvider>
     </ThemeProvider>
+  );
+}
+
+function RootNavigator() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoaded]);
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={isSignedIn}>
+        <Stack.Screen name="(main)" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!isSignedIn}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+
+      <Stack.Screen name="+not-found" options={{ headerShown: true }} />
+    </Stack>
   );
 }
