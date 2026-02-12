@@ -9,12 +9,13 @@
     "done": "Done",
     "next": "Next",
     "back": "Back",
-    "skip": "Skip"
+    "skip": "Skip",
+    "comingSoon": "Coming soon"
   },
   "tabs": {
     "home": "Home",
     "map": "Map",
-    "plan": "Plan",
+    "suggest": "Suggest",
     "community": "Community",
     "profile": "Profile"
   },

@@ -1,16 +1,16 @@
-import { View, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { StyleSheet } from "react-native-unistyles";
 import { useDirection } from "@/rtl";
 
-export default function HomeScreen() {
+export default function SuggestScreen() {
   const { t } = useTranslation();
   const { textAlign } = useDirection();
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { textAlign }]}>{t("home.title")}</Text>
-      <Text style={[styles.subtitle, { textAlign }]}>{t("common.appName")}</Text>
+      <Text style={[styles.title, { textAlign }]}>{t("tabs.suggest")}</Text>
+      <Text style={[styles.subtitle, { textAlign }]}>{t("common.comingSoon")}</Text>
     </View>
   );
 }
@@ -22,15 +22,15 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     backgroundColor: theme.colors.background,
     padding: theme.spacing.lg,
+    gap: theme.spacing.xs,
   },
   title: {
-    fontSize: theme.font.size.display,
+    fontSize: theme.font.size.xxl,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
-    marginBottom: theme.spacing.sm,
   },
   subtitle: {
-    fontSize: theme.font.size.lg,
+    fontSize: theme.font.size.md,
     fontFamily: theme.font.family.regular,
     color: theme.colors.textSecondary,
   },

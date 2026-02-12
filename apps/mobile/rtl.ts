@@ -1,5 +1,6 @@
 import { I18nManager } from "react-native";
 import * as Localization from "expo-localization";
+import { useTranslation } from "react-i18next";
 import i18n from "./i18n";
 
 /**
@@ -55,8 +56,9 @@ export const initializeRTL = () => {
  * Hook for getting direction-aware styles
  */
 export const useDirection = () => {
-  const direction = getDirection();
-  const isRtl = isRTL();
+  const { i18n: i18nInstance } = useTranslation();
+  const isRtl = i18nInstance.dir(i18nInstance.language) === "rtl";
+  const direction = isRtl ? "rtl" : "ltr";
 
   return {
     direction,
