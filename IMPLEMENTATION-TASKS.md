@@ -98,10 +98,10 @@
 
 ### 1.7.5 Sentry Setup
 
-- [ ] Create Sentry project (sentry.io)
-- [ ] Install @sentry/react-native
-- [ ] Configure Sentry in app entry
-- [ ] Test error reporting
+- [x] Create Sentry project (sentry.io)
+- [x] Install @sentry/react-native
+- [x] Configure Sentry in app entry
+- [x] Test error reporting
 
 ### 1.8 Navigation Shell
 

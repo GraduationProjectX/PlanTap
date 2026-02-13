@@ -61,3 +61,5 @@ package-lock.json
 /app.json
 # Convex auto generated files
 packages/backend/convex/_generated/
+packages/backend/convex/_generated/api.d.ts
+packages/backend/convex/_generated/dataModel.d.ts
