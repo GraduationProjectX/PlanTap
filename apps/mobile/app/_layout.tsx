@@ -10,8 +10,9 @@ initializeRTL();
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -20,6 +21,11 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { convex } from "@/lib/convex";
+import * as Sentry from "@sentry/react-native";
+
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay: !isRunningInExpoGo(),
+});
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,10 +36,22 @@ export const unstable_settings = {
   initialRouteName: "(main)",
 };
 
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
+  sendDefaultPii: true,
+  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  replaysSessionSampleRate: __DEV__ ? 1.0 : 0.1,
+  replaysOnErrorSampleRate: __DEV__ ? 0.1 : 1.0,
+  integrations: [navigationIntegration, Sentry.mobileReplayIntegration()],
+  enableNativeFramesTracking: !isRunningInExpoGo(),
+  enableLogs: true,
+});
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
   const colorScheme = useColorScheme();
 
   const [loaded, error] = useFonts({
@@ -70,6 +88,13 @@ export default function RootLayout() {
 
 function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
+  const navigationRef = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (navigationRef) {
+      navigationIntegration.registerNavigationContainer(navigationRef);
+    }
+  }, [navigationRef]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -95,3 +120,5 @@ function RootNavigator() {
     </Stack>
   );
 }
+
+export default Sentry.wrap(RootLayout);

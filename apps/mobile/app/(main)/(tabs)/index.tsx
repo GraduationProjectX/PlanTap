@@ -12,6 +12,7 @@ export default function HomeScreen() {
       <Text selectable style={[styles.title, { textAlign }]}>
         {t("home.title")}
       </Text>
+
       <Text selectable style={[styles.subtitle, { textAlign }]}>
         {t("common.appName")}
       </Text>
