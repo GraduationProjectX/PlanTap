@@ -32,3 +32,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# Auto Generated files by Convex(generates when you run pnpm convex dev)
+convex/_generated/
