@@ -5,17 +5,13 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export type AuthUserCache = {
   clerkUserId: string;
-  email: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  imageUrl: string | null;
 };
 
 type AuthState = {
   user: AuthUserCache | null;
   isSignedIn: boolean;
   setUser: (user: AuthUserCache | null) => void;
-  setSignedIn: (value: boolean) => void;
+  setSignedIn: (value: boolean, user?: AuthUserCache) => void;
   clearAuth: () => void;
 };
 
@@ -33,7 +29,18 @@ export const useAuthStore = create<AuthState>()(
           user,
           isSignedIn: !!user,
         }),
-      setSignedIn: (value) => set({ isSignedIn: value }),
+      setSignedIn: (value, user) => {
+        if (!value) {
+          set(initialAuthState);
+          return;
+        }
+
+        if (!user) {
+          throw new Error("setSignedIn(true) requires a user payload");
+        }
+
+        set({ user, isSignedIn: true });
+      },
       clearAuth: () => set(initialAuthState),
     }),
     {

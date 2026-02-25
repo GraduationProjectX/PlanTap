@@ -25,7 +25,13 @@ export const getNumber = (key: string) => {
 };
 
 export const setJSON = <T>(key: string, value: T) => {
-  storage.set(key, JSON.stringify(value));
+  try {
+    storage.set(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.error("Failed to store JSON value", { key, error });
+    return false;
+  }
 };
 
 export const getJSON = <T>(key: string) => {
