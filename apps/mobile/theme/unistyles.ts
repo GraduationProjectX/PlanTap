@@ -1,75 +1,213 @@
 import { StyleSheet } from "react-native-unistyles";
 
-// PlanTap Design Tokens placeholders
+/**
+ * PlanTap Design System Tokens
+ * Extracted from Figma designs - "Main" frame
+ * @see docs/design-system.md for full documentation
+ */
 const tokens = {
   // Spacing scale (used for padding, margin, gap)
   spacing: {
+    none: 0,
     xs: 4,
     sm: 8,
     md: 16,
     lg: 24,
     xl: 32,
     xxl: 48,
+    xxxl: 64,
   },
 
   // Border radius
   radius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-    full: 9999,
+    none: 0,
+    xs: 4, // Small chips, tags
+    sm: 6, // Badges
+    md: 8, // Buttons
+    lg: 12, // Image containers
+    xl: 16, // Cards
+    xxl: 32, // Header bottom corners
+    full: 9999, // Pills, circular buttons, avatars
   },
 
   // Typography
   font: {
-    // Will use Baloo Bhaijaan 2 once fonts are installed
     family: {
+      // Keep system fonts until Cairo font files are added and loaded in app/_layout.tsx.
       regular: "System",
       medium: "System",
+      semiBold: "System",
       bold: "System",
+      black: "System",
     },
     size: {
-      xs: 12,
-      sm: 14,
-      md: 16,
-      lg: 18,
-      xl: 22,
-      xxl: 28,
-      display: 36,
+      xs: 8, // Date labels on badges
+      sm: 10, // Category labels, uppercase tags
+      md: 12, // Captions, small buttons, location text
+      base: 14, // Body text, buttons
+      lg: 16, // Body large, H3 headings, input text
+      xl: 18, // H2 headings, card titles
+      "2xl": 20, // H1 headings, section titles
+      "3xl": 28, // Display text
+      "4xl": 36, // Large display
     },
+    lineHeight: {
+      tight: 1.125, // 12px text
+      normal: 1.25, // Most text
+      relaxed: 1.5, // Paragraphs
+    },
+    letterSpacing: {
+      tight: -0.5,
+      normal: 0,
+      wide: 0.3,
+      wider: 0.4,
+      widest: 1, // Uppercase labels
+    },
+  },
+
+  // Shadows (React Native compatible)
+  shadow: {
+    none: {
+      shadowColor: "transparent",
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0,
+      shadowRadius: 0,
+      elevation: 0,
+    },
+    sm: {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    md: {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    lg: {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.1,
+      shadowRadius: 15,
+      elevation: 5,
+    },
+    xl: {
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: 25 },
+      shadowOpacity: 0.25,
+      shadowRadius: 50,
+      elevation: 8,
+    },
+  },
+
+  // Icon sizes
+  icon: {
+    xs: 12,
+    sm: 16,
+    md: 18,
+    lg: 20,
+    xl: 24,
+  },
+
+  // Avatar sizes
+  avatar: {
+    xs: 24,
+    sm: 32,
+    md: 40,
+    lg: 48,
+    xl: 56,
+  },
+
+  // Button heights
+  button: {
+    sm: 32,
+    md: 40,
+    lg: 48,
+    xl: 56,
+  },
+
+  // Z-index layers
+  zIndex: {
+    base: 0,
+    dropdown: 1000,
+    sticky: 1100,
+    overlay: 1300,
+    modal: 1400,
+    popover: 1500,
+    toast: 1600,
   },
 } as const;
 
-// Light theme colors
+// Light theme colors (extracted from Figma)
 const lightTheme = {
   ...tokens,
   colors: {
-    // Brand
-    primary: "#6366F1",
-    primaryLight: "#818CF8",
-    primaryDark: "#4F46E5",
+    // Brand (primary action color)
+    primary: "#000000",
+    primaryForeground: "#FFFFFF",
 
-    // Background
-    background: "#FFFFFF",
-    surface: "#F8FAFC",
-    surfaceElevated: "#FFFFFF",
+    // Background hierarchy
+    background: "#F5F5F5", // Main app background
+    surface: "#FFFFFF", // Cards, elevated containers
+    surfaceElevated: "#FFFFFF", // Modals, sheets
 
-    // Text
-    text: "#0F172A",
-    textSecondary: "#64748B",
-    textMuted: "#94A3B8",
+    // Header/Dark sections
+    headerBackground: "#1E1E1E",
+    headerForeground: "#FFFFFF",
+    headerMuted: "rgba(255, 255, 255, 0.6)",
+    headerOverlay: "rgba(255, 255, 255, 0.1)",
+    headerBorder: "rgba(255, 255, 255, 0.05)",
 
-    // Semantic
+    // Text hierarchy
+    text: "#000000", // Primary text, headings
+    textSecondary: "#737373", // Subtitles, descriptions
+    textMuted: "#A3A3A3", // Labels, placeholders, disabled
+
+    // Semantic colors
     success: "#22C55E",
+    successForeground: "#FFFFFF",
     warning: "#F59E0B",
+    warningForeground: "#000000",
     error: "#EF4444",
+    errorForeground: "#FFFFFF",
     info: "#3B82F6",
+    infoForeground: "#FFFFFF",
 
-    // UI
-    border: "#E2E8F0",
-    divider: "#F1F5F9",
+    // Live/Active indicator
+    live: "#FFFFFF", // White dot for "live" status
+
+    // UI elements
+    border: "#F5F5F5", // Card borders
+    borderStrong: "#E5E5E5", // Stronger borders
+    divider: "#F5F5F5",
+
+    // Overlays
     overlay: "rgba(0, 0, 0, 0.5)",
+    overlayDark: "rgba(0, 0, 0, 0.8)", // Badge backgrounds
+    overlayLight: "rgba(255, 255, 255, 0.95)", // Date badges on images
+
+    // Input fields
+    inputBackground: "rgba(255, 255, 255, 0.1)",
+    inputBorder: "rgba(255, 255, 255, 0.05)",
+    inputPlaceholder: "rgba(255, 255, 255, 0.6)",
+
+    // Interactive states
+    pressedOverlay: "rgba(0, 0, 0, 0.1)",
+    focusRing: "#000000",
+
+    // Tab bar
+    tabBar: "#FFFFFF",
+    tabBarBorder: "rgba(0, 0, 0, 0.05)",
+    tabActive: "#000000",
+    tabInactive: "#A3A3A3",
+
+    // Skeleton loading
+    skeleton: "#E5E5E5",
+    skeletonHighlight: "#F5F5F5",
   },
 } as const;
 
@@ -78,39 +216,76 @@ const darkTheme = {
   ...tokens,
   colors: {
     // Brand
-    primary: "#818CF8",
-    primaryLight: "#A5B4FC",
-    primaryDark: "#6366F1",
+    primary: "#FFFFFF",
+    primaryForeground: "#000000",
 
-    // Background
-    background: "#0F172A",
-    surface: "#1E293B",
-    surfaceElevated: "#334155",
+    // Background hierarchy
+    background: "#0A0A0A",
+    surface: "#1A1A1A",
+    surfaceElevated: "#262626",
 
-    // Text
-    text: "#F8FAFC",
-    textSecondary: "#94A3B8",
-    textMuted: "#64748B",
+    // Header (inverted for dark mode)
+    headerBackground: "#1A1A1A",
+    headerForeground: "#FFFFFF",
+    headerMuted: "rgba(255, 255, 255, 0.6)",
+    headerOverlay: "rgba(255, 255, 255, 0.1)",
+    headerBorder: "rgba(255, 255, 255, 0.1)",
 
-    // Semantic
+    // Text hierarchy
+    text: "#FFFFFF",
+    textSecondary: "#A3A3A3",
+    textMuted: "#737373",
+
+    // Semantic colors
     success: "#4ADE80",
+    successForeground: "#000000",
     warning: "#FBBF24",
+    warningForeground: "#000000",
     error: "#F87171",
+    errorForeground: "#000000",
     info: "#60A5FA",
+    infoForeground: "#000000",
 
-    // UI
-    border: "#334155",
-    divider: "#1E293B",
+    // Live/Active indicator
+    live: "#FFFFFF",
+
+    // UI elements
+    border: "#262626",
+    borderStrong: "#404040",
+    divider: "#262626",
+
+    // Overlays
     overlay: "rgba(0, 0, 0, 0.7)",
+    overlayDark: "rgba(0, 0, 0, 0.9)",
+    overlayLight: "rgba(30, 30, 30, 0.95)",
+
+    // Input fields
+    inputBackground: "rgba(255, 255, 255, 0.1)",
+    inputBorder: "rgba(255, 255, 255, 0.1)",
+    inputPlaceholder: "rgba(255, 255, 255, 0.5)",
+
+    // Interactive states
+    pressedOverlay: "rgba(255, 255, 255, 0.1)",
+    focusRing: "#FFFFFF",
+
+    // Tab bar
+    tabBar: "#1A1A1A",
+    tabBarBorder: "rgba(255, 255, 255, 0.1)",
+    tabActive: "#FFFFFF",
+    tabInactive: "#737373",
+
+    // Skeleton loading
+    skeleton: "#262626",
+    skeletonHighlight: "#404040",
   },
 } as const;
 
-// Breakpoints for responsive design
+// Breakpoints for responsive design (based on common device widths)
 const breakpoints = {
-  xs: 0,
-  sm: 390,
-  md: 428,
-  lg: 768, // Tablet
+  xs: 0, // Small phones
+  sm: 390, // iPhone 14/15
+  md: 428, // iPhone 14/15 Plus, Pro Max
+  lg: 768, // Tablets (disabled but kept for future)
 } as const;
 
 // Define theme types
@@ -139,4 +314,11 @@ declare module "react-native-unistyles" {
   export interface UnistylesBreakpoints extends AppBreakpoints {}
 }
 
-export { lightTheme, darkTheme, tokens };
+// Export theme types for external use
+export type Theme = typeof lightTheme;
+export type ThemeColors = Theme["colors"];
+export type ThemeSpacing = Theme["spacing"];
+export type ThemeRadius = Theme["radius"];
+export type ThemeShadow = Theme["shadow"];
+
+export { lightTheme, darkTheme, tokens, breakpoints };
