@@ -535,8 +535,7 @@ const stylesheet = StyleSheet.create((theme) => ({
   glassButton: {
     backgroundColor: theme.colors.headerOverlay,
     borderRadius: theme.radius.full,
-    backdropFilter: 'blur(8px)', // Note: Use expo-blur for RN
-  },
+// For blur effect, wrap with <BlurView intensity={8} /> from expo-blur  },
 }));
 ```
 
