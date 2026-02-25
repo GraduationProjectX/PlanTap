@@ -129,37 +129,23 @@
 
 ### 1.9 Local Storage
 
-- [ ] Install react-native-mmkv
-- [ ] Create storage helper utilities
-- [ ] Create keys constants
-- [ ] Test storage save/load
+- [x] Install react-native-mmkv
+- [x] Create storage helper utilities
+- [x] Create keys constants
+- [x] Test storage save/load
 
 ### 1.10 State Management
 
-- [ ] Install zustand
-- [ ] Create UI state store (filters, toggles)
-- [ ] Create auth state store (user info cache)
-- [ ] Test store updates
+- [x] Install zustand
+- [x] Create UI state store 
+- [x] Create auth state store (user info cache)
+- [x] Test store updates
 
 ---
 
 ## Phase 3: Core Screens
 
-### 3.1 Shared Components(or just use HeroUI Native components)
-
-<!-- - [ ] `Button` (primary, secondary, outline, ghost)
-- [ ] `Card` (event card base)
-- [ ] `Badge` (price, distance, indoor/outdoor)
-- [ ] `Input` (text input with RTL support)
-- [ ] `SearchBar` (with filter button)
-- [ ] `BottomSheet` (reusable modal sheet)
-- [ ] `LoadingSkeleton` (content placeholders)
-- [ ] `EmptyState` (no results message)
-- [ ] `ErrorState` (error with retry)
-- [ ] `Avatar` (user avatar)
-- [ ] `IconButton` (icon-only button)
-- [ ] Verify all components RTL-compatible -->
-
+ 
 ### 3.2 Onboarding Flow
 
 - [ ] Check react-native-onboarding

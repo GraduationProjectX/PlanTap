@@ -12,7 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "convex": "^1.31.7",
+    "convex": "^1.32.0",
     "svix": "^1.84.1"
   },
   "devDependencies": {
