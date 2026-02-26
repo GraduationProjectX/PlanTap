@@ -833,7 +833,7 @@ apps/scraper/
 ### Convex Functions (packages/backend)
 
 ```bash
-corepack pnpm -C packages/backend exec convex dev --once  # Type check
+pnpm -C packages/backend exec convex dev --once  # Type check
 ```
 
 - Test suggestion algorithm with mock data
@@ -844,8 +844,8 @@ corepack pnpm -C packages/backend exec convex dev --once  # Type check
 
 ```bash
 cd apps/mobile
-corepack pnpm ios -- --simulator
-corepack pnpm android -- --emulator
+pnpm ios -- --simulator
+pnpm android -- --emulator
 ```
 
 - Manual testing on devices
@@ -855,8 +855,8 @@ corepack pnpm android -- --emulator
 
 ```bash
 cd apps/admin
-corepack pnpm run build  # Type check + build
-corepack pnpm run dev    # Visual testing
+pnpm run build  # Type check + build
+pnpm run dev    # Visual testing
 ```
 
 ## Manual Testing Checklist

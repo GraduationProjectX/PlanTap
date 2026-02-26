@@ -6,10 +6,10 @@ Expo React Native app for PlanTap - a collaborative university schedule app.
 
 ```bash
 # From the repo root
-corepack pnpm --filter mobile android
+pnpm --filter mobile android
 
 # Or from this directory
-corepack pnpm android
+pnpm android
 ```
 
 ## Development
@@ -19,7 +19,7 @@ corepack pnpm android
 1. Enable **USB Debugging** on your Android phone
 2. Connect via USB
 3. Run `adb devices` to verify connection
-4. Run `corepack pnpm --filter mobile android`
+4. Run `pnpm --filter mobile android`
 
 ### Hot Reload
 

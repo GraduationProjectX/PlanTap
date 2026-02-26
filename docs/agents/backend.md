@@ -2,8 +2,8 @@
 
 ## Common commands
 
-- Run Convex dev: `corepack pnpm --filter backend dev`
-- One-off type/validation run: `corepack pnpm -C packages/backend exec convex dev --once`
+- Run Convex dev: `pnpm --filter backend dev`
+- One-off type/validation run: `pnpm -C packages/backend exec convex dev --once`
 
 ## Notes
 
