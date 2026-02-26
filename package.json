@@ -17,9 +17,9 @@
     "ios": "expo run:ios"
   },
   "dependencies": {
-    "expo": "~54.0.33",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "expo": "~55.0.2",
+    "react": "19.2.0",
+    "react-native": "0.83.2"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -31,9 +31,9 @@
   "packageManager": "pnpm@10.28.2",
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "react-test-renderer": "19.1.0"
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
+      "react-test-renderer": "19.2.0"
     },
     "onlyBuiltDependencies": [
       "@clerk/shared",

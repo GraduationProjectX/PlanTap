@@ -1,20 +1,20 @@
 # Dependencies & Package Manager
 
-This repo uses pnpm workspaces (managed via Corepack).
+This repo uses pnpm workspaces.
 
 ## Commands
 
-- Install: `corepack pnpm install`
-- Run a root script: `corepack pnpm run <script>`
-- Run a workspace script: `corepack pnpm --filter <pkgName> <script>`
-  - Example: `corepack pnpm --filter mobile android`
+- Install: `pnpm install`
+- Run a root script: `pnpm run <script>`
+- Run a workspace script: `pnpm --filter <pkgName> <script>`
+  - Example: `pnpm --filter mobile android`
 
 ## Build Script Approval (pnpm v10)
 
 pnpm may block dependency install scripts and print an **Ignored build scripts** warning.
 
-- Approve: `corepack pnpm approve-builds`
-- Build anything pending: `corepack pnpm rebuild --pending`
+- Approve: `pnpm approve-builds`
+- Build anything pending: `pnpm rebuild --pending`
 
 ## Hygiene
 

@@ -30,7 +30,7 @@
 
 ### 1.2 Mobile Project Init
 
-- [x] `corepack pnpm dlx create-expo-app@latest apps/mobile --template tabs`
+- [x] `pnpm dlx create-expo-app@latest apps/mobile --template tabs`
 - [x] Upgrade to the latest stable Expo SDK if needed
 - [x] Configure TypeScript strict mode
 - [x] Remove default template content
@@ -77,7 +77,7 @@
 - [x] Copy Convex URL to environment
 - [x] Configure ConvexProvider in app entry (with Clerk integration)
 - [x] Create basic schema (packages/backend/convex/schema.ts) - users table with Clerk sync
-- [x] Run `corepack pnpm -C packages/backend dev` and verify connection
+- [x] Run `pnpm -C packages/backend dev` and verify connection
 - [x] Test basic query from mobile
 
 ### 1.7 Clerk Setup
