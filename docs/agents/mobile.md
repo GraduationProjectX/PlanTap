@@ -4,6 +4,7 @@
 
 - Dev client bundler: `pnpm --filter mobile dev -- -c`
 - Run Android: `pnpm --filter mobile android`
+- When you design make sure to account for lightmode and Darkmode users.
 
 ## Invalid hook call / duplicate React
 

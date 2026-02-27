@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "ea568acdc9036b82b969159757456e9a4cdfae7f645ac2fad5fdf0f734f53568"
     },
+    "heroui-native": {
+      "source": "heroui-inc/heroui",
+      "sourceType": "github",
+      "computedHash": "283b4a5e57701e683fde4a09552597ff7824244e1065d88c40970f77e322e569"
+    },
     "upgrading-expo": {
       "source": "expo/skills",
       "sourceType": "github",

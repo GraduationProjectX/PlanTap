@@ -181,9 +181,9 @@ const lightTheme = {
     live: "#FFFFFF", // White dot for "live" status
 
     // UI elements
-    border: "#F5F5F5", // Card borders
-    borderStrong: "#E5E5E5", // Stronger borders
-    divider: "#F5F5F5",
+    border: "#DEDEDE", // Card borders
+    borderStrong: "#BDBDBD", // Stronger borders
+    divider: "#CECECE",
 
     // Overlays
     overlay: "rgba(0, 0, 0, 0.5)",
@@ -250,9 +250,9 @@ const darkTheme = {
     live: "#FFFFFF",
 
     // UI elements
-    border: "#262626",
-    borderStrong: "#404040",
-    divider: "#262626",
+    border: "#454545",
+    borderStrong: "#757575",
+    divider: "#4A4A4A",
 
     // Overlays
     overlay: "rgba(0, 0, 0, 0.7)",

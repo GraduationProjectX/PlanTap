@@ -63,3 +63,5 @@ package-lock.json
 packages/backend/convex/_generated/
 packages/backend/convex/_generated/api.d.ts
 packages/backend/convex/_generated/dataModel.d.ts
+# heroui-agents-md
+.heroui-docs/
