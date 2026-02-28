@@ -47,9 +47,9 @@ const tokens = {
       base: 14, // Body text, buttons
       lg: 16, // Body large, H3 headings, input text
       xl: 18, // H2 headings, card titles
-      "2xl": 20, // H1 headings, section titles
-      "3xl": 28, // Display text
-      "4xl": 36, // Large display
+      xxl: 20, // H1 headings, section titles
+      xxxl: 28, // Display text
+      xxxxl: 36, // Large display
     },
     lineHeight: {
       tight: 1.125, // 12px text

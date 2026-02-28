@@ -78,7 +78,7 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     marginTop: theme.spacing.lg,
     color: theme.colors.text,
-    fontSize: theme.font.size["3xl"],
+    fontSize: theme.font.size.xxxl,
     fontFamily: theme.font.family.bold,
     letterSpacing: theme.font.letterSpacing.tight,
   },

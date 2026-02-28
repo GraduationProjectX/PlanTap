@@ -21,11 +21,21 @@
   },
   "home": {
     "title": "Discover",
-    "search": "Search events...",
+    "search": "Search events, activities...",
+    "filterEvents": "Filter",
+    "ongoingEvents": "Ongoing Events",
+    "upcoming": "Upcoming",
+    "recommended": "Recommended for You",
+    "viewAll": "View All",
+    "viewDetails": "View Details",
+    "liveNow": "LIVE NOW",
+    "endsToday": "ENDS TODAY",
+    "freeEntry": "Free Entry",
+    "spotsLeft": "{{count}} spots left",
+    "currentLocation": "Current Location",
     "tonight": "Tonight",
     "thisWeekend": "This Weekend",
     "nearYou": "Near You",
-    "trending": "Trending",
-    "upcoming": "Upcoming"
+    "trending": "Trending"
   }
 }

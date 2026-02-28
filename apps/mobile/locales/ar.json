@@ -21,11 +21,21 @@
   },
   "home": {
     "title": "اكتشف",
-    "search": "ابحث عن فعاليات...",
+    "search": "ابحث عن فعاليات، فنانين...",
+    "filterEvents": "تصفية",
+    "ongoingEvents": "فعاليات جارية",
+    "upcoming": "القادمة",
+    "recommended": "موصى بها لك",
+    "viewAll": "عرض الكل",
+    "viewDetails": "عرض التفاصيل",
+    "liveNow": "مباشر الآن",
+    "endsToday": "ينتهي اليوم",
+    "freeEntry": "دخول مجاني",
+    "spotsLeft": "{{count}} أماكن متبقية",
+    "currentLocation": "الموقع الحالي",
     "tonight": "اليوم",
     "thisWeekend": "نهاية الأسبوع",
     "nearYou": "بالقرب منك",
-    "trending": "الأكثر رواجاً",
-    "upcoming": "القادمة"
+    "trending": "الأكثر رواجاً"
   }
 }

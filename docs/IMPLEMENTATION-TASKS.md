@@ -145,7 +145,8 @@
 
 ## Phase 3: Core Screens
 
- 
+- [] Theming need to be fixed and changes only via Settings(Light,Dark, System options). 
+- [] Add app Icon in Login  and app Logo.
 ### 3.2 Onboarding Flow
 
 - [ ] Check react-native-onboarding

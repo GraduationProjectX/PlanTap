@@ -25,7 +25,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.xs,
   },
   title: {
-    fontSize: theme.font.size["2xl"],
+    fontSize: theme.font.size.xxl,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
   },

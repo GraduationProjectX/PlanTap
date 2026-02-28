@@ -1,42 +1,120 @@
-import { Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useDirection } from "@/rtl";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+
+import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
+import { SectionHeader } from "@/components/home/SectionHeader";
+import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
+import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
+import { RecommendedGrid } from "@/components/home/RecommendedGrid";
+import { ONGOING_EVENTS, UPCOMING_EVENTS, RECOMMENDED_EVENTS } from "@/data/mock-events";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { textAlign } = useDirection();
+  const router = useRouter();
+  const scrollY = useSharedValue(0);
+
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const onScroll = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
+
+  function handleEventPress(id: string) {
+    router.push(`/event/${id}`);
+  }
+
+  function handleFavorite(_id: string) {
+    // TODO: wire up favorites toggle via Convex
+  }
 
   return (
-    <View style={styles.container}>
-      <Text selectable style={[styles.title, { textAlign }]}>
-        {t("home.title")}
-      </Text>
+    <View style={styles.root}>
+      <Animated.ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        stickyHeaderIndices={[1]}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        overScrollMode="never"
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+      >
+        <HomeHeaderTop
+          city="Riyadh"
+          onFavoritePress={() => {}}
+          onLocationPress={() => {}}
+        />
+        <HomeHeaderSticky
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+          onFilterPress={() => {}}
+          scrollY={scrollY}
+        />
 
-      <Text selectable style={[styles.subtitle, { textAlign }]}>
-        {t("common.appName")}
-      </Text>
+        {ONGOING_EVENTS.length > 0 && (
+          <View style={styles.section}>
+            <SectionHeader
+              title={t("home.ongoingEvents")}
+              actionLabel={t("home.viewAll")}
+              onAction={() => {}}
+            />
+            <OngoingEventsCarousel
+              events={ONGOING_EVENTS}
+              onEventPress={handleEventPress}
+            />
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <SectionHeader
+            title={t("home.upcoming")}
+          />
+          <UpcomingEventsList
+            events={UPCOMING_EVENTS}
+            onEventPress={handleEventPress}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader
+            title={t("home.recommended")}
+          />
+          <RecommendedGrid
+            events={RECOMMENDED_EVENTS}
+            onEventPress={handleEventPress}
+            onFavorite={handleFavorite}
+          />
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </Animated.ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
+  root: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: theme.colors.background,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.sm,
   },
-  title: {
-    fontSize: theme.font.size["2xl"],
-    fontFamily: theme.font.family.bold,
-    color: theme.colors.text,
+  scroll: {
+    flex: 1,
   },
-  subtitle: {
-    fontSize: theme.font.size.lg,
-    fontFamily: theme.font.family.regular,
-    color: theme.colors.textSecondary,
+  scrollContent: {
+    flexGrow: 1,
+  },
+  section: {
+    paddingTop: theme.spacing.md,
+    gap: theme.spacing.xs,
+  },
+  bottomSpacer: {
+    height: theme.spacing.xl,
   },
 }));

@@ -1,0 +1,253 @@
+export type MockEvent = {
+  id: string;
+  title: string;
+  titleAr: string;
+  descriptionShort?: string;
+  descriptionShortAr?: string;
+  type: "event" | "activity";
+  categories: string[];
+  tags: string[];
+  startAt?: number;
+  endAt?: number;
+  city: string;
+  location: { lat: number; lng: number; address?: string; addressAr?: string };
+  priceMin?: number;
+  priceMax?: number;
+  indoorOutdoor: "indoor" | "outdoor" | "mixed" | "unknown";
+  familyFriendly?: boolean;
+  images: string[];
+  favoritesCount: number;
+  status: "pending" | "approved" | "rejected";
+  rating?: number;
+};
+
+const now = Date.now();
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
+
+export const MOCK_EVENTS: MockEvent[] = [
+  {
+    id: "evt_1",
+    title: "Summer Jazz Festival",
+    titleAr: "مهرجان الجاز الصيفي",
+    descriptionShort: "Live jazz performances under the stars at Central Park",
+    descriptionShortAr: "عروض جاز حية تحت النجوم في الحديقة المركزية",
+    type: "event",
+    categories: ["concerts"],
+    tags: ["music", "jazz", "live"],
+    startAt: now - 2 * HOUR,
+    endAt: now + 4 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7136, lng: 46.6753, address: "Central Park • 0.5mi", addressAr: "الحديقة المركزية • ٠.٨ كم" },
+    indoorOutdoor: "outdoor",
+    familyFriendly: true,
+    images: ["https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=600"],
+    favoritesCount: 1200,
+    status: "approved",
+    rating: 4.8,
+  },
+  {
+    id: "evt_2",
+    title: "Night Market",
+    titleAr: "السوق الليلي",
+    descriptionShort: "Food, crafts, and entertainment at the downtown night market",
+    descriptionShortAr: "طعام وحرف يدوية وترفيه في السوق الليلي",
+    type: "event",
+    categories: ["food"],
+    tags: ["food", "market", "nightlife"],
+    startAt: now - 1 * HOUR,
+    endAt: now + 3 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7006, lng: 46.6825, address: "Downtown • 1.2mi", addressAr: "وسط المدينة • ١.٩ كم" },
+    indoorOutdoor: "outdoor",
+    images: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=600"],
+    favoritesCount: 890,
+    status: "approved",
+    rating: 4.5,
+  },
+  {
+    id: "evt_3",
+    title: "Coldplay World Tour",
+    titleAr: "جولة كولدبلاي العالمية",
+    descriptionShort: "The legendary band live at King Fahd Stadium",
+    descriptionShortAr: "الفرقة الأسطورية على مسرح استاد الملك فهد",
+    type: "event",
+    categories: ["concerts"],
+    tags: ["music", "concert", "international"],
+    startAt: now + 12 * DAY,
+    endAt: now + 12 * DAY + 4 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7141, lng: 46.6745, address: "King Fahd Stadium", addressAr: "استاد الملك فهد" },
+    priceMin: 120,
+    priceMax: 450,
+    indoorOutdoor: "outdoor",
+    images: ["https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&h=600"],
+    favoritesCount: 3400,
+    status: "approved",
+  },
+  {
+    id: "evt_4",
+    title: "TechCrunch Disrupt",
+    titleAr: "تك كرانش ديسربت",
+    descriptionShort: "The world's leading tech startup conference",
+    descriptionShortAr: "المؤتمر الرائد عالميًا للشركات الناشئة",
+    type: "event",
+    categories: ["tech"],
+    tags: ["tech", "startup", "conference"],
+    startAt: now + 5 * DAY,
+    endAt: now + 5 * DAY + 8 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7253, lng: 46.6510, address: "Convention Center", addressAr: "مركز المؤتمرات" },
+    priceMin: 45,
+    priceMax: 200,
+    indoorOutdoor: "indoor",
+    images: ["https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600"],
+    favoritesCount: 670,
+    status: "approved",
+  },
+  {
+    id: "evt_5",
+    title: "Padel Tournament",
+    titleAr: "بطولة البادل",
+    descriptionShort: "Amateur padel championship with prizes",
+    descriptionShortAr: "بطولة البادل للهواة مع جوائز",
+    type: "event",
+    categories: ["sports"],
+    tags: ["sports", "padel", "tournament"],
+    startAt: now + 2 * DAY,
+    endAt: now + 2 * DAY + 6 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7400, lng: 46.6500, address: "Sports Club", addressAr: "النادي الرياضي" },
+    priceMin: 20,
+    indoorOutdoor: "indoor",
+    familyFriendly: true,
+    images: ["https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&h=600"],
+    favoritesCount: 230,
+    status: "approved",
+    rating: 4.6,
+  },
+  {
+    id: "evt_6",
+    title: "Deep Sea Fishing",
+    titleAr: "الصيد في أعماق البحر",
+    descriptionShort: "Full-day deep sea fishing experience",
+    descriptionShortAr: "تجربة صيد في أعماق البحر ليوم كامل",
+    type: "activity",
+    categories: ["sports"],
+    tags: ["fishing", "outdoor", "adventure"],
+    startAt: now + 3 * DAY,
+    endAt: now + 3 * DAY + 10 * HOUR,
+    city: "Jeddah",
+    location: { lat: 21.5433, lng: 39.1728, address: "Harbor", addressAr: "الميناء" },
+    indoorOutdoor: "outdoor",
+    images: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600"],
+    favoritesCount: 150,
+    status: "approved",
+    rating: 4.3,
+  },
+  {
+    id: "evt_7",
+    title: "Art Exhibition: Modern Saudi",
+    titleAr: "معرض فني: السعودية الحديثة",
+    descriptionShort: "Contemporary Saudi art from emerging artists",
+    descriptionShortAr: "فن سعودي معاصر من فنانين ناشئين",
+    type: "event",
+    categories: ["arts"],
+    tags: ["art", "exhibition", "culture"],
+    startAt: now + 1 * DAY,
+    endAt: now + 14 * DAY,
+    city: "Riyadh",
+    location: { lat: 24.6877, lng: 46.6851, address: "National Museum", addressAr: "المتحف الوطني" },
+    indoorOutdoor: "indoor",
+    images: ["https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=800&h=600"],
+    favoritesCount: 410,
+    status: "approved",
+    rating: 4.7,
+  },
+  {
+    id: "evt_8",
+    title: "Desert Safari Adventure",
+    titleAr: "مغامرة سفاري الصحراء",
+    descriptionShort: "Thrilling dune bashing and desert camping",
+    descriptionShortAr: "مغامرة الكثبان الرملية والتخييم في الصحراء",
+    type: "activity",
+    categories: ["adventure"],
+    tags: ["desert", "safari", "adventure"],
+    startAt: now + 4 * DAY,
+    endAt: now + 4 * DAY + 8 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.5500, lng: 46.8000, address: "Red Sand Dunes", addressAr: "الكثبان الحمراء" },
+    priceMin: 75,
+    priceMax: 150,
+    indoorOutdoor: "outdoor",
+    familyFriendly: true,
+    images: ["https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=800&h=600"],
+    favoritesCount: 920,
+    status: "approved",
+    rating: 4.9,
+  },
+  {
+    id: "evt_9",
+    title: "Comedy Night",
+    titleAr: "ليلة كوميدية",
+    descriptionShort: "Stand-up comedy showcase with local talent",
+    descriptionShortAr: "عرض كوميدي ستاند أب مع مواهب محلية",
+    type: "event",
+    categories: ["entertainment"],
+    tags: ["comedy", "standup", "nightlife"],
+    startAt: now + 7 * DAY,
+    endAt: now + 7 * DAY + 3 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7118, lng: 46.6742, address: "The Theater", addressAr: "المسرح" },
+    priceMin: 35,
+    priceMax: 80,
+    indoorOutdoor: "indoor",
+    images: ["https://images.unsplash.com/photo-1527224538127-2104bb71c51b?w=800&h=600"],
+    favoritesCount: 560,
+    status: "approved",
+  },
+  {
+    id: "evt_10",
+    title: "Yoga in the Park",
+    titleAr: "يوغا في الحديقة",
+    descriptionShort: "Morning yoga session for all levels",
+    descriptionShortAr: "جلسة يوغا صباحية لجميع المستويات",
+    type: "activity",
+    categories: ["wellness"],
+    tags: ["yoga", "wellness", "outdoor"],
+    startAt: now + 1 * DAY,
+    endAt: now + 1 * DAY + 2 * HOUR,
+    city: "Riyadh",
+    location: { lat: 24.7300, lng: 46.6700, address: "King Abdullah Park", addressAr: "حديقة الملك عبدالله" },
+    indoorOutdoor: "outdoor",
+    familyFriendly: true,
+    images: ["https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600"],
+    favoritesCount: 340,
+    status: "approved",
+    rating: 4.4,
+  },
+];
+
+export const ONGOING_EVENTS = MOCK_EVENTS.filter(
+  (e) => e.startAt && e.endAt && e.startAt <= now && e.endAt > now,
+);
+
+export const UPCOMING_EVENTS = MOCK_EVENTS.filter(
+  (e) => e.startAt && e.startAt > now,
+).sort((a, b) => (a.startAt ?? 0) - (b.startAt ?? 0));
+
+export const RECOMMENDED_EVENTS = MOCK_EVENTS.filter(
+  (e) => e.rating && e.rating >= 4.3,
+).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+
+export const CATEGORIES = [
+  { id: "all", label: "All", labelAr: "الكل", icon: "grid" as const },
+  { id: "sports", label: "Sports", labelAr: "رياضة", icon: "sports" as const },
+  { id: "adventure", label: "Adventure", labelAr: "مغامرة", icon: "adventure" as const },
+  { id: "entertainment", label: "Entertainment", labelAr: "ترفيه", icon: "entertainment" as const },
+  { id: "food", label: "Food", labelAr: "طعام", icon: "food" as const },
+  { id: "concerts", label: "Concerts", labelAr: "حفلات", icon: "music" as const },
+  { id: "arts", label: "Arts", labelAr: "فنون", icon: "arts" as const },
+  { id: "tech", label: "Tech", labelAr: "تقنية", icon: "tech" as const },
+  { id: "wellness", label: "Wellness", labelAr: "صحة", icon: "wellness" as const },
+] as const;
