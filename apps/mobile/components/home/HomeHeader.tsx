@@ -29,6 +29,7 @@ type HomeHeaderStickyProps = {
   selectedCategory: string;
   onCategorySelect: (id: string) => void;
   onFilterPress?: () => void;
+  isFilterActive?: boolean;
   scrollY?: SharedValue<number>;
 };
 
@@ -40,12 +41,12 @@ export function HomeHeaderTop({ city, onFavoritePress, onLocationPress }: HomeHe
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.topContainer, { paddingTop: insets.top + 8 }]}> 
-      <View style={[styles.topRow, { flexDirection }]}> 
+    <View style={[styles.topContainer, { paddingTop: insets.top + 8 }]}>
+      <View style={[styles.topRow, { flexDirection }]}>
         <View style={styles.locationContainer}>
           <Pressable onPress={onLocationPress}>
             <Text style={styles.locationLabel}>{t("home.currentLocation").toUpperCase()}</Text>
-            <View style={[styles.cityRow, { flexDirection }]}> 
+            <View style={[styles.cityRow, { flexDirection }]}>
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={[styles.cityText, { textAlign }]}>{city}</Text>
               <FontAwesome name="chevron-down" size={10} color="rgba(255,255,255,0.8)" />
@@ -73,6 +74,7 @@ export function HomeHeaderSticky({
   selectedCategory,
   onCategorySelect,
   onFilterPress,
+  isFilterActive,
   scrollY,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
@@ -133,6 +135,7 @@ export function HomeHeaderSticky({
           onChange={onSearchChange}
           placeholder={t("home.search")}
           onFilterPress={onFilterPress}
+          isFilterActive={isFilterActive}
         />
       </Animated.View>
 
@@ -161,11 +164,12 @@ export function HomeHeader(props: HomeHeaderProps) {
         selectedCategory={props.selectedCategory}
         onCategorySelect={props.onCategorySelect}
         onFilterPress={props.onFilterPress}
+        isFilterActive={props.isFilterActive}
         scrollY={props.scrollY}
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create((theme) => ({
   topContainer: {

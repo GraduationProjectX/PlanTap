@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 
 import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
@@ -11,6 +11,8 @@ import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { RecommendedGrid } from "@/components/home/RecommendedGrid";
 import { ONGOING_EVENTS, UPCOMING_EVENTS, RECOMMENDED_EVENTS } from "@/data/mock-events";
+
+type ViewAllEventType = "ongoing" | "upcoming" | "recommended" | "all";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -32,6 +34,14 @@ export default function HomeScreen() {
     // TODO: wire up favorites toggle via Convex
   }
 
+  function handleViewAll(type: ViewAllEventType) {
+    router.push(`/event?type=${type}` as Href);
+  }
+
+  const ongoingEvents = ONGOING_EVENTS;
+  const upcomingEvents = UPCOMING_EVENTS;
+  const recommendedEvents = RECOMMENDED_EVENTS;
+
   return (
     <View style={styles.root}>
       <Animated.ScrollView
@@ -44,54 +54,53 @@ export default function HomeScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
       >
-        <HomeHeaderTop
-          city="Riyadh"
-          onFavoritePress={() => {}}
-          onLocationPress={() => {}}
-        />
+        <HomeHeaderTop city="Riyadh" onFavoritePress={() => {}} onLocationPress={() => {}} />
         <HomeHeaderSticky
           searchValue={searchValue}
           onSearchChange={setSearchValue}
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
-          onFilterPress={() => {}}
+          onFilterPress={() => router.push("/filters?targetType=all" as Href)}
+          isFilterActive={false}
           scrollY={scrollY}
         />
 
-        {ONGOING_EVENTS.length > 0 && (
+        {ongoingEvents.length > 0 && (
           <View style={styles.section}>
             <SectionHeader
               title={t("home.ongoingEvents")}
               actionLabel={t("home.viewAll")}
-              onAction={() => {}}
+              onAction={() => handleViewAll("ongoing")}
             />
-            <OngoingEventsCarousel
-              events={ONGOING_EVENTS}
-              onEventPress={handleEventPress}
-            />
+            <OngoingEventsCarousel events={ongoingEvents} onEventPress={handleEventPress} />
           </View>
         )}
 
-        <View style={styles.section}>
-          <SectionHeader
-            title={t("home.upcoming")}
-          />
-          <UpcomingEventsList
-            events={UPCOMING_EVENTS}
-            onEventPress={handleEventPress}
-          />
-        </View>
+        {upcomingEvents.length > 0 && (
+          <View style={styles.section}>
+            <SectionHeader
+              title={t("home.upcoming")}
+              actionLabel={t("home.viewAll")}
+              onAction={() => handleViewAll("upcoming")}
+            />
+            <UpcomingEventsList events={upcomingEvents} onEventPress={handleEventPress} />
+          </View>
+        )}
 
-        <View style={styles.section}>
-          <SectionHeader
-            title={t("home.recommended")}
-          />
-          <RecommendedGrid
-            events={RECOMMENDED_EVENTS}
-            onEventPress={handleEventPress}
-            onFavorite={handleFavorite}
-          />
-        </View>
+        {recommendedEvents.length > 0 && (
+          <View style={styles.section}>
+            <SectionHeader
+              title={t("home.recommended")}
+              actionLabel={t("home.viewAll")}
+              onAction={() => handleViewAll("recommended")}
+            />
+            <RecommendedGrid
+              events={recommendedEvents}
+              onEventPress={handleEventPress}
+              onFavorite={handleFavorite}
+            />
+          </View>
+        )}
 
         <View style={styles.bottomSpacer} />
       </Animated.ScrollView>
