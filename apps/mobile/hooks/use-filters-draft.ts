@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import {
   getCategoryIdsForType,
@@ -34,20 +34,16 @@ type UseFiltersDraftResult = {
 export function useFiltersDraft({ initialFilters, isArabic }: UseFiltersDraftArgs): UseFiltersDraftResult {
   const [draft, setDraft] = useState<EventFilters>(initialFilters ?? DEFAULT_EVENT_FILTERS);
 
-  const categoryLabelById = useMemo(() => getCategoryLabelByIdMap(isArabic), [isArabic]);
+  const categoryLabelById = getCategoryLabelByIdMap(isArabic);
 
-  const categoryOptions = useMemo<FilterOption[]>(
-    () =>
-      getCategoryIdsForType(draft.type).map((id) => ({
-        id,
-        label: categoryLabelById[id] ?? id,
-      })),
-    [draft.type, categoryLabelById],
-  );
+  const categoryOptions: FilterOption[] = getCategoryIdsForType(draft.type).map((id) => ({
+    id,
+    label: categoryLabelById[id] ?? id,
+  }));
 
-  const cityOptions = useMemo(() => getCitiesForType(draft.type), [draft.type]);
+  const cityOptions = getCitiesForType(draft.type);
 
-  function selectType(type: FilterType) {
+  const selectType = (type: FilterType) => {
     const nextCategories = getCategoryIdsForType(type);
     const nextCities = getCitiesForType(type);
 
@@ -59,43 +55,43 @@ export function useFiltersDraft({ initialFilters, isArabic }: UseFiltersDraftArg
       categories: prev.categories.filter((categoryId) => nextCategories.includes(categoryId)),
       cities: prev.cities.filter((city) => nextCities.includes(city)),
     }));
-  }
+  };
 
-  function toggleCategory(categoryId: string) {
+  const toggleCategory = (categoryId: string) => {
     setDraft((prev) => ({
       ...prev,
       categories: toggleValue(prev.categories, categoryId),
     }));
-  }
+  };
 
-  function selectCity(city?: string) {
+  const selectCity = (city?: string) => {
     setDraft((prev) => ({
       ...prev,
       cities: city ? [city] : [],
     }));
-  }
+  };
 
-  function toggleDate(date: FilterDate) {
+  const toggleDate = (date: FilterDate) => {
     setDraft((prev) => ({
       ...prev,
       date: prev.date === date ? "any" : date,
       startDate: undefined,
       endDate: undefined,
     }));
-  }
+  };
 
-  function confirmSpecificDates(startDate: string, endDate: string) {
+  const confirmSpecificDates = (startDate: string, endDate: string) => {
     setDraft((prev) => ({
       ...prev,
       date: "specificDates",
       startDate,
       endDate,
     }));
-  }
+  };
 
-  function clearAll() {
+  const clearAll = () => {
     setDraft(DEFAULT_EVENT_FILTERS);
-  }
+  };
 
   return {
     draft,

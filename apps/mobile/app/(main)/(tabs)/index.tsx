@@ -26,17 +26,24 @@ export default function HomeScreen() {
     scrollY.value = event.contentOffset.y;
   });
 
-  function handleEventPress(id: string) {
-    router.push(`/event/${id}`);
-  }
+  const handleEventPress = (id: string) => {
+    router.push(`/event/${id}` as Href);
+  };
 
-  function handleFavorite(_id: string) {
+  const handleFavorite = (_id: string) => {
     // TODO: wire up favorites toggle via Convex
-  }
+  };
 
-  function handleViewAll(type: ViewAllEventType) {
+  const handleViewAll = (type: ViewAllEventType) => {
     router.push(`/event?type=${type}` as Href);
-  }
+  };
+
+  const handleViewAllOngoing = () => handleViewAll("ongoing");
+  const handleViewAllUpcoming = () => handleViewAll("upcoming");
+  const handleViewAllRecommended = () => handleViewAll("recommended");
+  const handleFilterPress = () => {
+    router.push("/filters?targetType=all" as Href);
+  };
 
   const ongoingEvents = ONGOING_EVENTS;
   const upcomingEvents = UPCOMING_EVENTS;
@@ -54,13 +61,17 @@ export default function HomeScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
       >
-        <HomeHeaderTop city="Riyadh" onFavoritePress={() => {}} onLocationPress={() => {}} />
+        <HomeHeaderTop
+          city="Riyadh"
+          onFavoritePress={() => router.push("/bookmarks" as Href)}
+          onLocationPress={() => undefined}
+        />
         <HomeHeaderSticky
           searchValue={searchValue}
           onSearchChange={setSearchValue}
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
-          onFilterPress={() => router.push("/filters?targetType=all" as Href)}
+          onFilterPress={handleFilterPress}
           isFilterActive={false}
           scrollY={scrollY}
         />
@@ -70,7 +81,7 @@ export default function HomeScreen() {
             <SectionHeader
               title={t("home.ongoingEvents")}
               actionLabel={t("home.viewAll")}
-              onAction={() => handleViewAll("ongoing")}
+              onAction={handleViewAllOngoing}
             />
             <OngoingEventsCarousel events={ongoingEvents} onEventPress={handleEventPress} />
           </View>
@@ -81,7 +92,7 @@ export default function HomeScreen() {
             <SectionHeader
               title={t("home.upcoming")}
               actionLabel={t("home.viewAll")}
-              onAction={() => handleViewAll("upcoming")}
+              onAction={handleViewAllUpcoming}
             />
             <UpcomingEventsList events={upcomingEvents} onEventPress={handleEventPress} />
           </View>
@@ -92,7 +103,7 @@ export default function HomeScreen() {
             <SectionHeader
               title={t("home.recommended")}
               actionLabel={t("home.viewAll")}
-              onAction={() => handleViewAll("recommended")}
+              onAction={handleViewAllRecommended}
             />
             <RecommendedGrid
               events={recommendedEvents}

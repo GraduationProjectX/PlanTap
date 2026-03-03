@@ -3,6 +3,24 @@ import type { FilterType } from "@/lib/event-filters";
 
 export type FilterOption = { id: string; label: string };
 
+const EVENTS_BY_TYPE = {
+  event: MOCK_EVENTS.filter((event) => event.type === "event"),
+  activity: MOCK_EVENTS.filter((event) => event.type === "activity"),
+  both: MOCK_EVENTS,
+} as const;
+
+const CATEGORY_IDS_BY_TYPE = {
+  event: uniqueSorted(EVENTS_BY_TYPE.event.flatMap((event) => event.categories)),
+  activity: uniqueSorted(EVENTS_BY_TYPE.activity.flatMap((event) => event.categories)),
+  both: uniqueSorted(EVENTS_BY_TYPE.both.flatMap((event) => event.categories)),
+} as const;
+
+const CITIES_BY_TYPE = {
+  event: uniqueSorted(EVENTS_BY_TYPE.event.map((event) => event.city)),
+  activity: uniqueSorted(EVENTS_BY_TYPE.activity.map((event) => event.city)),
+  both: uniqueSorted(EVENTS_BY_TYPE.both.map((event) => event.city)),
+} as const;
+
 export function getCategoryLabelByIdMap(isArabic: boolean): Record<string, string> {
   return Object.fromEntries(
     CATEGORIES.filter((category) => category.id !== "all").map((category) => [
@@ -17,23 +35,11 @@ function uniqueSorted(values: string[]): string[] {
 }
 
 export function getCategoryIdsForType(type: FilterType): string[] {
-  if (type === "both") {
-    return uniqueSorted(MOCK_EVENTS.flatMap((event) => event.categories));
-  }
-
-  return uniqueSorted(
-    MOCK_EVENTS.filter((event) => event.type === type).flatMap((event) => event.categories),
-  );
+  return CATEGORY_IDS_BY_TYPE[type];
 }
 
 export function getCitiesForType(type: FilterType): string[] {
-  if (type === "both") {
-    return uniqueSorted(MOCK_EVENTS.map((event) => event.city));
-  }
-
-  return uniqueSorted(
-    MOCK_EVENTS.filter((event) => event.type === type).map((event) => event.city),
-  );
+  return CITIES_BY_TYPE[type];
 }
 
 export function toggleValue(values: string[], value: string): string[] {

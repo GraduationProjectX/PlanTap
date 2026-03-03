@@ -26,7 +26,11 @@ const CATEGORY_ICONS: Record<string, React.ComponentProps<typeof FontAwesome>["n
   entertainment: "film",
 };
 
-export function CategoryChips({ categories, selected, onSelect }: CategoryChipsProps) {
+export function CategoryChips({
+  categories,
+  selected,
+  onSelect,
+}: CategoryChipsProps) {
   return (
     <ScrollView
       horizontal

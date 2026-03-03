@@ -15,33 +15,42 @@ function keyExtractor(item: MockEvent) {
   return item.id;
 }
 
-export function OngoingEventsCarousel({ events, onEventPress }: OngoingEventsCarouselProps) {
+export function OngoingEventsCarousel({
+  events,
+  onEventPress,
+}: OngoingEventsCarouselProps) {
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = screenWidth * 0.75;
+  const cardSizeWithGap = cardWidth + CARD_GAP;
 
-  function renderItem({ item }: { item: MockEvent }) {
-    return (
-      <BigEventCard
-        event={item}
-        onPress={onEventPress}
-        width={cardWidth}
-      />
-    );
-  }
+  const renderItem = ({ item }: { item: MockEvent }) => {
+    return <BigEventCard event={item} onPress={onEventPress} width={cardWidth} />;
+  };
+
+  const getItemLayout = (_data: ArrayLike<MockEvent> | null | undefined, index: number) => ({
+    length: cardSizeWithGap,
+    offset: cardSizeWithGap * index,
+    index,
+  });
 
   return (
     <FlatList
       data={events}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
+      getItemLayout={getItemLayout}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={[
         styles.content,
         { gap: CARD_GAP, paddingHorizontal: HORIZONTAL_PADDING },
       ]}
-      snapToInterval={cardWidth + CARD_GAP}
+      snapToInterval={cardSizeWithGap}
       decelerationRate="fast"
+      initialNumToRender={3}
+      maxToRenderPerBatch={3}
+      updateCellsBatchingPeriod={60}
+      windowSize={5}
     />
   );
 }

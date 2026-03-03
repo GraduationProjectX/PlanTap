@@ -22,6 +22,7 @@ export default function FiltersScreen() {
 
   const targetTypeParam = Array.isArray(targetType) ? targetType[0] : targetType;
   const normalizedTargetType = targetTypeParam ? normalizeEventListType(targetTypeParam) : "all";
+  const isArabic = i18n.language === "ar";
 
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
@@ -38,21 +39,27 @@ export default function FiltersScreen() {
     clearAll,
   } = useFiltersDraft({
     initialFilters: appliedFilters,
-    isArabic: i18n.language === "ar",
+    isArabic,
   });
 
-  function handleApply() {
+  const scrollContentStyle = [styles.scrollContent, { paddingBottom: insets.bottom + 110 }];
+
+  const handleApply = () => {
     setAppliedFilters(draft);
     router.replace(`/event?type=${normalizedTargetType}&source=filters` as Href);
-  }
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
 
   return (
     <View style={styles.root}>
-      <FiltersTopBar onBack={() => router.back()} onClearAll={clearAll} />
+      <FiltersTopBar onBack={handleBack} onClearAll={clearAll} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 110 }]}
+        contentContainerStyle={scrollContentStyle}
       >
         <FiltersTypeSection selectedType={draft.type} onSelectType={selectType} />
 

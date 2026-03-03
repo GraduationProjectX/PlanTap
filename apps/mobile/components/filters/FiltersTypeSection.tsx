@@ -12,7 +12,10 @@ type FiltersTypeSectionProps = {
   onSelectType: (type: FilterType) => void;
 };
 
-export function FiltersTypeSection({ selectedType, onSelectType }: FiltersTypeSectionProps) {
+export function FiltersTypeSection({
+  selectedType,
+  onSelectType,
+}: FiltersTypeSectionProps) {
   const { t } = useTranslation();
 
   const typeOptions: { id: FilterType; label: string }[] = [

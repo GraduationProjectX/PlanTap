@@ -39,7 +39,7 @@ function getEventTags(event: MockEvent): string[] {
   return Array.from(new Set([...derivedTags, ...sourceTags])).slice(0, 5);
 }
 
-export function MediumEventCard({ event, width, onPress }: MediumEventCardProps) {
+function MediumEventCardComponent({ event, width, onPress }: MediumEventCardProps) {
   const { t } = useTranslation();
   const { isRTL, flexDirection, textAlign } = useDirection();
 
@@ -47,9 +47,9 @@ export function MediumEventCard({ event, width, onPress }: MediumEventCardProps)
   const badgeLabel = live ? t("home.liveNow") : null;
   const tagLabels = getEventTags(event);
 
-  function handlePress() {
+  const handlePress = () => {
     onPress?.(event.id);
-  }
+  };
 
   return (
     <PressableFeedback
@@ -62,7 +62,7 @@ export function MediumEventCard({ event, width, onPress }: MediumEventCardProps)
           source={{ uri: event.images[0] }}
           style={styles.image}
           contentFit="cover"
-          transition={250}
+          transition={120}
         />
         <View style={styles.overlay} />
 
@@ -116,6 +116,8 @@ export function MediumEventCard({ event, width, onPress }: MediumEventCardProps)
     </PressableFeedback>
   );
 }
+
+export const MediumEventCard = MediumEventCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
   container: {

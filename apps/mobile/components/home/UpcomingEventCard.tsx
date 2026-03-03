@@ -1,7 +1,8 @@
 import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native-unistyles";
-import { Button } from "heroui-native";
+import { Chip } from "heroui-native";
+import Fontisto from "@expo/vector-icons/Fontisto";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
 import { DateBadge } from "./DateBadge";
@@ -10,9 +11,14 @@ import type { MockEvent } from "@/data/mock-events";
 type UpcomingEventCardProps = {
   event: MockEvent;
   onPress?: (id: string) => void;
+  onBookmark?: (id: string) => void;
+  isBookmarked?: boolean;
+  showCountdown?: boolean;
 };
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
 
 function getDateParts(timestamp?: number) {
   if (!timestamp) return { day: 0, month: "" };
@@ -20,13 +26,32 @@ function getDateParts(timestamp?: number) {
   return { day: d.getDate(), month: MONTH_NAMES[d.getMonth()] ?? "" };
 }
 
-export function UpcomingEventCard({ event, onPress }: UpcomingEventCardProps) {
+function getCountdownLabel(startAt?: number): string | null {
+  if (!startAt) return null;
+  const diff = startAt - Date.now();
+  if (diff <= 0) return null;
+  const days = Math.floor(diff / DAY);
+  const hours = Math.floor((diff % DAY) / HOUR);
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h`;
+  const minutes = Math.floor(diff / (60 * 1000));
+  return `${minutes}m`;
+}
+
+function UpcomingEventCardComponent({
+  event,
+  onPress,
+  onBookmark,
+  isBookmarked,
+  showCountdown = true,
+}: UpcomingEventCardProps) {
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
 
   const { day, month } = getDateParts(event.startAt);
   const categoryLabel = event.categories[0]?.toUpperCase() ?? "";
   const priceLabel = event.priceMin ? `$${event.priceMin}` : t("home.freeEntry");
+  const countdown = showCountdown ? getCountdownLabel(event.startAt) : null;
 
   return (
     <Pressable
@@ -39,22 +64,42 @@ export function UpcomingEventCard({ event, onPress }: UpcomingEventCardProps) {
             source={{ uri: event.images[0] }}
             style={styles.image}
             contentFit="cover"
-            transition={200}
+            transition={120}
           />
           <View style={styles.dateBadge}>
             <DateBadge day={day} month={month} />
           </View>
+
+          {onBookmark && (
+            <Pressable
+              onPress={() => onBookmark(event.id)}
+              style={styles.bookmarkButton}
+              hitSlop={8}
+            >
+              <Fontisto
+                name={isBookmarked ? "bookmark-alt" : "bookmark"}
+                size={14}
+                color="#FFFFFF"
+              />
+            </Pressable>
+          )}
         </View>
 
         <View style={styles.info}>
-          <View style={[styles.categoryRow, { flexDirection }]}>
-            <Text style={[styles.category, { textAlign }]}>{categoryLabel}</Text>
+          <View style={[styles.topRow, { flexDirection }]}>
+            {countdown && (
+              <Chip size="sm" variant="secondary" color="accent" animation="disable-all">
+                <Chip.Label>{t("bookmarks.startsIn", { time: countdown })}</Chip.Label>
+              </Chip>
+            )}
             <Text style={styles.price}>{priceLabel}</Text>
           </View>
 
-          <Text style={[styles.title, { textAlign }]} numberOfLines={1}>
+          <Text style={[styles.title, { textAlign }]} numberOfLines={2}>
             {event.title}
           </Text>
+
+          <Text style={[styles.category, { textAlign }]}>{categoryLabel}</Text>
 
           <View style={[styles.locationRow, { flexDirection }]}>
             <Text style={styles.locationIcon}>📍</Text>
@@ -62,20 +107,13 @@ export function UpcomingEventCard({ event, onPress }: UpcomingEventCardProps) {
               {event.location.address}
             </Text>
           </View>
-
-          <Button
-            variant="primary"
-            size="sm"
-            onPress={() => onPress?.(event.id)}
-            className="mt-1"
-          >
-            <Button.Label>{t("home.viewDetails")}</Button.Label>
-          </Button>
         </View>
       </View>
     </Pressable>
   );
 }
+
+export const UpcomingEventCard = UpcomingEventCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
   card: {
@@ -91,8 +129,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   imageContainer: {
-    width: 96,
-    height: 96,
+    width: 104,
+    height: 104,
     borderRadius: theme.radius.lg,
     borderCurve: "continuous",
     overflow: "hidden",
@@ -107,13 +145,25 @@ const styles = StyleSheet.create((theme) => ({
     top: 4,
     left: 4,
   },
+  bookmarkButton: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   info: {
     flex: 1,
-    gap: 4,
+    gap: 6,
   },
-  categoryRow: {
+  topRow: {
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 4,
   },
   category: {
     fontSize: theme.font.size.sm,

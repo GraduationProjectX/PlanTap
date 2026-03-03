@@ -19,6 +19,7 @@ export function FiltersCategorySection({
   onToggleCategory,
 }: FiltersCategorySectionProps) {
   const { t } = useTranslation();
+  const selectedCategoryIdsSet = new Set(selectedCategoryIds);
 
   return (
     <FilterSection step={2} title={t("filters.categories")} caption={t("filters.selectTopics")}>
@@ -27,7 +28,7 @@ export function FiltersCategorySection({
           <FilterPill
             key={option.id}
             label={option.label}
-            active={selectedCategoryIds.includes(option.id)}
+            active={selectedCategoryIdsSet.has(option.id)}
             onPress={() => onToggleCategory(option.id)}
           />
         ))}

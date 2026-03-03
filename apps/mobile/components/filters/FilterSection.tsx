@@ -13,7 +13,12 @@ type FilterSectionProps = {
   children: ReactNode;
 };
 
-export function FilterSection({ step, title, caption, children }: FilterSectionProps) {
+export function FilterSection({
+  step,
+  title,
+  caption,
+  children,
+}: FilterSectionProps) {
   const { flexDirection, textAlign } = useDirection();
 
   return (

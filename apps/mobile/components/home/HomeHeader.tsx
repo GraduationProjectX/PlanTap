@@ -35,7 +35,11 @@ type HomeHeaderStickyProps = {
 
 type HomeHeaderProps = HomeHeaderTopProps & HomeHeaderStickyProps;
 
-export function HomeHeaderTop({ city, onFavoritePress, onLocationPress }: HomeHeaderTopProps) {
+export function HomeHeaderTop({
+  city,
+  onFavoritePress,
+  onLocationPress,
+}: HomeHeaderTopProps) {
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
   const insets = useSafeAreaInsets();
@@ -94,14 +98,7 @@ export function HomeHeaderSticky({
       backgroundColor: interpolateColor(progress, [0, 1], ["#1E1E1E", "#161616"]),
       paddingTop: interpolate(progress, [0, 1], [4, insets.top + 6]),
       paddingBottom: interpolate(progress, [0, 1], [24, 12]),
-      borderBottomLeftRadius: interpolate(progress, [0, 1], [32, 18]),
-      borderBottomRightRadius: interpolate(progress, [0, 1], [32, 18]),
       transform: [{ translateY: interpolate(progress, [0, 1], [0, -2]) }],
-      shadowColor: "#000000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: interpolate(progress, [0, 1], [0, 0.25]),
-      shadowRadius: interpolate(progress, [0, 1], [0, 12]),
-      elevation: interpolate(progress, [0, 1], [0, 8]),
     };
   });
 

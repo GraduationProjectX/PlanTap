@@ -3,7 +3,7 @@ import { BottomSheet, Button } from "heroui-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
-import { Calendar, type DateData } from "react-native-calendars";
+import type { DateData } from "react-native-calendars";
 import { StyleSheet } from "react-native-unistyles";
 
 import {
@@ -12,6 +12,7 @@ import {
   formatRange,
   toLocalDateString,
 } from "@/lib/filters-screen-utils";
+import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import type { FilterDate } from "@/lib/event-filters";
 import { useDirection } from "@/rtl";
 
@@ -25,6 +26,9 @@ type FiltersDateSectionProps = {
   onToggleDate: (date: FilterDate) => void;
   onConfirmSpecificDates: (startDate: string, endDate: string) => void;
 };
+
+const TODAY_STR = toLocalDateString(new Date());
+const QUICK_DATE_OPTIONS = ["today", "thisWeekend"] as const;
 
 export function FiltersDateSection({
   activeDate,
@@ -40,23 +44,24 @@ export function FiltersDateSection({
   const [rangeStart, setRangeStart] = useState<string | undefined>();
   const [rangeEnd, setRangeEnd] = useState<string | undefined>();
 
-  const todayStr = toLocalDateString(new Date());
   const markedDates = buildMarkedDates(rangeStart, rangeEnd);
   const dateRangeLabel =
     activeDate === "specificDates" && startDate
       ? formatRange(startDate, endDate, i18n.language === "ar" ? "ar-SA" : "en-US")
       : null;
+  const CalendarComponent = calendarOpen ? require("react-native-calendars").Calendar : null;
+  const quickDateOptions = QUICK_DATE_OPTIONS;
 
-  function handleOpenChange(open: boolean) {
+  const handleOpenChange = (open: boolean) => {
     if (open) {
       setRangeStart(activeDate === "specificDates" ? startDate : undefined);
       setRangeEnd(activeDate === "specificDates" ? endDate : undefined);
     }
 
     setCalendarOpen(open);
-  }
+  };
 
-  function handleDayPress(day: DateData) {
+  const handleDayPress = (day: DateData) => {
     if (!rangeStart || rangeEnd) {
       setRangeStart(day.dateString);
       setRangeEnd(undefined);
@@ -70,22 +75,22 @@ export function FiltersDateSection({
     }
 
     setRangeEnd(day.dateString);
-  }
+  };
 
-  function handleConfirmDates() {
+  const handleConfirmDates = () => {
     if (!rangeStart) {
       return;
     }
 
     onConfirmSpecificDates(rangeStart, rangeEnd ?? rangeStart);
     setCalendarOpen(false);
-  }
+  };
 
   return (
     <FilterSection step={4} title={t("filters.date")} caption={t("filters.whenFree")}>
       <View style={styles.dateGroup}>
         <View style={styles.chipsRow}>
-          {(["today", "thisWeekend"] as const).map((key) => {
+          {quickDateOptions.map((key) => {
             const label = key === "today" ? t("filters.dateToday") : t("filters.dateThisWeekend");
 
             return (
@@ -100,7 +105,7 @@ export function FiltersDateSection({
           })}
         </View>
 
-        <BottomSheet isOpen={calendarOpen} onOpenChange={handleOpenChange}>
+        <BottomSheet isOpen={calendarOpen} onOpenChange={handleOpenChange} animation="disable-all">
           <BottomSheet.Trigger asChild>
             <Pressable style={[styles.specificDatesRow, { flexDirection }]}>
               <View style={[styles.specificDatesInner, { flexDirection }]}>
@@ -117,30 +122,32 @@ export function FiltersDateSection({
 
               <FontAwesome
                 name={isRTL ? "chevron-left" : "chevron-right"}
-                size={14}
-                color="#BABABA"
+                size={ICON_SIZES.chevronDisclosure}
+                color={ICON_COLORS.chevronMuted}
               />
             </Pressable>
           </BottomSheet.Trigger>
 
           <BottomSheet.Portal>
-            <BottomSheet.Overlay />
-            <BottomSheet.Content snapPoints={["65%"]}>
+            <BottomSheet.Overlay animation="disabled" />
+            <BottomSheet.Content snapPoints={["65%"]} animation="disabled">
               <BottomSheet.Close />
               <BottomSheet.Title style={styles.sheetTitle}>{t("filters.chooseDatesTitle")}</BottomSheet.Title>
               <BottomSheet.Description style={styles.sheetDesc}>
                 {t("filters.chooseDatesDesc")}
               </BottomSheet.Description>
 
-              <Calendar
-                markingType="period"
-                markedDates={markedDates}
-                onDayPress={handleDayPress}
-                minDate={todayStr}
-                enableSwipeMonths
-                theme={CALENDAR_THEME}
-                style={styles.calendar}
-              />
+              {CalendarComponent ? (
+                <CalendarComponent
+                  markingType="period"
+                  markedDates={markedDates}
+                  onDayPress={handleDayPress}
+                  minDate={TODAY_STR}
+                  enableSwipeMonths
+                  theme={CALENDAR_THEME}
+                  style={styles.calendar}
+                />
+              ) : null}
 
               <View style={styles.sheetActions}>
                 <Button

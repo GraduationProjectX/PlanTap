@@ -8,10 +8,15 @@ type UpcomingEventsListProps = {
   onEventPress?: (id: string) => void;
 };
 
-export function UpcomingEventsList({ events, onEventPress }: UpcomingEventsListProps) {
+export function UpcomingEventsList({
+  events,
+  onEventPress,
+}: UpcomingEventsListProps) {
+  const visibleEvents = events.slice(0, 4);
+
   return (
     <View style={styles.container}>
-      {events.slice(0, 4).map((event) => (
+      {visibleEvents.map((event) => (
         <UpcomingEventCard
           key={event.id}
           event={event}

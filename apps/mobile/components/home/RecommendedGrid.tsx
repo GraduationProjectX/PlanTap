@@ -9,10 +9,16 @@ type RecommendedGridProps = {
   onFavorite?: (id: string) => void;
 };
 
-export function RecommendedGrid({ events, onEventPress, onFavorite }: RecommendedGridProps) {
+export function RecommendedGrid({
+  events,
+  onEventPress,
+  onFavorite,
+}: RecommendedGridProps) {
+  const visibleEvents = events.slice(0, 4);
+
   return (
     <View style={styles.grid}>
-      {events.slice(0, 4).map((event) => (
+      {visibleEvents.map((event) => (
         <RecommendedEventCard
           key={event.id}
           event={event}

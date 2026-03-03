@@ -13,6 +13,7 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import { applyEventFilters, isDefaultEventFilters } from "@/lib/event-filters";
 import { normalizeEventListType, type EventListType } from "@/lib/event-list-type";
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
+import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import {
   MOCK_EVENTS,
   ONGOING_EVENTS,
@@ -25,6 +26,12 @@ import { useEventFiltersStore } from "@/stores/event-filters-store";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
+const DATA_MAP: Record<EventListType, MockEvent[]> = {
+  ongoing: ONGOING_EVENTS,
+  upcoming: UPCOMING_EVENTS,
+  recommended: RECOMMENDED_EVENTS,
+  all: MOCK_EVENTS,
+};
 
 function keyExtractor(item: MockEvent) {
   return item.id;
@@ -50,13 +57,6 @@ export default function ViewAllEventsScreen() {
   const sourceParam = Array.isArray(source) ? source[0] : source;
   const shouldApplyFilters = sourceParam === "filters";
 
-  const dataMap: Record<EventListType, MockEvent[]> = {
-    ongoing: ONGOING_EVENTS,
-    upcoming: UPCOMING_EVENTS,
-    recommended: RECOMMENDED_EVENTS,
-    all: MOCK_EVENTS,
-  };
-
   const titleMap: Record<EventListType, string> = {
     ongoing: t("home.ongoingEvents"),
     upcoming: t("home.upcoming"),
@@ -64,7 +64,7 @@ export default function ViewAllEventsScreen() {
     all: t("home.viewAll"),
   };
 
-  const events = dataMap[eventType];
+  const events = DATA_MAP[eventType];
   const filteredEvents = shouldApplyFilters ? applyEventFilters(events, appliedFilters) : events;
   const query = searchValue.trim().toLowerCase();
   const visibleEvents =
@@ -94,15 +94,15 @@ export default function ViewAllEventsScreen() {
   const hiddenFilterSummaryCount = Math.max(filterSummaryTags.length - visibleFilterSummaryTags.length, 0);
   const showFilterSummary = shouldApplyFilters;
 
-  function handleEventPress(id: string) {
+  const handleEventPress = (id: string) => {
     router.push(`/event/${id}` as Href);
-  }
+  };
 
-  function handleFilterPress() {
+  const handleFilterPress = () => {
     router.push(`/filters?targetType=${eventType}` as Href);
-  }
+  };
 
-  function handleRemoveFilterTag(tagId: string) {
+  const handleRemoveFilterTag = (tagId: string) => {
     if (!appliedFilters) {
       return;
     }
@@ -115,20 +115,20 @@ export default function ViewAllEventsScreen() {
     }
 
     setAppliedFilters(nextFilters);
-  }
+  };
 
-  function handleBackPress() {
+  const handleBackPress = () => {
     if (shouldApplyFilters) {
       router.replace("/" as Href);
       return;
     }
 
     router.back();
-  }
+  };
 
-  function renderItem({ item }: { item: MockEvent }) {
+  const renderItem = ({ item }: { item: MockEvent }) => {
     return <MediumEventCard event={item} width={cardWidth} onPress={handleEventPress} />;
-  }
+  };
 
   return (
     <View style={styles.root}>
@@ -139,7 +139,11 @@ export default function ViewAllEventsScreen() {
           onPress={handleBackPress}
           style={styles.iconButton}
         >
-          <FontAwesome name={isRTL ? "chevron-right" : "chevron-left"} size={14} color="#FFFFFF" />
+          <FontAwesome
+            name={isRTL ? "chevron-right" : "chevron-left"}
+            size={ICON_SIZES.chevronNav}
+            color={ICON_COLORS.chevronOnDark}
+          />
         </Button>
 
         {shouldApplyFilters ? (
@@ -205,6 +209,16 @@ export default function ViewAllEventsScreen() {
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={styles.row}
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
+        initialNumToRender={6}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={60}
+        windowSize={7}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <FontAwesome name="calendar-times-o" size={42} color={"gray"} />
+            <Text style={styles.noResultText}> No Result Found</Text>
+          </View>
+        }
       />
     </View>
   );
@@ -289,4 +303,16 @@ const styles = StyleSheet.create((theme) => ({
   row: {
     gap: COLUMN_GAP,
   },
+  emptyContainer: {
+    flex:1,
+    minHeight:300,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noResultText: {
+    marginTop: 16,
+    fontSize: theme.font.size.xxl,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+  }
 }));

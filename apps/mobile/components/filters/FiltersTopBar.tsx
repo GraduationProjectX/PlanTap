@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
+import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { useDirection } from "@/rtl";
 
 type FiltersTopBarProps = {
@@ -34,8 +35,8 @@ export function FiltersTopBar({ onBack, onClearAll }: FiltersTopBarProps) {
           >
             <FontAwesome
               name={isRTL ? "chevron-right" : "chevron-left"}
-              size={18}
-              color="#FFF"
+              size={ICON_SIZES.chevronNav}
+              color={ICON_COLORS.chevronOnDark}
             />
           </Pressable>
         </View>

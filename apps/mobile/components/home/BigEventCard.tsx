@@ -35,7 +35,7 @@ function getEventTags(event: MockEvent): string[] {
   return Array.from(new Set([...derivedTags, ...sourceTags])).slice(0, 8);
 }
 
-export function BigEventCard({ event, onPress, width }: BigEventCardProps) {
+function BigEventCardComponent({ event, onPress, width }: BigEventCardProps) {
   const { t } = useTranslation();
   const { textAlign, flexDirection } = useDirection();
 
@@ -44,16 +44,16 @@ export function BigEventCard({ event, onPress, width }: BigEventCardProps) {
   const tagLabels = getEventTags(event);
 
   return (
-    <Pressable
-      onPress={() => onPress?.(event.id)}
-      style={[styles.card, { width }]}
-    >
-      <Image
-        source={{ uri: event.images[0] }}
-        style={styles.image}
-        contentFit="cover"
-        transition={300}
-      />
+      <Pressable
+        onPress={() => onPress?.(event.id)}
+        style={[styles.card, { width }]}
+      >
+        <Image
+          source={{ uri: event.images[0] }}
+          style={styles.image}
+          contentFit="cover"
+          transition={160}
+        />
       <View style={styles.overlay} />
 
       {badgeLabel && (
@@ -91,6 +91,8 @@ export function BigEventCard({ event, onPress, width }: BigEventCardProps) {
     </Pressable>
   );
 }
+
+export const BigEventCard = BigEventCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
   card: {

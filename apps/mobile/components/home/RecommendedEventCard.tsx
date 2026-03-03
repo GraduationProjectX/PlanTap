@@ -12,7 +12,11 @@ type RecommendedEventCardProps = {
   onFavorite?: (id: string) => void;
 };
 
-export function RecommendedEventCard({ event, onPress, onFavorite }: RecommendedEventCardProps) {
+function RecommendedEventCardComponent({
+  event,
+  onPress,
+  onFavorite,
+}: RecommendedEventCardProps) {
   const { t } = useTranslation();
   const { textAlign } = useDirection();
 
@@ -33,7 +37,7 @@ export function RecommendedEventCard({ event, onPress, onFavorite }: Recommended
           source={{ uri: event.images[0] }}
           style={styles.image}
           contentFit="cover"
-          transition={200}
+          transition={120}
         />
 
         {event.rating && (
@@ -64,6 +68,8 @@ export function RecommendedEventCard({ event, onPress, onFavorite }: Recommended
     </Pressable>
   );
 }
+
+export const RecommendedEventCard = RecommendedEventCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
   card: {
