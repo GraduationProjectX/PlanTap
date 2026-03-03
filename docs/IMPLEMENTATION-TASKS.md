@@ -30,7 +30,7 @@
 
 ### 1.2 Mobile Project Init
 
-- [x] `corepack pnpm dlx create-expo-app@latest apps/mobile --template tabs`
+- [x] `pnpm dlx create-expo-app@latest apps/mobile --template tabs`
 - [x] Upgrade to the latest stable Expo SDK if needed
 - [x] Configure TypeScript strict mode
 - [x] Remove default template content
@@ -77,7 +77,7 @@
 - [x] Copy Convex URL to environment
 - [x] Configure ConvexProvider in app entry (with Clerk integration)
 - [x] Create basic schema (packages/backend/convex/schema.ts) - users table with Clerk sync
-- [x] Run `corepack pnpm -C packages/backend dev` and verify connection
+- [x] Run `pnpm -C packages/backend dev` and verify connection
 - [x] Test basic query from mobile
 
 ### 1.7 Clerk Setup
@@ -129,37 +129,23 @@
 
 ### 1.9 Local Storage
 
-- [ ] Install react-native-mmkv
-- [ ] Create storage helper utilities
-- [ ] Create keys constants
-- [ ] Test storage save/load
+- [x] Install react-native-mmkv
+- [x] Create storage helper utilities
+- [x] Create keys constants
+- [x] Test storage save/load
 
 ### 1.10 State Management
 
-- [ ] Install zustand
-- [ ] Create UI state store (filters, toggles)
-- [ ] Create auth state store (user info cache)
-- [ ] Test store updates
+- [x] Install zustand
+- [x] Create UI state store 
+- [x] Create auth state store (user info cache)
+- [x] Test store updates
 
 ---
 
 ## Phase 3: Core Screens
 
-### 3.1 Shared Components(or just use HeroUI Native components)
-
-<!-- - [ ] `Button` (primary, secondary, outline, ghost)
-- [ ] `Card` (event card base)
-- [ ] `Badge` (price, distance, indoor/outdoor)
-- [ ] `Input` (text input with RTL support)
-- [ ] `SearchBar` (with filter button)
-- [ ] `BottomSheet` (reusable modal sheet)
-- [ ] `LoadingSkeleton` (content placeholders)
-- [ ] `EmptyState` (no results message)
-- [ ] `ErrorState` (error with retry)
-- [ ] `Avatar` (user avatar)
-- [ ] `IconButton` (icon-only button)
-- [ ] Verify all components RTL-compatible -->
-
+ 
 ### 3.2 Onboarding Flow
 
 - [ ] Check react-native-onboarding

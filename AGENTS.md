@@ -4,12 +4,12 @@ PlanTap is a monorepo for an Expo (React Native) mobile app and a Convex backend
 
 ## Essentials
 
-- Package manager: pnpm (via Corepack). Prefer `corepack pnpm ...`.
-- Install deps: `corepack pnpm install`
-- Run all dev tasks (turbo): `corepack pnpm run dev`
-- Mobile: `corepack pnpm --filter mobile dev -- -c`, `corepack pnpm --filter mobile android`
-- Backend: `corepack pnpm --filter backend dev`
-- If install warns about ignored build scripts: `corepack pnpm approve-builds` then `corepack pnpm rebuild --pending`
+- Package manager: pnpm (Corepack optional). Prefer `pnpm ...`.
+- Install deps: `pnpm install`
+- Run all dev tasks (turbo): `pnpm run dev`
+- Mobile: `pnpm --filter mobile dev -- -c`, `pnpm --filter mobile android`
+- Backend: `pnpm --filter backend dev`
+- If install warns about ignored build scripts: `pnpm approve-builds` then `pnpm rebuild --pending`
 
 ## More docs
 

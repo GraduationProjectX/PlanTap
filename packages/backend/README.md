@@ -7,7 +7,7 @@ This package contains PlanTap's Convex backend (functions, schema, and generated
 From the repo root:
 
 ```bash
-corepack pnpm install
+pnpm install
 ```
 
 ## Dev
@@ -15,13 +15,13 @@ corepack pnpm install
 From this directory:
 
 ```bash
-corepack pnpm dev
+pnpm dev
 ```
 
 Or from the repo root (runs backend + mobile together via Turborepo):
 
 ```bash
-corepack pnpm run dev
+pnpm run dev
 ```
 
 ## Notes
