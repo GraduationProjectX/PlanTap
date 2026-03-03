@@ -3,6 +3,25 @@ import type { FilterType } from "@/lib/event-filters";
 
 export type FilterOption = { id: string; label: string };
 
+const SUPPORTED_CITIES = [
+  "Riyadh",
+  "Jeddah",
+  "Makkah",
+  "Madinah",
+  "Dammam",
+  "Khobar",
+  "Qassim",
+  "Taif",
+  "Abha",
+  "Tabuk",
+  "Hail",
+  "Jazan",
+  "Najran",
+  "Al Ahsa",
+  "Al Jubail",
+  "Yanbu",
+] as const;
+
 const EVENTS_BY_TYPE = {
   event: MOCK_EVENTS.filter((event) => event.type === "event"),
   activity: MOCK_EVENTS.filter((event) => event.type === "activity"),
@@ -20,6 +39,13 @@ const CITIES_BY_TYPE = {
   activity: uniqueSorted(EVENTS_BY_TYPE.activity.map((event) => event.city)),
   both: uniqueSorted(EVENTS_BY_TYPE.both.map((event) => event.city)),
 } as const;
+
+const ALL_CITY_OPTIONS = uniqueSorted([
+  ...SUPPORTED_CITIES,
+  ...CITIES_BY_TYPE.event,
+  ...CITIES_BY_TYPE.activity,
+  ...CITIES_BY_TYPE.both,
+]);
 
 export function getCategoryLabelByIdMap(isArabic: boolean): Record<string, string> {
   return Object.fromEntries(
@@ -39,7 +65,8 @@ export function getCategoryIdsForType(type: FilterType): string[] {
 }
 
 export function getCitiesForType(type: FilterType): string[] {
-  return CITIES_BY_TYPE[type];
+  void type;
+  return ALL_CITY_OPTIONS;
 }
 
 export function toggleValue(values: string[], value: string): string[] {

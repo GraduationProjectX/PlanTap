@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useLocalSearchParams, useRouter, type Href } from "expo-router";
-import { Button } from "heroui-native";
-import { useState } from "react";
+import { Button, Select } from "heroui-native";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,14 +10,15 @@ import { StyleSheet } from "react-native-unistyles";
 import { MediumEventCard } from "@/components/home/MediumEventCard";
 import { FilterButton } from "@/components/ui/FilterButton";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { applyEventFilters, isDefaultEventFilters } from "@/lib/event-filters";
+import { applyEventFilters, isDefaultEventFilters, type FilterType } from "@/lib/event-filters";
 import { normalizeEventListType, type EventListType } from "@/lib/event-list-type";
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
+import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import {
+  ACTIVITY_EVENTS,
   MOCK_EVENTS,
   ONGOING_EVENTS,
-  RECOMMENDED_EVENTS,
   UPCOMING_EVENTS,
   type MockEvent,
 } from "@/data/mock-events";
@@ -26,11 +27,19 @@ import { useEventFiltersStore } from "@/stores/event-filters-store";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
+const ALL_CITIES_VALUE = "__all_cities__";
 const DATA_MAP: Record<EventListType, MockEvent[]> = {
   ongoing: ONGOING_EVENTS,
   upcoming: UPCOMING_EVENTS,
-  recommended: RECOMMENDED_EVENTS,
+  activity: ACTIVITY_EVENTS,
   all: MOCK_EVENTS,
+};
+const NON_REMOVABLE_FILTER_TAG_IDS = new Set(["type:both", "category:any", "city:all"]);
+const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
+  ongoing: "event",
+  upcoming: "event",
+  activity: "activity",
+  all: "both",
 };
 
 function keyExtractor(item: MockEvent) {
@@ -42,35 +51,50 @@ export default function ViewAllEventsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
-  const { isRTL } = useDirection();
+  const { isRTL, flexDirection, textAlign } = useDirection();
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
   const clearAppliedFilters = useEventFiltersStore((state) => state.clearAppliedFilters);
   const isArabic = i18n.language === "ar";
   const [searchValue, setSearchValue] = useState("");
 
-  const { type, source } = useLocalSearchParams<{
+  const { type, source, city } = useLocalSearchParams<{
     type?: string | string[];
     source?: string | string[];
+    city?: string | string[];
   }>();
   const eventType = normalizeEventListType(Array.isArray(type) ? type[0] : type);
   const sourceParam = Array.isArray(source) ? source[0] : source;
+  const cityParam = Array.isArray(city) ? city[0] : city;
   const shouldApplyFilters = sourceParam === "filters";
+  const cityOptions = getCitiesForType(FILTER_TYPE_BY_EVENT_LIST_TYPE[eventType]);
+  const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
+  const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
+  const allCitiesLabel = t("filters.allCities");
+  const selectedCityLabel = selectedCity ?? allCitiesLabel;
 
-  const titleMap: Record<EventListType, string> = {
-    ongoing: t("home.ongoingEvents"),
-    upcoming: t("home.upcoming"),
-    recommended: t("home.recommended"),
-    all: t("home.viewAll"),
+  useEffect(() => {
+    setSelectedCity(initialCity);
+  }, [initialCity]);
+
+  const titlePrefixMap: Record<EventListType, string> = {
+    ongoing: t("home.ongoingEventsIn"),
+    upcoming: t("home.upcomingIn"),
+    activity: t("home.activitiesIn"),
+    all: `${t("home.viewAll")} `,
   };
 
   const events = DATA_MAP[eventType];
   const filteredEvents = shouldApplyFilters ? applyEventFilters(events, appliedFilters) : events;
+  const cityScopedEvents =
+    !shouldApplyFilters && selectedCity
+      ? filteredEvents.filter((event) => event.city === selectedCity)
+      : filteredEvents;
   const query = searchValue.trim().toLowerCase();
   const visibleEvents =
     query.length === 0
-      ? filteredEvents
-      : filteredEvents.filter((event) => {
+      ? cityScopedEvents
+      : cityScopedEvents.filter((event) => {
           const fields = [
             event.title,
             event.titleAr,
@@ -83,7 +107,6 @@ export default function ViewAllEventsScreen() {
 
           return fields.some((field) => field.toLowerCase().includes(query));
         });
-  const title = titleMap[eventType];
   const cardWidth = (screenWidth - HORIZONTAL_PADDING * 2 - COLUMN_GAP) / 2;
   const filterSummaryTags = buildFilterSummaryTags({
     filters: appliedFilters,
@@ -158,9 +181,71 @@ export default function ViewAllEventsScreen() {
             />
           </View>
         ) : (
-          <Text style={styles.topBarTitle} numberOfLines={1}>
-            {title}
-          </Text>
+          <View style={[styles.titleAndCitySlot, { flexDirection }]}> 
+            <Text
+              style={[styles.topBarTitle, eventType === "activity" && styles.topBarTitleActivity, { textAlign }]}
+              numberOfLines={1}
+            >
+              {titlePrefixMap[eventType]}
+            </Text>
+            <Select
+              presentation="bottom-sheet"
+              value={{
+                value: selectedCity ?? ALL_CITIES_VALUE,
+                label: selectedCityLabel,
+              }}
+              onValueChange={(option) => {
+                setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
+              }}
+            >
+              <Select.Trigger style={styles.citySelectTrigger}>
+                <View style={[styles.cityRow, { flexDirection }]}> 
+                  <Text style={styles.cityIcon}>📍</Text>
+                  <Text style={styles.cityText} numberOfLines={1}>
+                    {selectedCityLabel}
+                  </Text>
+                </View>
+                <Select.TriggerIndicator>
+                  <FontAwesome
+                    name="chevron-down"
+                    size={ICON_SIZES.chevronDisclosure}
+                    color="rgba(255,255,255,0.84)"
+                  />
+                </Select.TriggerIndicator>
+              </Select.Trigger>
+
+              <Select.Portal>
+                <Select.Overlay
+                  animation={{
+                    opacity: {
+                      value: [0, 1, 0] as [number, number, number],
+                    },
+                  }}
+                  style={styles.cityOverlay}
+                />
+                <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                  <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                  <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                    <View style={styles.cityOptionInner}>
+                      <Text style={styles.cityOptionIcon}>🌍</Text>
+                      <Select.ItemLabel />
+                    </View>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                  {cityOptions.map((cityOption) => (
+                    <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                      <View style={styles.cityOptionInner}>
+                        <Text style={styles.cityOptionIcon}>🏢</Text>
+                        <Select.ItemLabel />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                  <View style={{ height: insets.bottom + 16 }} />
+                </Select.Content>
+              </Select.Portal>
+            </Select>
+          </View>
         )}
 
         {!shouldApplyFilters && <FilterButton onPress={handleFilterPress} isActive={false} />}
@@ -175,20 +260,32 @@ export default function ViewAllEventsScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.filterTagsRow}
             >
-              {visibleFilterSummaryTags.map((tag) => (
-                <Pressable
-                  key={tag.id}
-                  onPress={() => handleRemoveFilterTag(tag.id)}
-                  style={styles.filterTag}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("filters.removeFilter")}
-                >
-                  <Text style={styles.filterTagText} numberOfLines={1}>
-                    {tag.label}
-                  </Text>
-                  <FontAwesome name="times" size={12} color="#FFF" />
-                </Pressable>
-              ))}
+              {visibleFilterSummaryTags.map((tag) => {
+                if (NON_REMOVABLE_FILTER_TAG_IDS.has(tag.id)) {
+                  return (
+                    <View key={tag.id} style={styles.filterTag}>
+                      <Text style={styles.filterTagText} numberOfLines={1}>
+                        {tag.label}
+                      </Text>
+                    </View>
+                  );
+                }
+
+                return (
+                  <Pressable
+                    key={tag.id}
+                    onPress={() => handleRemoveFilterTag(tag.id)}
+                    style={styles.filterTag}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("filters.removeFilter")}
+                  >
+                    <Text style={styles.filterTagText} numberOfLines={1}>
+                      {tag.label}
+                    </Text>
+                    <FontAwesome name="times" size={12} color="#FFF" />
+                  </Pressable>
+                );
+              })}
               {hiddenFilterSummaryCount > 0 && (
                 <View style={styles.filterTag}>
                   <Text style={styles.filterTagText}>+{hiddenFilterSummaryCount}</Text>
@@ -215,8 +312,19 @@ export default function ViewAllEventsScreen() {
         windowSize={7}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <FontAwesome name="calendar-times-o" size={42} color={"gray"} />
-            <Text style={styles.noResultText}> No Result Found</Text>
+            <FontAwesome
+              name={selectedCity && query.length === 0 ? "map-marker" : "calendar-times-o"}
+              size={42}
+              color={"gray"}
+            />
+            <Text style={styles.noResultText}>
+              {selectedCity && query.length === 0
+                ? t("home.noEventsInCity", { city: selectedCity })
+                : t("home.noResultsFound")}
+            </Text>
+            {selectedCity && query.length === 0 && (
+              <Text style={styles.emptyHintText}>{t("home.tryAnotherCity")}</Text>
+            )}
           </View>
         }
       />
@@ -282,11 +390,53 @@ const styles = StyleSheet.create((theme) => ({
     color: "#FFF",
   },
   topBarTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: theme.font.size.xl,
+    fontSize: 14,
     fontFamily: theme.font.family.bold,
     color: "#FFFFFF",
+    flexShrink: 1,
+  },
+  topBarTitleActivity: {
+    fontSize: 15,
+  },
+  titleAndCitySlot: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 0,
+  },
+  citySelectTrigger: {
+    borderRadius: 999,
+    borderCurve: "continuous",
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.24)",
+  },
+  cityRow: {
+    alignItems: "center",
+    gap: 6,
+  },
+  cityText: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.bold,
+    color: "#FFFFFF",
+    flexShrink: 1,
+  },
+  cityIcon: {
+    fontSize: 14,
+  },
+  cityOverlay: {
+    backgroundColor: "rgba(10, 14, 24, 0.68)",
+  },
+  cityOptionInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  cityOptionIcon: {
+    fontSize: 18,
   },
   iconButton: {
     width: 40,
@@ -304,15 +454,23 @@ const styles = StyleSheet.create((theme) => ({
     gap: COLUMN_GAP,
   },
   emptyContainer: {
-    flex:1,
-    minHeight:300,
+    flex: 1,
+    minHeight: 300,
     justifyContent: "center",
     alignItems: "center",
   },
   noResultText: {
-    marginTop: 16,
-    fontSize: theme.font.size.xxl,
+    marginTop: 14,
+    fontSize: theme.font.size.xl,
     color: theme.colors.textSecondary,
     textAlign: "center",
-  }
+    fontFamily: theme.font.family.bold,
+  },
+  emptyHintText: {
+    marginTop: 8,
+    fontSize: theme.font.size.md,
+    color: theme.colors.textSecondary,
+    textAlign: "center",
+    fontFamily: theme.font.family.medium,
+  },
 }));

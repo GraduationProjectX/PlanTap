@@ -17,11 +17,6 @@ type BookmarkHeroCardProps = {
 const HOUR = 60 * 60 * 1000;
 function isLiveNow(event: MockEvent): boolean {
   const now = Date.now();
-
-  if (event.type === "activity" && event.startAt == null && event.endAt == null) {
-    return true;
-  }
-
   return !!(event.startAt != null && event.endAt != null && event.startAt <= now && event.endAt > now);
 }
 
@@ -58,12 +53,10 @@ function BookmarkHeroCardComponent({
   const { t } = useTranslation();
   const { flexDirection, textAlign, isRTL } = useDirection();
 
-  const live = isLiveNow(event);
+  const live = event.type !== "activity" && isLiveNow(event);
   const dateLabel = event.startAt ? getStartDateLabel(event.startAt) : event.type === "activity" ? t("filters.whenAll") : null;
   const remaining = live ? getRemainingLabel(event.endAt) : null;
-  const badgeLabel = event.type === "activity" && event.startAt == null && event.endAt == null
-    ? t("bookmarks.availableNow")
-    : t("home.liveNow");
+  const badgeLabel = t("home.liveNow");
 
   return (
     <Pressable onPress={() => onPress?.(event.id)} style={styles.card}>
@@ -139,6 +132,8 @@ const styles = StyleSheet.create((theme) => ({
     borderCurve: "continuous",
     overflow: "hidden",
     // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    // marginBottom: theme.spacing.xs,
+    // backgroundColor: "red",
   },
   image: {
     position: "absolute",

@@ -39,9 +39,10 @@ function BigEventCardComponent({ event, onPress, width }: BigEventCardProps) {
   const { t } = useTranslation();
   const { textAlign, flexDirection } = useDirection();
 
-  const live = isLiveNow(event);
+  const isActivity = event.type === "activity";
+  const live = !isActivity && isLiveNow(event);
   const badgeLabel = live ? t("home.liveNow") : null;
-  const tagLabels = getEventTags(event);
+  const tagLabels = isActivity ? [] : getEventTags(event);
 
   return (
       <Pressable

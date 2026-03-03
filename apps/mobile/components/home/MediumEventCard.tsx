@@ -43,9 +43,10 @@ function MediumEventCardComponent({ event, width, onPress }: MediumEventCardProp
   const { t } = useTranslation();
   const { isRTL, flexDirection, textAlign } = useDirection();
 
-  const live = isLiveNow(event);
+  const isActivity = event.type === "activity";
+  const live = !isActivity && isLiveNow(event);
   const badgeLabel = live ? t("home.liveNow") : null;
-  const tagLabels = getEventTags(event);
+  const tagLabels = isActivity ? [] : getEventTags(event);
 
   const handlePress = () => {
     onPress?.(event.id);

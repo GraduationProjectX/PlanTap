@@ -31,7 +31,13 @@
     },
     "plugins": [
       "expo-router",
-      "@sentry/react-native/expo"
+      "@sentry/react-native/expo",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow PlanTap to detect your city and show nearby events."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

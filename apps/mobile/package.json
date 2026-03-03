@@ -30,6 +30,7 @@
     "expo-font": "~55.0.4",
     "expo-linking": "~55.0.7",
     "expo-localization": "~55.0.8",
+    "expo-location": "^55.1.2",
     "expo-router": "~55.0.2",
     "expo-secure-store": "~55.0.8",
     "expo-splash-screen": "~55.0.9",

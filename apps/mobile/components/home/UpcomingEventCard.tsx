@@ -14,6 +14,7 @@ type UpcomingEventCardProps = {
   onBookmark?: (id: string) => void;
   isBookmarked?: boolean;
   showCountdown?: boolean;
+  variant?: "list" | "grid";
 };
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -44,22 +45,23 @@ function UpcomingEventCardComponent({
   onBookmark,
   isBookmarked,
   showCountdown = true,
+  variant = "list",
 }: UpcomingEventCardProps) {
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
 
   const { day, month } = getDateParts(event.startAt);
   const categoryLabel = event.categories[0]?.toUpperCase() ?? "";
-  const priceLabel = event.priceMin ? `$${event.priceMin}` : t("home.freeEntry");
   const countdown = showCountdown ? getCountdownLabel(event.startAt) : null;
+  const isGrid = variant === "grid";
 
   return (
     <Pressable
       onPress={() => onPress?.(event.id)}
-      style={styles.card}
+      style={[styles.card, isGrid && styles.cardGrid]}
     >
-      <View style={[styles.row, { flexDirection }]}>
-        <View style={styles.imageContainer}>
+      <View style={[styles.row, { flexDirection: isGrid ? "column" : flexDirection }]}> 
+        <View style={[styles.imageContainer, isGrid && styles.imageContainerGrid]}>
           <Image
             source={{ uri: event.images[0] }}
             style={styles.image}
@@ -85,7 +87,7 @@ function UpcomingEventCardComponent({
           )}
         </View>
 
-        <View style={styles.info}>
+        <View style={[styles.info, isGrid && styles.infoGrid]}>
           <View style={[styles.topRow, { flexDirection }]}>
             {countdown && (
               <Chip size="sm" variant="secondary" color="accent" animation="disable-all">
@@ -123,6 +125,10 @@ const styles = StyleSheet.create((theme) => ({
     marginHorizontal: theme.spacing.md,
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
   },
+  cardGrid: {
+    marginHorizontal: 0,
+    padding: theme.spacing.xs,
+  },
   row: {
     alignItems: "center",
     gap: theme.spacing.sm,
@@ -134,6 +140,11 @@ const styles = StyleSheet.create((theme) => ({
     borderCurve: "continuous",
     overflow: "hidden",
     position: "relative",
+  },
+  imageContainerGrid: {
+    width: "100%",
+    height: undefined,
+    aspectRatio: 1.25,
   },
   image: {
     width: "100%",
@@ -158,6 +169,9 @@ const styles = StyleSheet.create((theme) => ({
   info: {
     flex: 1,
     gap: 6,
+  },
+  infoGrid: {
+    width: "100%",
   },
   topRow: {
     alignItems: "center",

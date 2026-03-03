@@ -422,9 +422,11 @@ export const UPCOMING_EVENTS = MOCK_EVENTS.filter(
   (e) => e.startAt && e.startAt > now,
 ).sort((a, b) => (a.startAt ?? 0) - (b.startAt ?? 0));
 
-export const RECOMMENDED_EVENTS = MOCK_EVENTS.filter(
-  (e) => e.rating && e.rating >= 4.3,
-).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+export const ACTIVITY_EVENTS = MOCK_EVENTS.filter((e) => e.type === "activity").sort((a, b) => {
+  const ratingDelta = (b.rating ?? 0) - (a.rating ?? 0);
+  if (ratingDelta !== 0) return ratingDelta;
+  return (a.startAt ?? Number.MAX_SAFE_INTEGER) - (b.startAt ?? Number.MAX_SAFE_INTEGER);
+});
 
 export const CATEGORIES = [
   { id: "all", label: "All", labelAr: "الكل", icon: "grid" as const },

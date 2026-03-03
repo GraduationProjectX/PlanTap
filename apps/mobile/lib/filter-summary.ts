@@ -43,9 +43,14 @@ export function buildFilterSummaryTags({
   if (filters.type === "activity") {
     tags.push({ id: "type:activity", label: t("filters.typeActivity") });
   }
+  if (filters.type === "both") {
+    tags.push({ id: "type:both", label: t("filters.activitiesAndEvents") });
+  }
 
   if (filters.cities.length > 0) {
     tags.push(...filters.cities.map((city) => ({ id: `city:${city}`, label: city })));
+  } else {
+    tags.push({ id: "city:all", label: t("filters.allCities") });
   }
 
   if (filters.categories.length > 0) {
@@ -55,6 +60,8 @@ export function buildFilterSummaryTags({
         label: categoryLabelById[categoryId] ?? categoryId,
       })),
     );
+  } else {
+    tags.push({ id: "category:any", label: t("filters.anyCategory") });
   }
 
   if (filters.date === "today") tags.push({ id: "date:today", label: t("filters.dateToday") });
@@ -102,6 +109,10 @@ export function removeFilterBySummaryTag(filters: EventFilters, tagId: string): 
   }
 
   if (kind === "city") {
+    if (value === "all") {
+      return filters;
+    }
+
     return {
       ...filters,
       cities: filters.cities.filter((city) => city !== value),
@@ -109,6 +120,10 @@ export function removeFilterBySummaryTag(filters: EventFilters, tagId: string): 
   }
 
   if (kind === "category") {
+    if (value === "any") {
+      return filters;
+    }
+
     return {
       ...filters,
       categories: filters.categories.filter((category) => category !== value),

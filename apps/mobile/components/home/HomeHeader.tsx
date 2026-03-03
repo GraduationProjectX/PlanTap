@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CategoryChips } from "./CategoryChips";
 import { CATEGORIES } from "@/data/mock-events";
-import { Button } from "heroui-native";
+import { Button, Select } from "heroui-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Animated, {
   Extrapolation,
@@ -18,10 +18,13 @@ import Animated, {
 } from "react-native-reanimated";
 
 type HomeHeaderTopProps = {
-  city: string;
+  city?: string;
+  cityOptions: string[];
   onFavoritePress?: () => void;
-  onLocationPress?: () => void;
+  onCitySelect?: (city?: string) => void;
 };
+
+const ALL_CITIES_VALUE = "__all_cities__";
 
 type HomeHeaderStickyProps = {
   searchValue: string;
@@ -37,25 +40,73 @@ type HomeHeaderProps = HomeHeaderTopProps & HomeHeaderStickyProps;
 
 export function HomeHeaderTop({
   city,
+  cityOptions,
   onFavoritePress,
-  onLocationPress,
+  onCitySelect,
 }: HomeHeaderTopProps) {
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
   const insets = useSafeAreaInsets();
 
+  const allCitiesLabel = t("filters.allCities");
+  const selectedCityLabel = city ?? allCitiesLabel;
+
   return (
     <View style={[styles.topContainer, { paddingTop: insets.top + 8 }]}>
       <View style={[styles.topRow, { flexDirection }]}>
         <View style={styles.locationContainer}>
-          <Pressable onPress={onLocationPress}>
-            <Text style={styles.locationLabel}>{t("home.currentLocation").toUpperCase()}</Text>
-            <View style={[styles.cityRow, { flexDirection }]}>
-              <Text style={styles.locationIcon}>📍</Text>
-              <Text style={[styles.cityText, { textAlign }]}>{city}</Text>
-              <FontAwesome name="chevron-down" size={10} color="rgba(255,255,255,0.8)" />
-            </View>
-          </Pressable>
+          <Select
+            presentation="bottom-sheet"
+            value={{
+              value: city ?? ALL_CITIES_VALUE,
+              label: selectedCityLabel,
+            }}
+            onValueChange={(option) => {
+              onCitySelect?.(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
+            }}
+          >
+            <Select.Trigger style={styles.locationTrigger}>
+              <Text style={styles.locationLabel}>{t("filters.city").toUpperCase()}</Text>
+              <View style={[styles.cityRow, { flexDirection }]}>
+                <Text style={styles.locationIcon}>📍</Text>
+                <Text style={[styles.cityText, { textAlign }]} numberOfLines={1}>
+                  {selectedCityLabel}
+                </Text>
+                <FontAwesome name="chevron-down" size={10} color="rgba(255,255,255,0.84)" />
+              </View>
+            </Select.Trigger>
+
+            <Select.Portal>
+              <Select.Overlay
+                animation={{
+                  opacity: {
+                    value: [0, 1, 0] as [number, number, number],
+                  },
+                }}
+                style={styles.cityOverlay}
+              />
+              <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                  <View style={styles.cityOptionInner}>
+                    <Text style={styles.cityOptionIcon}>🌍</Text>
+                    <Select.ItemLabel />
+                  </View>
+                  <Select.ItemIndicator />
+                </Select.Item>
+                {cityOptions.map((cityOption) => (
+                  <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                    <View style={styles.cityOptionInner}>
+                      <Text style={styles.cityOptionIcon}>🏢</Text>
+                      <Select.ItemLabel />
+                    </View>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+                <View style={{ height: insets.bottom + 16 }} />
+              </Select.Content>
+            </Select.Portal>
+          </Select>
         </View>
 
         <Button
@@ -152,8 +203,9 @@ export function HomeHeader(props: HomeHeaderProps) {
     <View>
       <HomeHeaderTop
         city={props.city}
+        cityOptions={props.cityOptions}
         onFavoritePress={props.onFavoritePress}
-        onLocationPress={props.onLocationPress}
+        onCitySelect={props.onCitySelect}
       />
       <HomeHeaderSticky
         searchValue={props.searchValue}
@@ -190,7 +242,23 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: 12,
   },
   locationContainer: {
+    // flex: 1,
+    minWidth: "25%",
+    maxWidth: "75%",
+  },
+  locationTrigger: {
+    borderRadius: 16,
+    borderCurve: "continuous",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "flex-start",
     gap: 2,
+  },
+  cityOverlay: {
+    backgroundColor: "rgba(10, 14, 24, 0.68)",
   },
   locationLabel: {
     fontSize: theme.font.size.xs,
@@ -209,6 +277,16 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
     color: "#FFFFFF",
+    flexShrink: 1,
+  },
+  cityOptionInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    // gap: 10,
+    flex: 1,
+  },
+  cityOptionIcon: {
+    fontSize: 18,
   },
   favoriteButton: {
     width: 40,

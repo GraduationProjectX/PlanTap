@@ -2,6 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Select } from "heroui-native";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
@@ -10,6 +11,8 @@ import { useDirection } from "@/rtl";
 import { FilterSection } from "./FilterSection";
 
 type SelectValue = { value: string; label: string } | undefined;
+
+const ALL_CITIES_VALUE = "__all_cities__";
 
 const CITY_SELECT_INDICATOR_ANIMATION = {
   rotation: {
@@ -45,10 +48,13 @@ export function FiltersCitySection({
 }: FiltersCitySectionProps) {
   const { t } = useTranslation();
   const { flexDirection } = useDirection();
+  const insets = useSafeAreaInsets();
+
+  const allCitiesLabel = t("filters.allCities");
 
   const citySelectValue: SelectValue = selectedCity
     ? { value: selectedCity, label: selectedCity }
-    : undefined;
+    : { value: ALL_CITIES_VALUE, label: allCitiesLabel };
 
   return (
     <FilterSection step={3} title={t("filters.city")} caption={t("filters.whereToLook")}>
@@ -56,7 +62,7 @@ export function FiltersCitySection({
         presentation="bottom-sheet"
         value={citySelectValue}
         onValueChange={(option) => {
-          onSelectCity(option?.value);
+          onSelectCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
         }}
       >
         <Select.Trigger style={styles.selectTrigger}>
@@ -83,6 +89,13 @@ export function FiltersCitySection({
             snapPoints={["65%"]}
           >
             <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+            <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+              <View style={styles.selectItemInner}>
+                <Text style={styles.selectEmoji}>🌍</Text>
+                <Select.ItemLabel />
+              </View>
+              <Select.ItemIndicator />
+            </Select.Item>
             {cityOptions.map((city) => (
               <Select.Item key={city} value={city} label={city}>
                 <View style={styles.selectItemInner}>
@@ -92,6 +105,7 @@ export function FiltersCitySection({
                 <Select.ItemIndicator />
               </Select.Item>
             ))}
+            <View style={{ height: insets.bottom + 16 }} />
           </Select.Content>
         </Select.Portal>
       </Select>

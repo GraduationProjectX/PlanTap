@@ -35,7 +35,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.sm,
   },
   title: {
-    fontSize: theme.font.size.xxl,
+    fontSize: theme.font.size.xl,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
   },

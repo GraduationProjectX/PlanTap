@@ -68,11 +68,11 @@ export function HomeSkeleton() {
         <View style={styles.sectionHeaderRow}>
           <SkeletonGroup.Item className="h-5 w-44 rounded-md" />
         </View>
-        <View style={styles.recommendedGrid}>
+        <View style={styles.activitiesGrid}>
           {[1, 2].map((i) => (
-            <View key={i} style={styles.recommendedCard}>
+            <View key={i} style={styles.activitiesCard}>
               <SkeletonGroup.Item className="rounded-xl" style={{ aspectRatio: 1, width: "100%" }} />
-              <View style={styles.recommendedInfo}>
+              <View style={styles.activitiesInfo}>
                 <SkeletonGroup.Item className="h-4 w-full rounded-md" />
                 <SkeletonGroup.Item className="h-3 w-3/4 rounded-md" />
                 <SkeletonGroup.Item className="h-3 w-16 rounded-md" />
@@ -142,16 +142,16 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     gap: 6,
   },
-  recommendedGrid: {
+  activitiesGrid: {
     flexDirection: "row",
     gap: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
   },
-  recommendedCard: {
+  activitiesCard: {
     flex: 1,
     gap: 6,
   },
-  recommendedInfo: {
+  activitiesInfo: {
     gap: 4,
   },
 }));
