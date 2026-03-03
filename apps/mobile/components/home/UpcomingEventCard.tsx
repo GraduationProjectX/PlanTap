@@ -92,7 +92,6 @@ function UpcomingEventCardComponent({
                 <Chip.Label>{t("bookmarks.startsIn", { time: countdown })}</Chip.Label>
               </Chip>
             )}
-            <Text style={styles.price}>{priceLabel}</Text>
           </View>
 
           <Text style={[styles.title, { textAlign }]} numberOfLines={2}>
@@ -168,7 +167,7 @@ const styles = StyleSheet.create((theme) => ({
   category: {
     fontSize: theme.font.size.sm,
     fontFamily: theme.font.family.semiBold,
-    color: "#6366F1",
+    color: theme.colors.textSecondary,
     letterSpacing: theme.font.letterSpacing.wider,
   },
   price: {

@@ -79,11 +79,17 @@
     "removeFilter": "Remove filter"
   },
   "bookmarks": {
-    "title": "Bookmarks",
+    "title": "Bookmarked",
     "events": "Events",
     "activities": "Activities",
     "empty": "No bookmarks yet",
     "emptyDescription": "Tap the bookmark icon on events to save them here.",
-    "startsIn": "Starts in {{time}}"
+    "startsIn": "Starts in {{time}}",
+    "happeningNow": "Happening Now",
+    "availableNow": "Available Now",
+    "thisWeek": "This Week",
+    "later": "Coming Up",
+    "remaining": "{{time}} remaining",
+    "liveEvent": "LIVE EVENT"
   }
 }

@@ -77,5 +77,19 @@
     "clear": "مسح الفلاتر",
     "resultsCount": "{{count}} نتيجة",
     "removeFilter": "إزالة الفلتر"
+  },
+  "bookmarks": {
+    "title": "المحفوظات",
+    "events": "الفعاليات",
+    "activities": "الأنشطة",
+    "empty": "لا توجد عناصر محفوظة بعد",
+    "emptyDescription": "اضغط على أيقونة الحفظ في الفعاليات لإضافتها هنا.",
+    "startsIn": "يبدأ خلال {{time}}",
+    "happeningNow": "يحدث الآن",
+    "availableNow": "متاح الآن",
+    "thisWeek": "هذا الأسبوع",
+    "later": "القادم",
+    "remaining": "متبقي {{time}}",
+    "liveEvent": "مباشر"
   }
 }

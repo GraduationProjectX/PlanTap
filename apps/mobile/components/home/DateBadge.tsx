@@ -21,7 +21,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 44,
     borderRadius: theme.radius.lg,
     borderCurve: "continuous",
-    backgroundColor: "#6366F1",
+    backgroundColor: theme.colors.headerBackground,
     alignItems: "center",
     justifyContent: "center",
     gap: 1,
