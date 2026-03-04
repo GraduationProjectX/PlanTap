@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
 import { useRouter, type Href } from "expo-router";
@@ -9,17 +9,21 @@ import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
-import { UpcomingEventCard } from "@/components/home/UpcomingEventCard";
+import { MediumEventCard } from "@/components/home/MediumEventCard";
 import { ACTIVITY_EVENTS, ONGOING_EVENTS, UPCOMING_EVENTS } from "@/data/mock-events";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { detectCityFromUserLocation } from "@/lib/location-city";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
+const HORIZONTAL_PADDING = 16;
+const COLUMN_GAP = 12;
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const scrollY = useSharedValue(0);
+  const { width: screenWidth } = useWindowDimensions();
 
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -54,10 +58,6 @@ export default function HomeScreen() {
     router.push(`/event/${id}` as Href);
   };
 
-  const handleFavorite = (_id: string) => {
-    // TODO: wire up favorites toggle via Convex
-  };
-
   const handleViewAll = (type: ViewAllEventType) => {
     const params = new URLSearchParams({ type });
 
@@ -76,6 +76,7 @@ export default function HomeScreen() {
   };
 
   const cityMatches = (city: string) => !selectedCity || city === selectedCity;
+  const activityCardWidth = (screenWidth - HORIZONTAL_PADDING * 2 - COLUMN_GAP) / 2;
 
   const ongoingEvents = ONGOING_EVENTS.filter((event) => cityMatches(event.city));
   const upcomingEvents = UPCOMING_EVENTS.filter((event) => cityMatches(event.city));
@@ -139,15 +140,12 @@ export default function HomeScreen() {
             />
             <View style={styles.activitiesGrid}>
               {activityEvents.slice(0, 4).map((event) => (
-                <View key={event.id} style={styles.activityCardSlot}>
-                  <UpcomingEventCard
-                    event={event}
-                    onPress={handleEventPress}
-                    onBookmark={handleFavorite}
-                    showCountdown={false}
-                    variant="grid"
-                  />
-                </View>
+                <MediumEventCard
+                  key={event.id}
+                  event={event}
+                  onPress={handleEventPress}
+                  width={activityCardWidth}
+                />
               ))}
             </View>
           </View>
@@ -189,11 +187,8 @@ const styles = StyleSheet.create((theme) => ({
   activitiesGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-  },
-  activityCardSlot: {
-    width: "48%",
+    gap: COLUMN_GAP,
+    paddingHorizontal: HORIZONTAL_PADDING,
   },
   bottomSpacer: {
     height: theme.spacing.xl,

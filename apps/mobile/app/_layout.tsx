@@ -17,10 +17,9 @@ import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import * as Location from "expo-location";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { Platform, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { HeroUINativeProvider } from "heroui-native";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
@@ -71,22 +70,6 @@ function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      return;
-    }
-
-    const requestLocationPermission = async () => {
-      try {
-        await Location.requestForegroundPermissionsAsync();
-      } catch {
-        // ignore location permission errors at launch
-      }
-    };
-
-    void requestLocationPermission();
-  }, []);
 
   if (!loaded) {
     return null;

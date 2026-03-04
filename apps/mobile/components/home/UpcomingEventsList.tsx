@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { UpcomingEventCard } from "./UpcomingEventCard";
+import { EventPreviewCard } from "./EventPreviewCard";
 import type { MockEvent } from "@/data/mock-events";
 
 type UpcomingEventsListProps = {
@@ -17,7 +17,7 @@ export function UpcomingEventsList({
   return (
     <View style={styles.container}>
       {visibleEvents.map((event) => (
-        <UpcomingEventCard
+        <EventPreviewCard
           key={event.id}
           event={event}
           onPress={onEventPress}

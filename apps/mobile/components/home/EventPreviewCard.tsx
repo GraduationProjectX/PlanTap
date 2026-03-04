@@ -2,20 +2,10 @@ import { View, Text, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native-unistyles";
 import { Chip } from "heroui-native";
-import Fontisto from "@expo/vector-icons/Fontisto";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
 import { DateBadge } from "./DateBadge";
 import type { MockEvent } from "@/data/mock-events";
-
-type UpcomingEventCardProps = {
-  event: MockEvent;
-  onPress?: (id: string) => void;
-  onBookmark?: (id: string) => void;
-  isBookmarked?: boolean;
-  showCountdown?: boolean;
-  variant?: "list" | "grid";
-};
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const HOUR = 60 * 60 * 1000;
@@ -39,14 +29,19 @@ function getCountdownLabel(startAt?: number): string | null {
   return `${minutes}m`;
 }
 
-function UpcomingEventCardComponent({
+type EventPreviewCardProps = {
+  event: MockEvent;
+  onPress?: (id: string) => void;
+  showCountdown?: boolean;
+  variant?: "list" | "grid";
+};
+
+function EventPreviewCardComponent({
   event,
   onPress,
-  onBookmark,
-  isBookmarked,
   showCountdown = true,
   variant = "list",
-}: UpcomingEventCardProps) {
+}: EventPreviewCardProps) {
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
 
@@ -60,7 +55,7 @@ function UpcomingEventCardComponent({
       onPress={() => onPress?.(event.id)}
       style={[styles.card, isGrid && styles.cardGrid]}
     >
-      <View style={[styles.row, { flexDirection: isGrid ? "column" : flexDirection }]}> 
+      <View style={[styles.row, { flexDirection: isGrid ? "column" : flexDirection }]}>
         <View style={[styles.imageContainer, isGrid && styles.imageContainerGrid]}>
           <Image
             source={{ uri: event.images[0] }}
@@ -71,32 +66,18 @@ function UpcomingEventCardComponent({
           <View style={styles.dateBadge}>
             <DateBadge day={day} month={month} />
           </View>
-
-          {onBookmark && (
-            <Pressable
-              onPress={() => onBookmark(event.id)}
-              style={styles.bookmarkButton}
-              hitSlop={8}
-            >
-              <Fontisto
-                name={isBookmarked ? "bookmark-alt" : "bookmark"}
-                size={14}
-                color="#FFFFFF"
-              />
-            </Pressable>
-          )}
         </View>
 
         <View style={[styles.info, isGrid && styles.infoGrid]}>
           <View style={[styles.topRow, { flexDirection }]}>
             {countdown && (
               <Chip size="sm" variant="secondary" color="accent" animation="disable-all">
-                <Chip.Label>{t("bookmarks.startsIn", { time: countdown })}</Chip.Label>
+                <Chip.Label style={{ color: "#000" }}>{t("bookmarks.startsIn", { time: countdown })}</Chip.Label>
               </Chip>
             )}
           </View>
 
-          <Text style={[styles.title, { textAlign }]} numberOfLines={2}>
+          <Text style={[styles.title, isGrid && styles.titleGrid, { textAlign }]} numberOfLines={2}>
             {event.title}
           </Text>
 
@@ -104,7 +85,7 @@ function UpcomingEventCardComponent({
 
           <View style={[styles.locationRow, { flexDirection }]}>
             <Text style={styles.locationIcon}>📍</Text>
-            <Text style={[styles.location, { textAlign }]} numberOfLines={1}>
+            <Text style={[styles.location, { textAlign }]} numberOfLines={2}>
               {event.location.address}
             </Text>
           </View>
@@ -114,7 +95,7 @@ function UpcomingEventCardComponent({
   );
 }
 
-export const UpcomingEventCard = UpcomingEventCardComponent;
+export const EventPreviewCard = EventPreviewCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
   card: {
@@ -155,17 +136,6 @@ const styles = StyleSheet.create((theme) => ({
     top: 4,
     left: 4,
   },
-  bookmarkButton: {
-    position: "absolute",
-    bottom: 4,
-    right: 4,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   info: {
     flex: 1,
     gap: 6,
@@ -193,6 +163,10 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
+  },
+  titleGrid: {
+    lineHeight: theme.font.size.lg * theme.font.lineHeight.normal,
+    minHeight: theme.font.size.lg * theme.font.lineHeight.normal * 2,
   },
   locationRow: {
     alignItems: "center",

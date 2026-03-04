@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Select } from "heroui-native";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { Platform, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -49,6 +49,8 @@ export function FiltersCitySection({
   const { t } = useTranslation();
   const { flexDirection } = useDirection();
   const insets = useSafeAreaInsets();
+  const cityModalBottomSpacer =
+    (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
 
   const allCitiesLabel = t("filters.allCities");
 
@@ -105,7 +107,7 @@ export function FiltersCitySection({
                 <Select.ItemIndicator />
               </Select.Item>
             ))}
-            <View style={{ height: insets.bottom + 16 }} />
+            <View style={{ height: cityModalBottomSpacer }} />
           </Select.Content>
         </Select.Portal>
       </Select>

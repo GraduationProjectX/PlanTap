@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter, type Href } from "expo-router";
 import { Button, Select } from "heroui-native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
+import { FlatList, Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -50,6 +50,8 @@ export default function ViewAllEventsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const cityModalBottomSpacer =
+    (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
   const { width: screenWidth } = useWindowDimensions();
   const { isRTL, flexDirection, textAlign } = useDirection();
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
@@ -241,7 +243,7 @@ export default function ViewAllEventsScreen() {
                       <Select.ItemIndicator />
                     </Select.Item>
                   ))}
-                  <View style={{ height: insets.bottom + 16 }} />
+                  <View style={{ height: cityModalBottomSpacer }} />
                 </Select.Content>
               </Select.Portal>
             </Select>

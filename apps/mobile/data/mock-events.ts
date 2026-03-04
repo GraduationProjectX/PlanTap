@@ -107,7 +107,7 @@ export const MOCK_EVENTS: MockEvent[] = [
   },
   {
     id: "evt_5",
-    title: "Padel Tournament",
+    title: "Padel Tournament Padel TournamentPadel TournamentPadel TournamentPadel TournamentPadel TournamentPadel TournamentPadel Tournament",
     titleAr: "بطولة البادل",
     descriptionShort: "Amateur padel championship with prizes",
     descriptionShortAr: "بطولة البادل للهواة مع جوائز",

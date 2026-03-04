@@ -36,19 +36,21 @@ export async function detectCityFromUserLocation(cityOptions: string[]): Promise
       return undefined;
     }
 
-    const currentPermission = await Location.getForegroundPermissionsAsync();
-    const permission =
-      currentPermission.status === "granted" || !currentPermission.canAskAgain
-        ? currentPermission
-        : await Location.requestForegroundPermissionsAsync();
+    const permission = await Location.getForegroundPermissionsAsync();
 
     if (permission.status !== "granted") {
       return undefined;
     }
 
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
+    const position =
+      (await Location.getLastKnownPositionAsync()) ??
+      (await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      }));
+
+    if (!position) {
+      return undefined;
+    }
 
     const places = await Location.reverseGeocodeAsync({
       latitude: position.coords.latitude,

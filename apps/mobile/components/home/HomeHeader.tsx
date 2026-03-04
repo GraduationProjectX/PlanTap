@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { Platform, View, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -47,6 +47,8 @@ export function HomeHeaderTop({
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
   const insets = useSafeAreaInsets();
+  const cityModalBottomSpacer =
+    (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
 
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = city ?? allCitiesLabel;
@@ -103,7 +105,7 @@ export function HomeHeaderTop({
                     <Select.ItemIndicator />
                   </Select.Item>
                 ))}
-                <View style={{ height: insets.bottom + 16 }} />
+                <View style={{ height: cityModalBottomSpacer }} />
               </Select.Content>
             </Select.Portal>
           </Select>

@@ -130,7 +130,6 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.xl,
     borderCurve: "continuous",
     overflow: "hidden",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.16)",
   },
   image: {
     position: "absolute",
