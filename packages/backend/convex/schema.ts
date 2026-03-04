@@ -32,6 +32,35 @@ export const userFields = {
   lastName: nullableString,
   imageUrl: nullableString,
   locale: nullableString,
+  city: v.optional(v.string()),
+  preferences: v.optional(
+    v.object({
+      likedTags: v.array(v.string()),
+      dislikedTags: v.array(v.string()),
+    }),
+  ),
+  defaults: v.optional(
+    v.object({
+      budgetMin: v.optional(v.number()),
+      budgetMax: v.optional(v.number()),
+      radiusKm: v.optional(v.number()),
+      groupType: v.optional(
+        v.union(
+          v.literal("solo"),
+          v.literal("group"),
+          v.literal("kids"),
+        ),
+      ),
+      indoorOutdoor: v.optional(
+        v.union(
+          v.literal("indoor"),
+          v.literal("outdoor"),
+          v.literal("mixed"),
+          v.literal("any"),
+        ),
+      ),
+    }),
+  ),
   createdAt: v.number(),
   updatedAt: v.number(),
 };

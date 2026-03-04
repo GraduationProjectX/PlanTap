@@ -55,3 +55,33 @@ export const getById = query({
     return event;
   },
 });
+
+export const listApproved = query({
+  args: {
+    city: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+  returns: v.array(eventValidator),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Not authenticated");
+    }
+
+    const limit = args.limit ?? 50;
+
+    if (args.city !== undefined) {
+      const city = args.city;
+      return await ctx.db
+        .query("events")
+        .withIndex("by_city_and_status", (q) => q.eq("city", city))
+        .filter((q) => q.eq(q.field("status"), "approved"))
+        .take(limit);
+    }
+
+    return await ctx.db
+      .query("events")
+      .withIndex("by_status", (q) => q.eq("status", "approved"))
+      .take(limit);
+  },
+});

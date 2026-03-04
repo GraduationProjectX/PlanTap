@@ -1,20 +1,300 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useClerk } from "@clerk/clerk-expo";
-import { Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useUIStore, type AppThemeMode } from "@/stores/ui-store";
+import { useAiStore, type AiProvider } from "@/stores";
+import { useEventRecommendations } from "@/hooks/useEventRecommendations";
+import {
+  getApiKey,
+  setApiKey,
+  clearApiKey,
+  type AiProviderKey,
+} from "@/services/ai/secureKeys";
+import {
+  AVAILABLE_MODELS,
+  downloadModel,
+  cancelDownload,
+  deleteModel,
+} from "@/services/ai/modelDownloader";
 
 const THEME_OPTIONS: AppThemeMode[] = ["system", "light", "dark"];
+
+const PROVIDERS: { key: AiProvider; label: string }[] = [
+  { key: "gemini", label: "Gemini" },
+  { key: "openai", label: "OpenAI" },
+  { key: "claude", label: "Claude" },
+  { key: "local", label: "Local (on-device)" },
+];
+
+const CLOUD_PROVIDERS: { key: AiProviderKey; label: string }[] = [
+  { key: "gemini", label: "Gemini" },
+  { key: "openai", label: "OpenAI" },
+  { key: "claude", label: "Claude" },
+];
+
+function ProviderSelector() {
+  const provider = useAiStore((s) => s.provider);
+  const setProvider = useAiStore((s) => s.setProvider);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>AI Provider</Text>
+      <View style={styles.providerRow}>
+        {PROVIDERS.map((p) => (
+          <Pressable
+            key={p.key}
+            style={[
+              styles.providerChip,
+              provider === p.key && styles.providerChipActive,
+            ]}
+            onPress={() => setProvider(p.key)}
+          >
+            <Text
+              style={[
+                styles.providerChipText,
+                provider === p.key && styles.providerChipTextActive,
+              ]}
+            >
+              {p.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function ApiKeySection() {
+  const [keys, setKeys] = useState<Record<AiProviderKey, string>>({
+    gemini: "",
+    openai: "",
+    claude: "",
+  });
+  const [saving, setSaving] = useState<AiProviderKey | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const loaded: Record<AiProviderKey, string> = {
+        gemini: "",
+        openai: "",
+        claude: "",
+      };
+      for (const p of CLOUD_PROVIDERS) {
+        const k = await getApiKey(p.key);
+        if (k) {
+          loaded[p.key] = k;
+        }
+      }
+      setKeys(loaded);
+    })();
+  }, []);
+
+  const handleSave = useCallback(
+    async (provider: AiProviderKey) => {
+      const value = keys[provider].trim();
+      if (!value) {
+        return;
+      }
+
+      setSaving(provider);
+      try {
+        await setApiKey(provider, value);
+        Alert.alert("Saved", `${provider} API key saved securely.`);
+      } catch {
+        Alert.alert("Error", "Failed to save key.");
+      } finally {
+        setSaving(null);
+      }
+    },
+    [keys],
+  );
+
+  const handleClear = useCallback(async (provider: AiProviderKey) => {
+    await clearApiKey(provider);
+    setKeys((prev) => ({ ...prev, [provider]: "" }));
+  }, []);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>API Keys</Text>
+      {CLOUD_PROVIDERS.map((p) => (
+        <View key={p.key} style={styles.keyRow}>
+          <Text style={styles.keyLabel}>{p.label}</Text>
+          <TextInput
+            style={styles.keyInput}
+            value={keys[p.key]}
+            onChangeText={(text) =>
+              setKeys((prev) => ({ ...prev, [p.key]: text }))
+            }
+            placeholder={`Enter ${p.label} API key`}
+            placeholderTextColor="#999"
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <View style={styles.keyActions}>
+            <Pressable
+              style={styles.smallBtn}
+              onPress={() => handleSave(p.key)}
+              disabled={saving === p.key}
+            >
+              {saving === p.key ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.smallBtnText}>Save</Text>
+              )}
+            </Pressable>
+            <Pressable
+              style={[styles.smallBtn, styles.dangerBtn]}
+              onPress={() => handleClear(p.key)}
+            >
+              <Text style={styles.smallBtnText}>Clear</Text>
+            </Pressable>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function LocalModelSection() {
+  const {
+    localModelDownloaded,
+    localModelPath,
+    isDownloading,
+    downloadProgress,
+  } = useAiStore();
+
+  const handleDownload = useCallback(async () => {
+    try {
+      await downloadModel(AVAILABLE_MODELS[0]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Download failed";
+      Alert.alert("Download Error", msg);
+    }
+  }, []);
+
+  const handleDelete = useCallback(async () => {
+    Alert.alert("Delete Model", "Remove the downloaded model?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteModel(AVAILABLE_MODELS[0].filename);
+          } catch {
+            Alert.alert("Error", "Failed to delete model.");
+          }
+        },
+      },
+    ]);
+  }, []);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Local Model</Text>
+      <Text style={styles.modelInfo}>
+        {AVAILABLE_MODELS[0].label} ({AVAILABLE_MODELS[0].sizeLabel})
+      </Text>
+
+      {isDownloading && (
+        <View style={styles.progressContainer}>
+          <View style={styles.progressTrack}>
+            <View
+              style={[styles.progressFill, { width: `${downloadProgress}%` }]}
+            />
+          </View>
+          <Text style={styles.progressText}>{downloadProgress}%</Text>
+          <Pressable
+            style={[styles.smallBtn, styles.dangerBtn]}
+            onPress={cancelDownload}
+          >
+            <Text style={styles.smallBtnText}>Cancel</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {!isDownloading && !localModelDownloaded && (
+        <Pressable style={styles.actionBtn} onPress={handleDownload}>
+          <Text style={styles.actionBtnText}>Download Model</Text>
+        </Pressable>
+      )}
+
+      {localModelDownloaded && (
+        <View style={styles.modelReady}>
+          <Text style={styles.modelReadyText}>
+            Model ready at{"\n"}
+            {localModelPath}
+          </Text>
+          <Pressable
+            style={[styles.smallBtn, styles.dangerBtn]}
+            onPress={handleDelete}
+          >
+            <Text style={styles.smallBtnText}>Delete</Text>
+          </Pressable>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function TestSection() {
+  const { eventIds, isLoading, error, recommendTest } = useEventRecommendations();
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Test Recommendations</Text>
+      <Pressable
+        style={styles.actionBtn}
+        onPress={() => {
+          recommendTest();
+        }}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.actionBtnText}>Run Test Prompt</Text>
+        )}
+      </Pressable>
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {eventIds.length > 0 && (
+        <View style={styles.resultBox}>
+          <Text style={styles.resultTitle}>Recommended IDs:</Text>
+          {eventIds.map((id) => (
+            <Text key={id} style={styles.resultItem}>
+              {id}
+            </Text>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const { signOut } = useClerk();
+
   const [isSigningOut, setIsSigningOut] = useState(false);
   const themeMode = useUIStore((state) => state.themeMode);
   const setThemeMode = useUIStore((state) => state.setThemeMode);
 
-  const handleTemporaryLogout = async () => {
+  const handleTemporaryLogout = useCallback(async () => {
     if (isSigningOut) {
       return;
     }
@@ -27,12 +307,14 @@ export default function SettingsScreen() {
     } finally {
       setIsSigningOut(false);
     }
-  };
+  }, [isSigningOut, signOut]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <Text style={styles.title}>{t("settings.title")}</Text>
+
       <View style={styles.section}>
-        <Text style={styles.title}>{t("settings.title")}</Text>
+        <Text style={styles.sectionTitle}>{t("settings.title")}</Text>
         <Text style={styles.subtitle}>{t("settings.appearanceDescription")}</Text>
 
         <View style={styles.optionList}>
@@ -48,8 +330,12 @@ export default function SettingsScreen() {
                 accessibilityState={{ checked: isSelected }}
               >
                 <View style={styles.optionCopy}>
-                  <Text style={styles.optionTitle}>{t(`settings.themeMode.${option}.label`)}</Text>
-                  <Text style={styles.optionHint}>{t(`settings.themeMode.${option}.hint`)}</Text>
+                  <Text style={styles.optionTitle}>
+                    {t(`settings.themeMode.${option}.label`)}
+                  </Text>
+                  <Text style={styles.optionHint}>
+                    {t(`settings.themeMode.${option}.hint`)}
+                  </Text>
                 </View>
                 <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
                   {isSelected && <View style={styles.radioInner} />}
@@ -61,7 +347,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.title}>{t("settings.temporaryLogout.label")}</Text>
+        <Text style={styles.sectionTitle}>{t("settings.temporaryLogout.label")}</Text>
         <Text style={styles.subtitle}>{t("settings.temporaryLogout.hint")}</Text>
 
         <Pressable
@@ -71,20 +357,35 @@ export default function SettingsScreen() {
           accessibilityRole="button"
         >
           <Text style={styles.logoutButtonLabel}>
-            {isSigningOut ? t("settings.temporaryLogout.loading") : t("settings.temporaryLogout.action")}
+            {isSigningOut
+              ? t("settings.temporaryLogout.loading")
+              : t("settings.temporaryLogout.action")}
           </Text>
         </Pressable>
       </View>
-    </View>
+
+      <ProviderSelector />
+      <ApiKeySection />
+      <LocalModelSection />
+      <TestSection />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  scrollContent: {
     padding: theme.spacing.lg,
+    paddingBottom: theme.spacing.xxxl,
     gap: theme.spacing.md,
+  },
+  title: {
+    fontSize: theme.font.size["2xl"],
+    fontFamily: theme.font.family.bold,
+    color: theme.colors.text,
   },
   section: {
     backgroundColor: theme.colors.surface,
@@ -94,12 +395,146 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
-  title: {
-    fontSize: theme.font.size.xl,
-    fontFamily: theme.font.family.bold,
+  sectionTitle: {
+    fontSize: theme.font.size.lg,
+    fontFamily: theme.font.family.semiBold,
     color: theme.colors.text,
   },
   subtitle: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.textSecondary,
+  },
+  providerRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
+  },
+  providerChip: {
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+  },
+  providerChipActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  providerChipText: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.text,
+  },
+  providerChipTextActive: {
+    color: theme.colors.primaryForeground,
+  },
+  keyRow: {
+    gap: theme.spacing.xs,
+  },
+  keyLabel: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.text,
+  },
+  keyInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.text,
+    backgroundColor: theme.colors.background,
+  },
+  keyActions: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  smallBtn: {
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primary,
+    alignSelf: "flex-start",
+  },
+  smallBtnText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.primaryForeground,
+  },
+  dangerBtn: {
+    backgroundColor: theme.colors.error,
+  },
+  actionBtn: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primary,
+    alignSelf: "flex-start",
+    minHeight: theme.button.md,
+    justifyContent: "center",
+  },
+  actionBtnText: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
+    color: theme.colors.primaryForeground,
+  },
+  modelInfo: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.textSecondary,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+  },
+  progressTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.skeleton,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.success,
+  },
+  progressText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.text,
+    minWidth: 40,
+    textAlign: "right",
+  },
+  modelReady: {
+    gap: theme.spacing.sm,
+  },
+  modelReadyText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.success,
+  },
+  errorText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.error,
+  },
+  resultBox: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.sm,
+    gap: theme.spacing.xs,
+  },
+  resultTitle: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
+    color: theme.colors.text,
+  },
+  resultItem: {
     fontSize: theme.font.size.base,
     fontFamily: theme.font.family.regular,
     color: theme.colors.textSecondary,
