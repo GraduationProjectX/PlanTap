@@ -9,10 +9,11 @@ import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
-import { MediumEventCard } from "@/components/home/MediumEventCard";
+import { EventCard } from "@/components/events/EventCard";
 import { MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { detectCityFromUserLocation } from "@/lib/location-city";
+import { getEventSharedBoundTag } from "@/lib/event-transition";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
@@ -50,11 +51,12 @@ export default function HomeScreen() {
   }, []);
 
   const onScroll = useAnimatedScrollHandler((event) => {
-    scrollY.value = event.contentOffset.y;
+    scrollY.set(event.contentOffset.y);
   });
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
+    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
   };
 
   const handleViewAll = (type: ViewAllEventType) => {
@@ -139,9 +141,10 @@ export default function HomeScreen() {
             />
             <View style={styles.activitiesGrid}>
               {activityEvents.slice(0, 4).map((event) => (
-                <MediumEventCard
+                <EventCard
                   key={event.id}
                   event={event}
+                  variant="medium"
                   onPress={handleEventPress}
                   width={activityCardWidth}
                 />

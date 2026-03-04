@@ -8,13 +8,13 @@ import { Button, Tabs } from "heroui-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
-import { BookmarkGridCard } from "@/components/bookmarks/BookmarkGridCard";
-import { BookmarkHeroCard } from "@/components/bookmarks/BookmarkHeroCard";
+import { EventCard } from "@/components/events/EventCard";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
 import { isEventLiveNow } from "@/lib/event-formatters";
 import type { EventRecord } from "@/lib/events/event-contracts";
 import { MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
+import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
 
 const HOUR = 60 * 60 * 1000;
@@ -221,7 +221,8 @@ export default function BookmarksScreen() {
   );
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
+    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
   };
 
   const handleBookmarkToggle = (id: string) => {
@@ -270,8 +271,9 @@ export default function BookmarksScreen() {
     if (item.kind === "hero") {
       return (
         <View key={item.id} style={[styles.itemInset, styles.heroItem]}>
-          <BookmarkHeroCard
+          <EventCard
             event={item.event}
+            variant="bookmark-hero"
             onPress={handleEventPress}
             onBookmark={handleBookmarkToggle}
             isBookmarked={bookmarkedIds.has(item.event.id)}
@@ -284,9 +286,10 @@ export default function BookmarksScreen() {
       <View key={item.id} style={styles.itemInset}>
         <View style={styles.gridRow}>
           {item.events.map((event) => (
-            <BookmarkGridCard
+            <EventCard
               key={event.id}
               event={event}
+              variant="bookmark-grid"
               onPress={handleEventPress}
               onBookmark={handleBookmarkToggle}
               isBookmarked={bookmarkedIds.has(event.id)}

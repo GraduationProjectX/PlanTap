@@ -19,3 +19,13 @@ If you see "Invalid hook call" on mobile, it is usually Metro resolving multiple
 - Root theme wiring happens in `apps/mobile/app/_layout.tsx`; this applies both React Navigation theme and Unistyles runtime mode.
 - Settings UI for changing theme mode lives in `apps/mobile/app/(main)/settings/index.tsx`.
 - To add new appearance modes later, update the `AppThemeMode` type, persisted migration, and settings options in one pass.
+
+## Screen transitions
+
+- Transition library: `react-native-screen-transitions`.
+- Main stack integration lives in `apps/mobile/app/(main)/_layout.tsx` using `createNativeStackNavigator` + `withLayoutContext`.
+- Enable transition presets only for `event/[id]` when opened from an event card shared tag.
+- Do not apply this library to tab switching or other stack routes by default.
+- Event cards use shared tags from `apps/mobile/lib/event-transition.ts` and pass tags through navigation params.
+- Event details consumes the shared tag in `apps/mobile/app/(main)/event/[id].tsx`.
+- Keep gesture dismissal disabled on `event/[id]` shared transitions unless explicitly requested.

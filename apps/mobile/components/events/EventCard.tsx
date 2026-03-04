@@ -1,14 +1,16 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
-import { Button, Card, Chip, PressableFeedback } from "heroui-native";
+import { Button, Card, Chip } from "heroui-native";
 import { useTranslation } from "react-i18next";
-import { Pressable, Text, type GestureResponderEvent, View } from "react-native";
+import { Pressable as RNPressable, Text, type GestureResponderEvent, View } from "react-native";
+import Transition from "react-native-screen-transitions";
 import { StyleSheet } from "react-native-unistyles";
 
 import { DateBadge } from "@/components/home/DateBadge";
 import { LiveBadge } from "@/components/home/LiveBadge";
 import type { EventRecord } from "@/lib/events/event-contracts";
 import { getEventCardMeta } from "@/lib/event-card-meta";
+import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
 
 export type EventCardVariant =
@@ -57,6 +59,7 @@ function EventCardComponent({
   const remainingLabel = meta.remainingLabel
     ? t("bookmarks.remaining", { time: meta.remainingLabel })
     : null;
+  const sharedBoundTag = getEventSharedBoundTag(event.id);
 
   const handleCardPress = () => {
     onPress?.(event.id);
@@ -71,7 +74,8 @@ function EventCardComponent({
     const isGrid = variant === "preview-grid";
 
     return (
-      <Pressable
+      <Transition.Pressable
+        sharedBoundTag={sharedBoundTag}
         onPress={handleCardPress}
         style={[styles.previewCard, isGrid && styles.previewCardGrid]}
       >
@@ -111,13 +115,17 @@ function EventCardComponent({
             </View>
           </View>
         </View>
-      </Pressable>
+      </Transition.Pressable>
     );
   }
 
   if (variant === "bookmark-grid") {
     return (
-      <Pressable onPress={handleCardPress} style={styles.bookmarkGridCard}>
+      <Transition.Pressable
+        sharedBoundTag={sharedBoundTag}
+        onPress={handleCardPress}
+        style={styles.bookmarkGridCard}
+      >
         <View style={styles.bookmarkGridImageContainer}>
           <Image
             source={{ uri: event.images[0] }}
@@ -128,7 +136,7 @@ function EventCardComponent({
           <View style={styles.bookmarkGridOverlay} />
 
           {onBookmark && (
-            <Pressable
+            <RNPressable
               onPress={handleBookmarkPress}
               style={styles.bookmarkGridHeartButton}
               hitSlop={8}
@@ -138,7 +146,7 @@ function EventCardComponent({
                 size={14}
                 color="#FFFFFF"
               />
-            </Pressable>
+            </RNPressable>
           )}
 
           {!!meta.dateLabel && (
@@ -162,13 +170,17 @@ function EventCardComponent({
             </View>
           </View>
         </View>
-      </Pressable>
+      </Transition.Pressable>
     );
   }
 
   if (variant === "bookmark-hero") {
     return (
-      <Pressable onPress={handleCardPress} style={styles.bookmarkHeroCard}>
+      <Transition.Pressable
+        sharedBoundTag={sharedBoundTag}
+        onPress={handleCardPress}
+        style={styles.bookmarkHeroCard}
+      >
         <Image
           source={{ uri: event.images[0] }}
           style={styles.bookmarkHeroImage}
@@ -179,7 +191,7 @@ function EventCardComponent({
 
         <View style={[styles.bookmarkHeroTopRow, { flexDirection }]}> 
           {onBookmark && (
-            <Pressable
+            <RNPressable
               onPress={handleBookmarkPress}
               style={styles.bookmarkHeroHeartButton}
               hitSlop={8}
@@ -189,7 +201,7 @@ function EventCardComponent({
                 size={16}
                 color="#FFFFFF"
               />
-            </Pressable>
+            </RNPressable>
           )}
           <View style={styles.bookmarkHeroTopSpacer} />
           <View
@@ -226,16 +238,16 @@ function EventCardComponent({
             </Text>
           </View>
         </View>
-      </Pressable>
+      </Transition.Pressable>
     );
   }
 
   if (variant === "medium") {
     return (
-      <PressableFeedback
+      <Transition.Pressable
+        sharedBoundTag={sharedBoundTag}
         onPress={handleCardPress}
         style={[styles.mediumContainer, width != null ? { width } : null]}
-        animation={{ scale: { value: 0.985 } }}
       >
         <Card style={styles.mediumCard} animation="disable-all" variant="transparent">
           <Image
@@ -293,12 +305,13 @@ function EventCardComponent({
             )}
           </Card.Body>
         </Card>
-      </PressableFeedback>
+      </Transition.Pressable>
     );
   }
 
   return (
-    <Pressable
+    <Transition.Pressable
+      sharedBoundTag={sharedBoundTag}
       onPress={handleCardPress}
       style={[styles.heroCard, width != null ? { width } : null]}
     >
@@ -342,7 +355,7 @@ function EventCardComponent({
           </View>
         )}
       </View>
-    </Pressable>
+    </Transition.Pressable>
   );
 }
 

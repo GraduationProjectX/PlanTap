@@ -8,7 +8,7 @@ import { Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
-import { MediumEventCard } from "@/components/home/MediumEventCard";
+import { EventCard } from "@/components/events/EventCard";
 import { FilterButton } from "@/components/ui/FilterButton";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { applyEventFilters, isDefaultEventFilters, type FilterType } from "@/lib/event-filters";
@@ -18,6 +18,7 @@ import { getEventsForListType, MOCK_EVENT_COLLECTIONS } from "@/lib/events/event
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
+import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
@@ -110,7 +111,8 @@ export default function ViewAllEventsScreen() {
   const showFilterSummary = shouldApplyFilters;
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
+    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
   };
 
   const handleFilterPress = () => {
@@ -146,7 +148,7 @@ export default function ViewAllEventsScreen() {
 
     return (
       <View style={[styles.itemCell, isRightColumn && styles.itemCellOffset]}>
-        <MediumEventCard event={item} width={cardWidth} onPress={handleEventPress} />
+        <EventCard event={item} variant="medium" width={cardWidth} onPress={handleEventPress} />
       </View>
     );
   };

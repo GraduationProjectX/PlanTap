@@ -1,6 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { EventPreviewCard } from "./EventPreviewCard";
+import { EventCard } from "@/components/events/EventCard";
 import type { EventRecord } from "@/lib/events/event-contracts";
 
 type UpcomingEventsListProps = {
@@ -19,7 +20,7 @@ export function UpcomingEventsList({
   const visibleEvents = events.slice(0, 4);
 
   const renderItem = ({ item }: { item: EventRecord }) => {
-    return <EventPreviewCard event={item} onPress={onEventPress} />;
+    return <EventCard event={item} variant="preview-list" onPress={onEventPress} />;
   };
 
   return (
@@ -28,15 +29,19 @@ export function UpcomingEventsList({
       keyExtractor={keyExtractor}
       renderItem={renderItem}
       getItemType={() => "upcoming-event-preview"}
+      ItemSeparatorComponent={Separator}
       scrollEnabled={false}
-      contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     />
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
-    gap: theme.spacing.sm,
+  separator: {
+    height: theme.spacing.sm,
   },
 }));
+
+function Separator() {
+  return <View style={styles.separator} />;
+}

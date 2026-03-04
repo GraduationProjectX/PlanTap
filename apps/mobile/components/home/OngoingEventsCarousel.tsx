@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { BigEventCard } from "./BigEventCard";
+import { EventCard } from "@/components/events/EventCard";
 import type { EventRecord } from "@/lib/events/event-contracts";
 
 type OngoingEventsCarouselProps = {
@@ -25,7 +25,7 @@ export function OngoingEventsCarousel({
   const cardSizeWithGap = cardWidth + CARD_GAP;
 
   const renderItem = ({ item }: { item: EventRecord }) => {
-    return <BigEventCard event={item} onPress={onEventPress} width={cardWidth} />;
+    return <EventCard event={item} variant="hero" onPress={onEventPress} width={cardWidth} />;
   };
 
   return (

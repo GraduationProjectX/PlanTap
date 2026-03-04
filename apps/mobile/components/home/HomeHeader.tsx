@@ -12,7 +12,7 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import Animated, {
   Extrapolation,
   interpolate,
-  interpolateColor,
+  useDerivedValue,
   useAnimatedStyle,
   type SharedValue,
 } from "react-native-reanimated";
@@ -136,8 +136,10 @@ export function HomeHeaderSticky({
   scrollY,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
-  const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
+  const collapsedTopPadding = insets.top + 6;
+  const expandedTopPadding = 4;
+  const topInsetDelta = Math.max(0, collapsedTopPadding - expandedTopPadding);
 
   const isAr = i18n.language === "ar";
   const categories = CATEGORIES.map((c) => ({
@@ -145,42 +147,55 @@ export function HomeHeaderSticky({
     label: isAr ? c.labelAr : c.label,
   }));
 
-  const stickyAnimatedStyle = useAnimatedStyle(() => {
-    const offsetY = scrollY?.value ?? 0;
-    const progress = interpolate(offsetY, [0, 90], [0, 1], Extrapolation.CLAMP);
-
-    return {
-      backgroundColor: interpolateColor(progress, [0, 1], [theme.colors.headerBackground, theme.colors.headerBackground]),
-      paddingTop: interpolate(progress, [0, 1], [4, insets.top + 6]),
-      paddingBottom: interpolate(progress, [0, 1], [24, 12]),
-      transform: [{ translateY: interpolate(progress, [0, 1], [0, -2]) }],
-    };
+  const collapseProgress = useDerivedValue(() => {
+    const offsetY = scrollY?.get() ?? 0;
+    return interpolate(offsetY, [0, 120], [0, 1], Extrapolation.CLAMP);
   });
 
   const searchAnimatedStyle = useAnimatedStyle(() => {
-    const offsetY = scrollY?.value ?? 0;
-    const progress = interpolate(offsetY, [0, 120], [0, 1], Extrapolation.CLAMP);
+    const progress = collapseProgress.get();
 
     return {
+      opacity: interpolate(progress, [0, 1], [1, 0.98], Extrapolation.CLAMP),
       transform: [
-        { scale: interpolate(progress, [0, 1], [1, 0.985]) },
-        { translateY: interpolate(progress, [0, 1], [0, -2]) },
+        {
+          translateY: interpolate(
+            progress,
+            [0, 1],
+            [-topInsetDelta, -2],
+            Extrapolation.CLAMP,
+          ),
+        },
+        { scale: interpolate(progress, [0, 1], [1, 0.985], Extrapolation.CLAMP) },
       ],
     };
   });
 
   const chipsAnimatedStyle = useAnimatedStyle(() => {
-    const offsetY = scrollY?.value ?? 0;
-    const progress = interpolate(offsetY, [0, 120], [0, 1], Extrapolation.CLAMP);
+    const progress = collapseProgress.get();
 
     return {
-      opacity: interpolate(progress, [0, 1], [1, 0.93]),
-      transform: [{ translateY: interpolate(progress, [0, 1], [0, -4]) }],
+      opacity: interpolate(progress, [0, 1], [1, 0.9], Extrapolation.CLAMP),
+      transform: [
+        {
+          translateY: interpolate(
+            progress,
+            [0, 1],
+            [-topInsetDelta * 0.65, -6],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
     };
   });
 
   return (
-    <Animated.View style={[styles.stickyContainer, stickyAnimatedStyle]}>
+    <Animated.View
+      style={[
+        styles.stickyContainer,
+        { paddingTop: collapsedTopPadding, paddingBottom: 12 },
+      ]}
+    >
       <Animated.View style={searchAnimatedStyle}>
         <SearchBar
           value={searchValue}
