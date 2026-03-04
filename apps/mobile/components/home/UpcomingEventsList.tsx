@@ -1,12 +1,16 @@
-import { View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { StyleSheet } from "react-native-unistyles";
 import { EventPreviewCard } from "./EventPreviewCard";
-import type { MockEvent } from "@/data/mock-events";
+import type { EventRecord } from "@/lib/events/event-contracts";
 
 type UpcomingEventsListProps = {
-  events: MockEvent[];
+  events: EventRecord[];
   onEventPress?: (id: string) => void;
 };
+
+function keyExtractor(item: EventRecord) {
+  return item.id;
+}
 
 export function UpcomingEventsList({
   events,
@@ -14,16 +18,20 @@ export function UpcomingEventsList({
 }: UpcomingEventsListProps) {
   const visibleEvents = events.slice(0, 4);
 
+  const renderItem = ({ item }: { item: EventRecord }) => {
+    return <EventPreviewCard event={item} onPress={onEventPress} />;
+  };
+
   return (
-    <View style={styles.container}>
-      {visibleEvents.map((event) => (
-        <EventPreviewCard
-          key={event.id}
-          event={event}
-          onPress={onEventPress}
-        />
-      ))}
-    </View>
+    <FlashList
+      data={visibleEvents}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      getItemType={() => "upcoming-event-preview"}
+      scrollEnabled={false}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }
 

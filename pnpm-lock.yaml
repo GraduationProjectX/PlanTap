@@ -59,6 +59,9 @@ importers:
       '@sentry/react-native':
         specifier: ~7.11.0
         version: 7.11.0(expo@55.0.2)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.0)(utf-8-validate@5.0.10))(react@19.2.0)
+      '@shopify/flash-list':
+        specifier: ^2.2.3
+        version: 2.2.3(@babel/runtime@7.28.6)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.0)(utf-8-validate@5.0.10))(react@19.2.0)
       convex:
         specifier: ^1.32.0
         version: 1.32.0(@clerk/clerk-react@5.60.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(bufferutil@4.1.0)(react@19.2.0)(utf-8-validate@5.0.10)
@@ -2036,6 +2039,13 @@ packages:
   '@sentry/types@10.37.0':
     resolution: {integrity: sha512-umpnUKRC0AAbJrADg6SlFtqN2yzf7NHciCF9lkHau+ax2PIZ/NDmoG4RQujFVflVaVoD60Ly2t+CcPnYIWMPlw==}
     engines: {node: '>=18'}
+
+  '@shopify/flash-list@2.2.3':
+    resolution: {integrity: sha512-2dnModpqd2ebUB1TiaEoMvJH1sqvWc62gXoHxFC54FtZ3Qw1YV+dUObUhA4H5dmPCayHB1O/BKyzhBJnpWLonQ==}
+    peerDependencies:
+      '@babel/runtime': '*'
+      react: 19.2.0
+      react-native: '*'
 
   '@sideway/address@4.1.5':
     resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==}
@@ -8436,6 +8446,12 @@ snapshots:
   '@sentry/types@10.37.0':
     dependencies:
       '@sentry/core': 10.37.0
+
+  '@shopify/flash-list@2.2.3(@babel/runtime@7.28.6)(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.0)(utf-8-validate@5.0.10))(react@19.2.0)':
+    dependencies:
+      '@babel/runtime': 7.28.6
+      react: 19.2.0
+      react-native: 0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(bufferutil@4.1.0)(react@19.2.0)(utf-8-validate@5.0.10)
 
   '@sideway/address@4.1.5':
     dependencies:

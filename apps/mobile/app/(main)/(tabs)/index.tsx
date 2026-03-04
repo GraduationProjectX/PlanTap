@@ -10,7 +10,7 @@ import { SectionHeader } from "@/components/home/SectionHeader";
 import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { MediumEventCard } from "@/components/home/MediumEventCard";
-import { ACTIVITY_EVENTS, ONGOING_EVENTS, UPCOMING_EVENTS } from "@/data/mock-events";
+import { MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { detectCityFromUserLocation } from "@/lib/location-city";
 
@@ -18,6 +18,7 @@ type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
+const CITY_OPTIONS = getCitiesForType("both");
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -29,13 +30,11 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
-  const cityOptions = getCitiesForType("both");
-
   useEffect(() => {
     let isMounted = true;
 
     const detectCity = async () => {
-      const detectedCity = await detectCityFromUserLocation(cityOptions);
+      const detectedCity = await detectCityFromUserLocation(CITY_OPTIONS);
       if (!isMounted || !detectedCity) {
         return;
       }
@@ -48,7 +47,7 @@ export default function HomeScreen() {
     return () => {
       isMounted = false;
     };
-  }, [cityOptions]);
+  }, []);
 
   const onScroll = useAnimatedScrollHandler((event) => {
     scrollY.value = event.contentOffset.y;
@@ -78,9 +77,9 @@ export default function HomeScreen() {
   const cityMatches = (city: string) => !selectedCity || city === selectedCity;
   const activityCardWidth = (screenWidth - HORIZONTAL_PADDING * 2 - COLUMN_GAP) / 2;
 
-  const ongoingEvents = ONGOING_EVENTS.filter((event) => cityMatches(event.city));
-  const upcomingEvents = UPCOMING_EVENTS.filter((event) => cityMatches(event.city));
-  const activityEvents = ACTIVITY_EVENTS.filter((event) => cityMatches(event.city));
+  const ongoingEvents = MOCK_EVENT_COLLECTIONS.ongoing.filter((event) => cityMatches(event.city));
+  const upcomingEvents = MOCK_EVENT_COLLECTIONS.upcoming.filter((event) => cityMatches(event.city));
+  const activityEvents = MOCK_EVENT_COLLECTIONS.activity.filter((event) => cityMatches(event.city));
 
   const ongoingTitle = selectedCity
     ? t("home.ongoingEventsInCity", { city: selectedCity })
@@ -106,7 +105,7 @@ export default function HomeScreen() {
       >
         <HomeHeaderTop
           city={selectedCity}
-          cityOptions={cityOptions}
+          cityOptions={CITY_OPTIONS}
           onFavoritePress={() => router.push("/bookmarks" as Href)}
           onCitySelect={setSelectedCity}
         />

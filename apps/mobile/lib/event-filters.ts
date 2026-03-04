@@ -1,4 +1,4 @@
-import type { MockEvent } from "@/data/mock-events";
+import type { EventRecord } from "@/lib/events/event-contracts";
 
 export type FilterType = "event" | "activity" | "both";
 export type FilterTiming = "all" | "ongoing" | "upcoming";
@@ -38,11 +38,11 @@ export function isDefaultEventFilters(filters: EventFilters): boolean {
   );
 }
 
-function isEventOngoing(event: MockEvent, now: number): boolean {
+function isEventOngoing(event: EventRecord, now: number): boolean {
   return !!(event.startAt && event.endAt && event.startAt <= now && event.endAt > now);
 }
 
-function isEventUpcoming(event: MockEvent, now: number): boolean {
+function isEventUpcoming(event: EventRecord, now: number): boolean {
   return !!(event.startAt && event.startAt > now);
 }
 
@@ -83,7 +83,7 @@ function toLocalDateString(date: Date): string {
 }
 
 function matchesDateFilter(
-  event: MockEvent,
+  event: EventRecord,
   dateFilter: FilterDate,
   now: number,
   startDate?: string,
@@ -109,7 +109,7 @@ function matchesDateFilter(
   return event.startAt >= now && event.startAt <= now + 7 * DAY;
 }
 
-export function applyEventFilters(events: MockEvent[], filters: EventFilters | null): MockEvent[] {
+export function applyEventFilters(events: EventRecord[], filters: EventFilters | null): EventRecord[] {
   if (!filters) return events;
 
   const now = Date.now();

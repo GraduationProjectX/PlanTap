@@ -1,5 +1,5 @@
 import { Platform, View, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
@@ -44,6 +44,7 @@ export function HomeHeaderTop({
   onFavoritePress,
   onCitySelect,
 }: HomeHeaderTopProps) {
+  const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
   const insets = useSafeAreaInsets();
@@ -74,7 +75,7 @@ export function HomeHeaderTop({
                 <Text style={[styles.cityText, { textAlign }]} numberOfLines={1}>
                   {selectedCityLabel}
                 </Text>
-                <FontAwesome name="chevron-down" size={10} color="rgba(255,255,255,0.84)" />
+                <FontAwesome name="chevron-down" size={10} color={theme.colors.headerMuted} />
               </View>
             </Select.Trigger>
 
@@ -118,7 +119,7 @@ export function HomeHeaderTop({
           isIconOnly
           feedbackVariant="scale"
         >
-          <Fontisto name="bookmark" size={20} color="white" />
+          <Fontisto name="bookmark" size={20} color={theme.colors.headerForeground} />
         </Button>
       </View>
     </View>
@@ -135,6 +136,7 @@ export function HomeHeaderSticky({
   scrollY,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
+  const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
 
   const isAr = i18n.language === "ar";
@@ -148,7 +150,7 @@ export function HomeHeaderSticky({
     const progress = interpolate(offsetY, [0, 90], [0, 1], Extrapolation.CLAMP);
 
     return {
-      backgroundColor: interpolateColor(progress, [0, 1], ["#1E1E1E", "#161616"]),
+      backgroundColor: interpolateColor(progress, [0, 1], [theme.colors.headerBackground, theme.colors.headerBackground]),
       paddingTop: interpolate(progress, [0, 1], [4, insets.top + 6]),
       paddingBottom: interpolate(progress, [0, 1], [24, 12]),
       transform: [{ translateY: interpolate(progress, [0, 1], [0, -2]) }],
@@ -253,19 +255,19 @@ const styles = StyleSheet.create((theme) => ({
     borderCurve: "continuous",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.colors.headerOverlay,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderColor: theme.colors.inputBorder,
     alignItems: "flex-start",
     gap: 2,
   },
   cityOverlay: {
-    backgroundColor: "rgba(10, 14, 24, 0.68)",
+    backgroundColor: theme.colors.overlayDark,
   },
   locationLabel: {
     fontSize: theme.font.size.xs,
     fontFamily: theme.font.family.medium,
-    color: "rgba(255, 255, 255, 0.5)",
+    color: theme.colors.headerMuted,
     letterSpacing: theme.font.letterSpacing.widest,
   },
   cityRow: {
@@ -278,7 +280,7 @@ const styles = StyleSheet.create((theme) => ({
   cityText: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
-    color: "#FFFFFF",
+    color: theme.colors.headerForeground,
     flexShrink: 1,
   },
   cityOptionInner: {
@@ -294,7 +296,7 @@ const styles = StyleSheet.create((theme) => ({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: theme.colors.headerOverlay,
     alignItems: "center",
     justifyContent: "center",
   },

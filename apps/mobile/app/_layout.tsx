@@ -12,7 +12,12 @@ import { initializeRTL } from "@/rtl";
 initializeRTL();
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+  type Theme as NavigationTheme,
+} from "@react-navigation/native";
 import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
 import { Stack, useNavigationContainerRef } from "expo-router";
@@ -22,10 +27,13 @@ import "react-native-reanimated";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { HeroUINativeProvider } from "heroui-native";
+import { UnistylesRuntime } from "react-native-unistyles";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { convex } from "@/lib/convex";
+import { useUIStore } from "@/stores/ui-store";
+import { darkTheme, lightTheme } from "@/theme/unistyles";
 import * as Sentry from "@sentry/react-native";
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -56,8 +64,35 @@ Sentry.init({
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+const navigationLightTheme: NavigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: lightTheme.colors.primary,
+    background: lightTheme.colors.background,
+    card: lightTheme.colors.surface,
+    text: lightTheme.colors.text,
+    border: lightTheme.colors.border,
+    notification: lightTheme.colors.error,
+  },
+};
+
+const navigationDarkTheme: NavigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: darkTheme.colors.primary,
+    background: darkTheme.colors.background,
+    card: darkTheme.colors.surface,
+    text: darkTheme.colors.text,
+    border: darkTheme.colors.border,
+    notification: darkTheme.colors.error,
+  },
+};
+
 function RootLayout() {
-  const colorScheme = useColorScheme();
+  const systemColorScheme = useColorScheme();
+  const themeMode = useUIStore((state) => state.themeMode);
 
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
@@ -71,6 +106,25 @@ function RootLayout() {
     if (error) throw error;
   }, [error]);
 
+  const resolvedThemeName =
+    themeMode === "system" ? (systemColorScheme === "dark" ? "dark" : "light") : themeMode;
+
+  useEffect(() => {
+    if (themeMode === "system") {
+      UnistylesRuntime.setAdaptiveThemes(true);
+      return;
+    }
+
+    UnistylesRuntime.setAdaptiveThemes(false);
+    UnistylesRuntime.setTheme(themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    UnistylesRuntime.setRootViewBackgroundColor(
+      resolvedThemeName === "dark" ? darkTheme.colors.background : lightTheme.colors.background,
+    );
+  }, [resolvedThemeName]);
+
   if (!loaded) {
     return null;
   }
@@ -82,7 +136,7 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}>
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             <HeroUINativeProvider>

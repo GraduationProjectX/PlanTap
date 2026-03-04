@@ -1,21 +1,33 @@
 import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 
-type ClerkEmailAddress = {
-  email_address: string;
-  id: string;
-};
-
-type UserData = {
+type ClerkUserData = {
   id: string;
   first_name?: string | null;
   last_name?: string | null;
   image_url?: string | null;
   email_address?: string | null;
-  // because Clerk webhook usually send an array of Emails instead of a single email.
   primary_email_address_id?: string | null;
-  email_addresses?: ClerkEmailAddress[] | null;
+  email_addresses?: Array<{
+    email_address: string;
+    id: string;
+  }> | null;
 };
+
+const clerkEmailAddressValidator = v.object({
+  email_address: v.string(),
+  id: v.string(),
+});
+
+const clerkUserDataValidator = v.object({
+  id: v.string(),
+  first_name: v.optional(v.union(v.string(), v.null())),
+  last_name: v.optional(v.union(v.string(), v.null())),
+  image_url: v.optional(v.union(v.string(), v.null())),
+  email_address: v.optional(v.union(v.string(), v.null())),
+  primary_email_address_id: v.optional(v.union(v.string(), v.null())),
+  email_addresses: v.optional(v.union(v.array(clerkEmailAddressValidator), v.null())),
+});
 
 export const current = query({
   args: {},
@@ -30,7 +42,7 @@ export const current = query({
   },
 });
 
-function getPrimaryEmail(userData: UserData): string | null {
+function getPrimaryEmail(userData: ClerkUserData): string | null {
   if (userData.email_address) return userData.email_address;
 
   if (!userData.email_addresses?.length) return null;
@@ -47,24 +59,23 @@ function getPrimaryEmail(userData: UserData): string | null {
 }
 
 export const addOrUpdateUser = internalMutation({
-  args: { data: v.any() },
+  args: { data: clerkUserDataValidator },
   handler: async (ctx, { data }) => {
-    const userData = data as UserData;
     const now = Date.now();
 
     const patch = {
-      clerkUserId: userData.id,
-      email: getPrimaryEmail(userData),
-      firstName: userData.first_name ?? null,
-      lastName: userData.last_name ?? null,
-      imageUrl: userData.image_url ?? null,
+      clerkUserId: data.id,
+      email: getPrimaryEmail(data),
+      firstName: data.first_name ?? null,
+      lastName: data.last_name ?? null,
+      imageUrl: data.image_url ?? null,
       locale: null,
       updatedAt: now,
     };
 
     const existUser = await ctx.db
       .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", userData.id))
+      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", data.id))
       .unique();
 
     if (existUser) {

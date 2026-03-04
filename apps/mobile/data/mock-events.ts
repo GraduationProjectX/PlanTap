@@ -1,31 +1,13 @@
-export type MockEvent = {
-  id: string;
-  title: string;
-  titleAr: string;
-  descriptionShort?: string;
-  descriptionShortAr?: string;
-  type: "event" | "activity";
-  categories: string[];
-  tags: string[];
-  startAt?: number;
-  endAt?: number;
-  city: string;
-  location: { lat: number; lng: number; address?: string; addressAr?: string };
-  priceMin?: number;
-  priceMax?: number;
-  indoorOutdoor: "indoor" | "outdoor" | "mixed" | "unknown";
-  familyFriendly?: boolean;
-  images: string[];
-  favoritesCount: number;
-  status: "pending" | "approved" | "rejected";
-  rating?: number;
-};
+import { adaptMockEvent, type MockEventSource } from "@/lib/events/event-adapters";
+import type { EventRecord } from "@/lib/events/event-contracts";
+
+export type MockEvent = EventRecord;
 
 const now = Date.now();
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
-export const MOCK_EVENTS: MockEvent[] = [
+const MOCK_EVENT_FIXTURES: MockEventSource[] = [
   {
     id: "evt_1",
     title: "Summer Jazz Festival",
@@ -413,6 +395,8 @@ export const MOCK_EVENTS: MockEvent[] = [
     rating: 4.6,
   },
 ];
+
+export const MOCK_EVENTS: EventRecord[] = MOCK_EVENT_FIXTURES.map(adaptMockEvent);
 
 export const ONGOING_EVENTS = MOCK_EVENTS.filter(
   (e) => e.startAt && e.endAt && e.startAt <= now && e.endAt > now,

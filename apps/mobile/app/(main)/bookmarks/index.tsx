@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useRouter, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -8,86 +8,174 @@ import { Button, Tabs } from "heroui-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
-import { BookmarkHeroCard } from "@/components/bookmarks/BookmarkHeroCard";
 import { BookmarkGridCard } from "@/components/bookmarks/BookmarkGridCard";
+import { BookmarkHeroCard } from "@/components/bookmarks/BookmarkHeroCard";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
-import { MOCK_EVENTS, type MockEvent } from "@/data/mock-events";
-import { useDirection } from "@/rtl";
+import { isEventLiveNow } from "@/lib/event-formatters";
+import type { EventRecord } from "@/lib/events/event-contracts";
+import { MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
+import { useDirection } from "@/rtl";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 const HORIZONTAL_PADDING = 16;
 const GRID_GAP = 12;
 
-const ALL_BOOKMARKED = MOCK_EVENTS;
-const ALL_BOOKMARKED_IDS = new Set(ALL_BOOKMARKED.map((e) => e.id));
+const ALL_BOOKMARKED = MOCK_EVENT_COLLECTIONS.all;
+const ALL_BOOKMARKED_IDS = new Set(ALL_BOOKMARKED.map((event) => event.id));
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-function formatDateRange(events: MockEvent[]): string {
+type GroupedEvents = {
+  happening: EventRecord[];
+  thisWeek: EventRecord[];
+  later: EventRecord[];
+};
+
+type BookmarkListItem =
+  | { id: string; kind: "empty" }
+  | { id: string; kind: "header"; title: string; dateRange?: string; isFirstSection: boolean }
+  | { id: string; kind: "hero"; event: EventRecord }
+  | { id: string; kind: "grid-row"; events: EventRecord[] };
+
+type RenderedSections = {
+  items: BookmarkListItem[];
+  stickyHeaderIndices: number[];
+};
+
+function formatDateRange(events: EventRecord[]): string {
   if (events.length === 0) return "";
+
   const timestamps = events
-    .map((e) => e.startAt)
-    .filter((t): t is number => t != null)
-    .sort((a, b) => a - b);
+    .map((event) => event.startAt)
+    .filter((value): value is number => value != null)
+    .sort((left, right) => left - right);
+
   if (timestamps.length === 0) return "";
 
   const first = new Date(timestamps[0]!);
   const last = new Date(timestamps[timestamps.length - 1]!);
-  const m1 = MONTH_SHORT[first.getMonth()]!.toUpperCase();
+  const firstMonth = MONTH_SHORT[first.getMonth()]!.toUpperCase();
 
   if (first.getDate() === last.getDate() && first.getMonth() === last.getMonth()) {
-    return `${m1} ${first.getDate()}`;
+    return `${firstMonth} ${first.getDate()}`;
   }
 
   if (first.getMonth() === last.getMonth()) {
-    return `${m1} ${first.getDate()} – ${last.getDate()}`;
+    return `${firstMonth} ${first.getDate()} - ${last.getDate()}`;
   }
 
-  const m2 = MONTH_SHORT[last.getMonth()]!.toUpperCase();
-  return `${m1} ${first.getDate()} – ${m2} ${last.getDate()}`;
+  const lastMonth = MONTH_SHORT[last.getMonth()]!.toUpperCase();
+  return `${firstMonth} ${first.getDate()} - ${lastMonth} ${last.getDate()}`;
 }
 
-type GroupedEvents = {
-  happening: MockEvent[];
-  thisWeek: MockEvent[];
-  later: MockEvent[];
-};
+function chunkIntoRows(events: EventRecord[], size: number): EventRecord[][] {
+  const rows: EventRecord[][] = [];
+  for (let index = 0; index < events.length; index += size) {
+    rows.push(events.slice(index, index + size));
+  }
+  return rows;
+}
 
-type RenderedSections = {
-  content: ReactNode;
-  stickyHeaderIndices?: number[];
-};
-
-function groupByTimePeriod(events: MockEvent[]): GroupedEvents {
+function groupByTimePeriod(events: EventRecord[]): GroupedEvents {
   const now = Date.now();
   const weekAhead = now + 7 * DAY;
 
-  const happening: MockEvent[] = [];
-  const thisWeek: MockEvent[] = [];
-  const later: MockEvent[] = [];
+  const happening: EventRecord[] = [];
+  const thisWeek: EventRecord[] = [];
+  const later: EventRecord[] = [];
 
-  for (const e of events) {
-    if (e.type === "activity" && e.startAt == null && e.endAt == null) {
-      happening.push(e);
+  for (const event of events) {
+    if (event.type === "activity" && event.startAt == null && event.endAt == null) {
+      happening.push(event);
       continue;
     }
 
-    const isOngoing = e.startAt != null && e.endAt != null && e.startAt <= now && e.endAt > now;
-    if (isOngoing) {
-      happening.push(e);
-    } else if (e.startAt != null && e.startAt > now && e.startAt <= weekAhead) {
-      thisWeek.push(e);
-    } else if (e.startAt != null && e.startAt > weekAhead) {
-      later.push(e);
+    if (isEventLiveNow(event)) {
+      happening.push(event);
+      continue;
+    }
+
+    if (event.startAt != null && event.startAt > now && event.startAt <= weekAhead) {
+      thisWeek.push(event);
+      continue;
+    }
+
+    if (event.startAt != null && event.startAt > weekAhead) {
+      later.push(event);
     }
   }
 
-  thisWeek.sort((a, b) => (a.startAt ?? 0) - (b.startAt ?? 0));
-  later.sort((a, b) => (a.startAt ?? 0) - (b.startAt ?? 0));
+  thisWeek.sort((left, right) => (left.startAt ?? 0) - (right.startAt ?? 0));
+  later.sort((left, right) => (left.startAt ?? 0) - (right.startAt ?? 0));
 
   return { happening, thisWeek, later };
+}
+
+function buildRenderedSections(
+  groups: GroupedEvents,
+  labels: { happening: string; thisWeek: string; later: string },
+  scope: string,
+): RenderedSections {
+  const { happening, thisWeek, later } = groups;
+  const isEmpty = happening.length === 0 && thisWeek.length === 0 && later.length === 0;
+
+  if (isEmpty) {
+    return {
+      items: [{ id: `${scope}:empty`, kind: "empty" }],
+      stickyHeaderIndices: [],
+    };
+  }
+
+  const items: BookmarkListItem[] = [];
+  const stickyHeaderIndices: number[] = [];
+  let sectionsCount = 0;
+
+  const pushHeader = (id: string, title: string, dateRange?: string) => {
+    stickyHeaderIndices.push(items.length);
+    items.push({
+      id,
+      kind: "header",
+      title,
+      dateRange,
+      isFirstSection: sectionsCount === 0,
+    });
+    sectionsCount += 1;
+  };
+
+  if (happening.length > 0) {
+    pushHeader(`${scope}:happening:header`, labels.happening);
+    for (const event of happening) {
+      items.push({ id: `${scope}:happening:${event.id}`, kind: "hero", event });
+    }
+  }
+
+  if (thisWeek.length > 0) {
+    pushHeader(`${scope}:thisWeek:header`, labels.thisWeek, formatDateRange(thisWeek));
+    const rows = chunkIntoRows(thisWeek, 2);
+    for (const row of rows) {
+      items.push({
+        id: `${scope}:thisWeek:row:${row.map((event) => event.id).join("-")}`,
+        kind: "grid-row",
+        events: row,
+      });
+    }
+  }
+
+  if (later.length > 0) {
+    pushHeader(`${scope}:later:header`, labels.later, formatDateRange(later));
+    const rows = chunkIntoRows(later, 2);
+    for (const row of rows) {
+      items.push({
+        id: `${scope}:later:row:${row.map((event) => event.id).join("-")}`,
+        kind: "grid-row",
+        events: row,
+      });
+    }
+  }
+
+  return { items, stickyHeaderIndices };
 }
 
 function EmptyState({ message, description }: { message: string; description: string }) {
@@ -100,54 +188,6 @@ function EmptyState({ message, description }: { message: string; description: st
   );
 }
 
-function GridRow({ events, onPress, onBookmark, bookmarkedIds }: {
-  events: MockEvent[];
-  onPress: (id: string) => void;
-  onBookmark: (id: string) => void;
-  bookmarkedIds: Set<string>;
-}) {
-  return (
-    <View style={styles.gridRow}>
-      {events.map((event) => (
-        <BookmarkGridCard
-          key={event.id}
-          event={event}
-          onPress={onPress}
-          onBookmark={onBookmark}
-          isBookmarked={bookmarkedIds.has(event.id)}
-        />
-      ))}
-      {events.length % 2 !== 0 && <View style={styles.gridSpacer} />}
-    </View>
-  );
-}
-
-function EventGrid({ events, onPress, onBookmark, bookmarkedIds }: {
-  events: MockEvent[];
-  onPress: (id: string) => void;
-  onBookmark: (id: string) => void;
-  bookmarkedIds: Set<string>;
-}) {
-  const rows: MockEvent[][] = [];
-  for (let i = 0; i < events.length; i += 2) {
-    rows.push(events.slice(i, i + 2));
-  }
-
-  return (
-    <View style={styles.gridContainer}>
-      {rows.map((row) => (
-        <GridRow
-          key={row.map((e) => e.id).join("-")}
-          events={row}
-          onPress={onPress}
-          onBookmark={onBookmark}
-          bookmarkedIds={bookmarkedIds}
-        />
-      ))}
-    </View>
-  );
-}
-
 export default function BookmarksScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -155,24 +195,38 @@ export default function BookmarksScreen() {
   const { isRTL } = useDirection();
 
   const [activeTab, setActiveTab] = useState("events");
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(
-    () => new Set(ALL_BOOKMARKED_IDS),
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(() => new Set(ALL_BOOKMARKED_IDS));
+
+  const bookmarked = ALL_BOOKMARKED.filter((event) => bookmarkedIds.has(event.id));
+  const eventItems = bookmarked.filter((event) => event.type === "event");
+  const activityItems = bookmarked.filter((event) => event.type === "activity");
+
+  const eventSections = buildRenderedSections(
+    groupByTimePeriod(eventItems),
+    {
+      happening: t("bookmarks.happeningNow"),
+      thisWeek: t("bookmarks.thisWeek"),
+      later: t("bookmarks.later"),
+    },
+    "events",
   );
-
-  const bookmarked = ALL_BOOKMARKED.filter((e) => bookmarkedIds.has(e.id));
-  const eventItems = bookmarked.filter((e) => e.type === "event");
-  const activityItems = bookmarked.filter((e) => e.type === "activity");
-
-  const eventGroups = groupByTimePeriod(eventItems);
-  const activityGroups = groupByTimePeriod(activityItems);
+  const activitySections = buildRenderedSections(
+    groupByTimePeriod(activityItems),
+    {
+      happening: t("bookmarks.availableNow"),
+      thisWeek: t("bookmarks.thisWeek"),
+      later: t("bookmarks.later"),
+    },
+    "activities",
+  );
 
   const handleEventPress = (id: string) => {
     router.push(`/event/${id}` as Href);
   };
 
   const handleBookmarkToggle = (id: string) => {
-    setBookmarkedIds((prev) => {
-      const next = new Set(prev);
+    setBookmarkedIds((previous) => {
+      const next = new Set(previous);
       if (next.has(id)) {
         next.delete(id);
       } else {
@@ -186,35 +240,51 @@ export default function BookmarksScreen() {
     router.back();
   };
 
-  const renderSections = (groups: GroupedEvents, happeningTitle: string): RenderedSections => {
-    const { happening, thisWeek, later } = groups;
-    const isEmpty = happening.length === 0 && thisWeek.length === 0 && later.length === 0;
-
-    if (isEmpty) {
-      return {
-        content: (
+  const renderListItem = (item: BookmarkListItem) => {
+    if (item.kind === "empty") {
+      return (
+        <View key={item.id} style={styles.itemInset}>
           <EmptyState
             message={t("bookmarks.empty")}
             description={t("bookmarks.emptyDescription")}
           />
-        ),
-      };
+        </View>
+      );
     }
 
-    const nodes: ReactNode[] = [];
-    const stickyHeaderIndices: number[] = [];
-
-    if (happening.length > 0) {
-      stickyHeaderIndices.push(nodes.length);
-      nodes.push(
-        <View key="happening-header" style={styles.stickyHeader}>
-          <BookmarkSectionHeader title={happeningTitle} />
-        </View>,
+    if (item.kind === "header") {
+      return (
+        <View
+          key={item.id}
+          style={[
+            styles.stickyHeader,
+            styles.itemInset,
+            !item.isFirstSection && styles.stickyHeaderSpaced,
+          ]}
+        >
+          <BookmarkSectionHeader title={item.title} dateRange={item.dateRange} />
+        </View>
       );
-      nodes.push(
-        <View key="happening-body" style={styles.sectionBody}>
-          {happening.map((event) => (
-            <BookmarkHeroCard
+    }
+
+    if (item.kind === "hero") {
+      return (
+        <View key={item.id} style={[styles.itemInset, styles.heroItem]}>
+          <BookmarkHeroCard
+            event={item.event}
+            onPress={handleEventPress}
+            onBookmark={handleBookmarkToggle}
+            isBookmarked={bookmarkedIds.has(item.event.id)}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <View key={item.id} style={styles.itemInset}>
+        <View style={styles.gridRow}>
+          {item.events.map((event) => (
+            <BookmarkGridCard
               key={event.id}
               event={event}
               onPress={handleEventPress}
@@ -222,59 +292,11 @@ export default function BookmarksScreen() {
               isBookmarked={bookmarkedIds.has(event.id)}
             />
           ))}
-        </View>,
-      );
-    }
-
-    if (thisWeek.length > 0) {
-      stickyHeaderIndices.push(nodes.length);
-      nodes.push(
-        <View key="this-week-header" style={styles.stickyHeader}>
-          <BookmarkSectionHeader
-            title={t("bookmarks.thisWeek")}
-            dateRange={formatDateRange(thisWeek)}
-          />
-        </View>,
-      );
-      nodes.push(
-        <View key="this-week-body" style={styles.sectionBody}>
-          <EventGrid
-            events={thisWeek}
-            onPress={handleEventPress}
-            onBookmark={handleBookmarkToggle}
-            bookmarkedIds={bookmarkedIds}
-          />
-        </View>,
-      );
-    }
-
-    if (later.length > 0) {
-      stickyHeaderIndices.push(nodes.length);
-      nodes.push(
-        <View key="later-header" style={styles.stickyHeader}>
-          <BookmarkSectionHeader
-            title={t("bookmarks.later")}
-            dateRange={formatDateRange(later)}
-          />
-        </View>,
-      );
-      nodes.push(
-        <View key="later-body" style={styles.sectionBody}>
-          <EventGrid
-            events={later}
-            onPress={handleEventPress}
-            onBookmark={handleBookmarkToggle}
-            bookmarkedIds={bookmarkedIds}
-          />
-        </View>,
-      );
-    }
-
-    return { content: nodes, stickyHeaderIndices };
+          {item.events.length % 2 !== 0 && <View style={styles.gridSpacer} />}
+        </View>
+      </View>
+    );
   };
-
-  const eventSections = renderSections(eventGroups, t("bookmarks.happeningNow"));
-  const activitySections = renderSections(activityGroups, t("bookmarks.availableNow"));
 
   return (
     <View style={styles.root}>
@@ -317,9 +339,10 @@ export default function BookmarksScreen() {
             stickyHeaderIndices={eventSections.stickyHeaderIndices}
             contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
           >
-            {eventSections.content}
+            {eventSections.items.map((item) => renderListItem(item))}
           </ScrollView>
         </Tabs.Content>
+
         <Tabs.Content value="activities" style={styles.tabContent}>
           <ScrollView
             style={styles.scrollView}
@@ -327,7 +350,7 @@ export default function BookmarksScreen() {
             stickyHeaderIndices={activitySections.stickyHeaderIndices}
             contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
           >
-            {activitySections.content}
+            {activitySections.items.map((item) => renderListItem(item))}
           </ScrollView>
         </Tabs.Content>
       </Tabs>
@@ -391,30 +414,28 @@ const styles = StyleSheet.create((theme) => ({
   },
   tabContent: {
     flex: 1,
-    justifyContent: "center",
-    alignContent: "center",
-    textAlign: "center",
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     paddingTop: theme.spacing.lg,
+  },
+  itemInset: {
     paddingHorizontal: HORIZONTAL_PADDING,
   },
   stickyHeader: {
     backgroundColor: theme.colors.background,
     zIndex: 1,
   },
-  sectionBody: {
-    paddingTop: theme.spacing.xs,
-    marginBottom: theme.spacing.lg,
-    gap: theme.spacing.xs,
+  stickyHeaderSpaced: {
+    marginTop: theme.spacing.lg,
   },
-  gridContainer: {
-    gap: GRID_GAP,
+  heroItem: {
+    marginTop: theme.spacing.xs,
   },
   gridRow: {
+    marginTop: theme.spacing.xs,
     flexDirection: "row",
     gap: GRID_GAP,
   },

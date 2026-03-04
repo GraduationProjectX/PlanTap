@@ -1,36 +1,8 @@
-import { View, Text, Pressable } from "react-native";
-import { Image } from "expo-image";
-import { StyleSheet } from "react-native-unistyles";
-import { Chip } from "heroui-native";
-import { useTranslation } from "react-i18next";
-import { useDirection } from "@/rtl";
-import { DateBadge } from "./DateBadge";
-import type { MockEvent } from "@/data/mock-events";
-
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const HOUR = 60 * 60 * 1000;
-const DAY = 24 * HOUR;
-
-function getDateParts(timestamp?: number) {
-  if (!timestamp) return { day: 0, month: "" };
-  const d = new Date(timestamp);
-  return { day: d.getDate(), month: MONTH_NAMES[d.getMonth()] ?? "" };
-}
-
-function getCountdownLabel(startAt?: number): string | null {
-  if (!startAt) return null;
-  const diff = startAt - Date.now();
-  if (diff <= 0) return null;
-  const days = Math.floor(diff / DAY);
-  const hours = Math.floor((diff % DAY) / HOUR);
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h`;
-  const minutes = Math.floor(diff / (60 * 1000));
-  return `${minutes}m`;
-}
+import { EventCard } from "@/components/events/EventCard";
+import type { EventRecord } from "@/lib/events/event-contracts";
 
 type EventPreviewCardProps = {
-  event: MockEvent;
+  event: EventRecord;
   onPress?: (id: string) => void;
   showCountdown?: boolean;
   variant?: "list" | "grid";
@@ -42,143 +14,14 @@ function EventPreviewCardComponent({
   showCountdown = true,
   variant = "list",
 }: EventPreviewCardProps) {
-  const { t } = useTranslation();
-  const { flexDirection, textAlign } = useDirection();
-
-  const { day, month } = getDateParts(event.startAt);
-  const categoryLabel = event.categories[0]?.toUpperCase() ?? "";
-  const countdown = showCountdown ? getCountdownLabel(event.startAt) : null;
-  const isGrid = variant === "grid";
-
   return (
-    <Pressable
-      onPress={() => onPress?.(event.id)}
-      style={[styles.card, isGrid && styles.cardGrid]}
-    >
-      <View style={[styles.row, { flexDirection: isGrid ? "column" : flexDirection }]}>
-        <View style={[styles.imageContainer, isGrid && styles.imageContainerGrid]}>
-          <Image
-            source={{ uri: event.images[0] }}
-            style={styles.image}
-            contentFit="cover"
-            transition={120}
-          />
-          <View style={styles.dateBadge}>
-            <DateBadge day={day} month={month} />
-          </View>
-        </View>
-
-        <View style={[styles.info, isGrid && styles.infoGrid]}>
-          <View style={[styles.topRow, { flexDirection }]}>
-            {countdown && (
-              <Chip size="sm" variant="secondary" color="accent" animation="disable-all">
-                <Chip.Label style={{ color: "#000" }}>{t("bookmarks.startsIn", { time: countdown })}</Chip.Label>
-              </Chip>
-            )}
-          </View>
-
-          <Text style={[styles.title, isGrid && styles.titleGrid, { textAlign }]} numberOfLines={2}>
-            {event.title}
-          </Text>
-
-          <Text style={[styles.category, { textAlign }]}>{categoryLabel}</Text>
-
-          <View style={[styles.locationRow, { flexDirection }]}>
-            <Text style={styles.locationIcon}>📍</Text>
-            <Text style={[styles.location, { textAlign }]} numberOfLines={2}>
-              {event.location.address}
-            </Text>
-          </View>
-        </View>
-      </View>
-    </Pressable>
+    <EventCard
+      event={event}
+      variant={variant === "grid" ? "preview-grid" : "preview-list"}
+      onPress={onPress}
+      showCountdown={showCountdown}
+    />
   );
 }
 
 export const EventPreviewCard = EventPreviewCardComponent;
-
-const styles = StyleSheet.create((theme) => ({
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.xl,
-    borderCurve: "continuous",
-    padding: theme.spacing.sm,
-    marginHorizontal: theme.spacing.md,
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-  },
-  cardGrid: {
-    marginHorizontal: 0,
-    padding: theme.spacing.xs,
-  },
-  row: {
-    alignItems: "center",
-    gap: theme.spacing.sm,
-  },
-  imageContainer: {
-    width: 104,
-    height: 104,
-    borderRadius: theme.radius.lg,
-    borderCurve: "continuous",
-    overflow: "hidden",
-    position: "relative",
-  },
-  imageContainerGrid: {
-    width: "100%",
-    height: undefined,
-    aspectRatio: 1.25,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  dateBadge: {
-    position: "absolute",
-    top: 4,
-    left: 4,
-  },
-  info: {
-    flex: 1,
-    gap: 6,
-  },
-  infoGrid: {
-    width: "100%",
-  },
-  topRow: {
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 4,
-  },
-  category: {
-    fontSize: theme.font.size.sm,
-    fontFamily: theme.font.family.semiBold,
-    color: theme.colors.textSecondary,
-    letterSpacing: theme.font.letterSpacing.wider,
-  },
-  price: {
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.bold,
-    color: theme.colors.text,
-  },
-  title: {
-    fontSize: theme.font.size.lg,
-    fontFamily: theme.font.family.bold,
-    color: theme.colors.text,
-  },
-  titleGrid: {
-    lineHeight: theme.font.size.lg * theme.font.lineHeight.normal,
-    minHeight: theme.font.size.lg * theme.font.lineHeight.normal * 2,
-  },
-  locationRow: {
-    alignItems: "center",
-    gap: 4,
-  },
-  locationIcon: {
-    fontSize: 11,
-  },
-  location: {
-    fontSize: theme.font.size.md,
-    fontFamily: theme.font.family.regular,
-    color: theme.colors.textSecondary,
-    flex: 1,
-  },
-}));

@@ -1,17 +1,18 @@
-import { FlatList, useWindowDimensions } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import { View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { BigEventCard } from "./BigEventCard";
-import type { MockEvent } from "@/data/mock-events";
+import type { EventRecord } from "@/lib/events/event-contracts";
 
 type OngoingEventsCarouselProps = {
-  events: MockEvent[];
+  events: EventRecord[];
   onEventPress?: (id: string) => void;
 };
 
 const CARD_GAP = 12;
 const HORIZONTAL_PADDING = 16;
 
-function keyExtractor(item: MockEvent) {
+function keyExtractor(item: EventRecord) {
   return item.id;
 }
 
@@ -23,34 +24,23 @@ export function OngoingEventsCarousel({
   const cardWidth = screenWidth * 0.75;
   const cardSizeWithGap = cardWidth + CARD_GAP;
 
-  const renderItem = ({ item }: { item: MockEvent }) => {
+  const renderItem = ({ item }: { item: EventRecord }) => {
     return <BigEventCard event={item} onPress={onEventPress} width={cardWidth} />;
   };
 
-  const getItemLayout = (_data: ArrayLike<MockEvent> | null | undefined, index: number) => ({
-    length: cardSizeWithGap,
-    offset: cardSizeWithGap * index,
-    index,
-  });
-
   return (
-    <FlatList
+    <FlashList
       data={events}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      getItemLayout={getItemLayout}
+      getItemType={() => "ongoing-event-card"}
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[
-        styles.content,
-        { gap: CARD_GAP, paddingHorizontal: HORIZONTAL_PADDING },
-      ]}
+      contentContainerStyle={styles.content}
+      ItemSeparatorComponent={Separator}
       snapToInterval={cardSizeWithGap}
       decelerationRate="fast"
-      initialNumToRender={3}
-      maxToRenderPerBatch={3}
-      updateCellsBatchingPeriod={60}
-      windowSize={5}
+      drawDistance={cardSizeWithGap * 2}
     />
   );
 }
@@ -58,5 +48,13 @@ export function OngoingEventsCarousel({
 const styles = StyleSheet.create(() => ({
   content: {
     paddingVertical: 4,
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  separator: {
+    width: CARD_GAP,
   },
 }));
+
+function Separator() {
+  return <View style={styles.separator} />;
+}

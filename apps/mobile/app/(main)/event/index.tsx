@@ -1,9 +1,10 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams, useRouter, type Href } from "expo-router";
 import { Button, Select } from "heroui-native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
+import { Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -12,28 +13,17 @@ import { FilterButton } from "@/components/ui/FilterButton";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { applyEventFilters, isDefaultEventFilters, type FilterType } from "@/lib/event-filters";
 import { normalizeEventListType, type EventListType } from "@/lib/event-list-type";
+import type { EventRecord } from "@/lib/events/event-contracts";
+import { getEventsForListType, MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
-import {
-  ACTIVITY_EVENTS,
-  MOCK_EVENTS,
-  ONGOING_EVENTS,
-  UPCOMING_EVENTS,
-  type MockEvent,
-} from "@/data/mock-events";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
 const ALL_CITIES_VALUE = "__all_cities__";
-const DATA_MAP: Record<EventListType, MockEvent[]> = {
-  ongoing: ONGOING_EVENTS,
-  upcoming: UPCOMING_EVENTS,
-  activity: ACTIVITY_EVENTS,
-  all: MOCK_EVENTS,
-};
 const NON_REMOVABLE_FILTER_TAG_IDS = new Set(["type:both", "category:any", "city:all"]);
 const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
   ongoing: "event",
@@ -42,7 +32,7 @@ const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
   all: "both",
 };
 
-function keyExtractor(item: MockEvent) {
+function keyExtractor(item: EventRecord) {
   return item.id;
 }
 
@@ -86,7 +76,7 @@ export default function ViewAllEventsScreen() {
     all: `${t("home.viewAll")} `,
   };
 
-  const events = DATA_MAP[eventType];
+  const events = getEventsForListType(MOCK_EVENT_COLLECTIONS, eventType);
   const filteredEvents = shouldApplyFilters ? applyEventFilters(events, appliedFilters) : events;
   const cityScopedEvents =
     !shouldApplyFilters && selectedCity
@@ -151,8 +141,14 @@ export default function ViewAllEventsScreen() {
     router.back();
   };
 
-  const renderItem = ({ item }: { item: MockEvent }) => {
-    return <MediumEventCard event={item} width={cardWidth} onPress={handleEventPress} />;
+  const renderItem = ({ item, index }: { item: EventRecord; index: number }) => {
+    const isRightColumn = index % 2 !== 0;
+
+    return (
+      <View style={[styles.itemCell, isRightColumn && styles.itemCellOffset]}>
+        <MediumEventCard event={item} width={cardWidth} onPress={handleEventPress} />
+      </View>
+    );
   };
 
   return (
@@ -300,18 +296,15 @@ export default function ViewAllEventsScreen() {
 
       {showFilterSummary && <View style={styles.summarySeparator} />}
 
-      <FlatList
+      <FlashList
         data={visibleEvents}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         numColumns={2}
+        getItemType={() => "event-grid-card"}
         showsVerticalScrollIndicator={false}
-        columnWrapperStyle={styles.row}
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
-        initialNumToRender={6}
-        maxToRenderPerBatch={8}
-        updateCellsBatchingPeriod={60}
-        windowSize={7}
+        drawDistance={900}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <FontAwesome
@@ -452,8 +445,11 @@ const styles = StyleSheet.create((theme) => ({
     paddingTop: theme.spacing.md,
     paddingHorizontal: HORIZONTAL_PADDING,
   },
-  row: {
-    gap: COLUMN_GAP,
+  itemCell: {
+    width: "50%",
+  },
+  itemCellOffset: {
+    paddingLeft: COLUMN_GAP,
   },
   emptyContainer: {
     flex: 1,
