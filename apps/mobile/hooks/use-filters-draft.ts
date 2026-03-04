@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import type { EventDoc } from "@/hooks/use-events";
+import type { CategoryDoc } from "@/hooks/use-categories";
 import {
   getCategoryIdsForType,
   getCategoryLabelByIdMap,
@@ -17,6 +19,8 @@ import {
 type UseFiltersDraftArgs = {
   initialFilters: EventFilters | null;
   isArabic: boolean;
+  events: EventDoc[];
+  categories: CategoryDoc[];
 };
 
 type UseFiltersDraftResult = {
@@ -31,21 +35,21 @@ type UseFiltersDraftResult = {
   clearAll: () => void;
 };
 
-export function useFiltersDraft({ initialFilters, isArabic }: UseFiltersDraftArgs): UseFiltersDraftResult {
+export function useFiltersDraft({ initialFilters, isArabic, events, categories }: UseFiltersDraftArgs): UseFiltersDraftResult {
   const [draft, setDraft] = useState<EventFilters>(initialFilters ?? DEFAULT_EVENT_FILTERS);
 
-  const categoryLabelById = getCategoryLabelByIdMap(isArabic);
+  const categoryLabelById = getCategoryLabelByIdMap(categories, isArabic);
 
-  const categoryOptions: FilterOption[] = getCategoryIdsForType(draft.type).map((id) => ({
+  const categoryOptions: FilterOption[] = getCategoryIdsForType(events, draft.type).map((id) => ({
     id,
     label: categoryLabelById[id] ?? id,
   }));
 
-  const cityOptions = getCitiesForType(draft.type);
+  const cityOptions = getCitiesForType(events, draft.type);
 
   const selectType = (type: FilterType) => {
-    const nextCategories = getCategoryIdsForType(type);
-    const nextCities = getCitiesForType(type);
+    const nextCategories = getCategoryIdsForType(events, type);
+    const nextCities = getCitiesForType(events, type);
 
     setDraft((prev) => ({
       ...prev,

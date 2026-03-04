@@ -8,8 +8,12 @@ import { FiltersApplyBar } from "@/components/filters/FiltersApplyBar";
 import { FiltersCategorySection } from "@/components/filters/FiltersCategorySection";
 import { FiltersCitySection } from "@/components/filters/FiltersCitySection";
 import { FiltersDateSection } from "@/components/filters/FiltersDateSection";
+import { FiltersSkeleton } from "@/components/filters/FiltersSkeleton";
 import { FiltersTopBar } from "@/components/filters/FiltersTopBar";
 import { FiltersTypeSection } from "@/components/filters/FiltersTypeSection";
+import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransition";
+import { useCategories } from "@/hooks/use-categories";
+import { useEvents } from "@/hooks/use-events";
 import { useFiltersDraft } from "@/hooks/use-filters-draft";
 import { normalizeEventListType } from "@/lib/event-list-type";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
@@ -26,6 +30,8 @@ export default function FiltersScreen() {
 
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
+  const { events, isLoading: isEventsLoading } = useEvents();
+  const { categories, isLoading: isCategoriesLoading } = useCategories();
 
   const {
     draft,
@@ -40,7 +46,11 @@ export default function FiltersScreen() {
   } = useFiltersDraft({
     initialFilters: appliedFilters,
     isArabic,
+    events: events ?? [],
+    categories,
   });
+
+  const isInitialLoading = isEventsLoading || isCategoriesLoading;
 
   const scrollContentStyle = [styles.scrollContent, { paddingBottom: insets.bottom + 110 }];
 
@@ -54,38 +64,40 @@ export default function FiltersScreen() {
   };
 
   return (
-    <View style={styles.root}>
-      <FiltersTopBar onBack={handleBack} onClearAll={clearAll} />
+    <SkeletonScreenTransition isLoading={isInitialLoading} skeleton={<FiltersSkeleton topInset={88} />}>
+      <View style={styles.root}>
+        <FiltersTopBar onBack={handleBack} onClearAll={clearAll} />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={scrollContentStyle}
-      >
-        <FiltersTypeSection selectedType={draft.type} onSelectType={selectType} />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={scrollContentStyle}
+        >
+          <FiltersTypeSection selectedType={draft.type} onSelectType={selectType} />
 
-        <FiltersCategorySection
-          options={categoryOptions}
-          selectedCategoryIds={draft.categories}
-          onToggleCategory={toggleCategory}
-        />
+          <FiltersCategorySection
+            options={categoryOptions}
+            selectedCategoryIds={draft.categories}
+            onToggleCategory={toggleCategory}
+          />
 
-        <FiltersCitySection
-          cityOptions={cityOptions}
-          selectedCity={draft.cities[0]}
-          onSelectCity={selectCity}
-        />
+          <FiltersCitySection
+            cityOptions={cityOptions}
+            selectedCity={draft.cities[0]}
+            onSelectCity={selectCity}
+          />
 
-        <FiltersDateSection
-          activeDate={draft.date}
-          startDate={draft.startDate}
-          endDate={draft.endDate}
-          onToggleDate={toggleDate}
-          onConfirmSpecificDates={confirmSpecificDates}
-        />
-      </ScrollView>
+          <FiltersDateSection
+            activeDate={draft.date}
+            startDate={draft.startDate}
+            endDate={draft.endDate}
+            onToggleDate={toggleDate}
+            onConfirmSpecificDates={confirmSpecificDates}
+          />
+        </ScrollView>
 
-      <FiltersApplyBar onApply={handleApply} />
-    </View>
+        <FiltersApplyBar onApply={handleApply} />
+      </View>
+    </SkeletonScreenTransition>
   );
 }
 

@@ -8,7 +8,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { DateBadge } from "@/components/home/DateBadge";
 import { LiveBadge } from "@/components/home/LiveBadge";
-import type { EventRecord } from "@/lib/events/event-contracts";
+import type { EventDoc } from "@/hooks/use-events";
 import { getEventCardMeta } from "@/lib/event-card-meta";
 import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
@@ -22,7 +22,7 @@ export type EventCardVariant =
   | "bookmark-grid";
 
 type EventCardProps = {
-  event: EventRecord;
+  event: EventDoc;
   variant: EventCardVariant;
   width?: number;
   onPress?: (id: string) => void;
@@ -59,15 +59,15 @@ function EventCardComponent({
   const remainingLabel = meta.remainingLabel
     ? t("bookmarks.remaining", { time: meta.remainingLabel })
     : null;
-  const sharedBoundTag = getEventSharedBoundTag(event.id);
+  const sharedBoundTag = getEventSharedBoundTag(event._id);
 
   const handleCardPress = () => {
-    onPress?.(event.id);
+    onPress?.(event._id);
   };
 
   const handleBookmarkPress = (pressEvent: GestureResponderEvent) => {
     pressEvent.stopPropagation();
-    onBookmark?.(event.id);
+    onBookmark?.(event._id);
   };
 
   if (variant === "preview-list" || variant === "preview-grid") {
@@ -291,7 +291,7 @@ function EventCardComponent({
               <View style={[styles.mediumTagsContainer, { flexDirection }]}> 
                 {meta.tagLabels.map((tag) => (
                   <Chip
-                    key={`${event.id}-${tag}`}
+                    key={`${event._id}-${tag}`}
                     size="sm"
                     variant="soft"
                     color="default"
@@ -348,7 +348,7 @@ function EventCardComponent({
         {meta.tagLabels.length > 0 && (
           <View style={[styles.heroTagsContainer, { flexDirection }]}> 
             {meta.tagLabels.map((tag) => (
-              <View key={`${event.id}-${tag}`} style={styles.heroTagChip}>
+              <View key={`${event._id}-${tag}`} style={styles.heroTagChip}>
                 <Text style={styles.heroTagText}>{tag}</Text>
               </View>
             ))}

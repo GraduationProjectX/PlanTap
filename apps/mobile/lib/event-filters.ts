@@ -1,4 +1,4 @@
-import type { EventRecord } from "@/lib/events/event-contracts";
+import type { EventDoc } from "@/hooks/use-events";
 
 export type FilterType = "event" | "activity" | "both";
 export type FilterTiming = "all" | "ongoing" | "upcoming";
@@ -38,11 +38,11 @@ export function isDefaultEventFilters(filters: EventFilters): boolean {
   );
 }
 
-function isEventOngoing(event: EventRecord, now: number): boolean {
+function isEventOngoing(event: EventDoc, now: number): boolean {
   return !!(event.startAt && event.endAt && event.startAt <= now && event.endAt > now);
 }
 
-function isEventUpcoming(event: EventRecord, now: number): boolean {
+function isEventUpcoming(event: EventDoc, now: number): boolean {
   return !!(event.startAt && event.startAt > now);
 }
 
@@ -83,7 +83,7 @@ function toLocalDateString(date: Date): string {
 }
 
 function matchesDateFilter(
-  event: EventRecord,
+  event: EventDoc,
   dateFilter: FilterDate,
   now: number,
   startDate?: string,
@@ -109,7 +109,7 @@ function matchesDateFilter(
   return event.startAt >= now && event.startAt <= now + 7 * DAY;
 }
 
-export function applyEventFilters(events: EventRecord[], filters: EventFilters | null): EventRecord[] {
+export function applyEventFilters(events: EventDoc[], filters: EventFilters | null): EventDoc[] {
   if (!filters) return events;
 
   const now = Date.now();

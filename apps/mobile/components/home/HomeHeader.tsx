@@ -1,4 +1,4 @@
-import { Platform, View, Text } from "react-native";
+import { View, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -6,7 +6,7 @@ import { useDirection } from "@/rtl";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CategoryChips } from "./CategoryChips";
-import { CATEGORIES } from "@/data/mock-events";
+import { CategoryChipsSkeleton } from "./CategoryChipsSkeleton";
 import { Button, Select } from "heroui-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Animated, {
@@ -26,6 +26,8 @@ type HomeHeaderTopProps = {
 
 const ALL_CITIES_VALUE = "__all_cities__";
 
+type CategoryItem = { key?: string; id?: string; label: string; labelAr: string };
+
 type HomeHeaderStickyProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -34,9 +36,11 @@ type HomeHeaderStickyProps = {
   onFilterPress?: () => void;
   isFilterActive?: boolean;
   scrollY?: SharedValue<number>;
+  categories?: CategoryItem[];
+  isCategoriesLoading?: boolean;
 };
 
-type HomeHeaderProps = HomeHeaderTopProps & HomeHeaderStickyProps;
+type HomeHeaderProps = HomeHeaderTopProps & Omit<HomeHeaderStickyProps, "categories"> & { categories?: CategoryItem[] };
 
 export function HomeHeaderTop({
   city,
@@ -48,8 +52,7 @@ export function HomeHeaderTop({
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
   const insets = useSafeAreaInsets();
-  const cityModalBottomSpacer =
-    (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
+  const cityListBottomPadding = 100;
 
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = city ?? allCitiesLabel;
@@ -88,25 +91,25 @@ export function HomeHeaderTop({
                 }}
                 style={styles.cityOverlay}
               />
-              <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+              <Select.Content presentation="bottom-sheet">
                 <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
-                  <View style={styles.cityOptionInner}>
-                    <Text style={styles.cityOptionIcon}>🌍</Text>
-                    <Select.ItemLabel />
-                  </View>
-                  <Select.ItemIndicator />
-                </Select.Item>
-                {cityOptions.map((cityOption) => (
-                  <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                  <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
                     <View style={styles.cityOptionInner}>
-                      <Text style={styles.cityOptionIcon}>🏢</Text>
+                      <Text style={styles.cityOptionIcon}>🌍</Text>
                       <Select.ItemLabel />
                     </View>
                     <Select.ItemIndicator />
                   </Select.Item>
-                ))}
-                <View style={{ height: cityModalBottomSpacer }} />
+                  {cityOptions.map((cityOption) => (
+                    <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                      <View style={styles.cityOptionInner}>
+                        <Text style={styles.cityOptionIcon}>🏢</Text>
+                        <Select.ItemLabel />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                  <View style={{ height: cityListBottomPadding }} />
               </Select.Content>
             </Select.Portal>
           </Select>
@@ -134,6 +137,8 @@ export function HomeHeaderSticky({
   onFilterPress,
   isFilterActive,
   scrollY,
+  categories: categoryItems = [],
+  isCategoriesLoading = false,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -142,10 +147,19 @@ export function HomeHeaderSticky({
   const topInsetDelta = Math.max(0, collapsedTopPadding - expandedTopPadding);
 
   const isAr = i18n.language === "ar";
-  const categories = CATEGORIES.map((c) => ({
-    id: c.id,
-    label: isAr ? c.labelAr : c.label,
-  }));
+  const categories = categoryItems
+    .map((c) => {
+      const normalizedId = c.key ?? c.id ?? c.label.trim().toLowerCase().replace(/\s+/g, "-");
+      if (!normalizedId) {
+        return null;
+      }
+
+      return {
+        id: normalizedId,
+        label: isAr ? c.labelAr : c.label,
+      };
+    })
+    .filter((item): item is { id: string; label: string } => item !== null);
 
   const collapseProgress = useDerivedValue(() => {
     const offsetY = scrollY?.get() ?? 0;
@@ -196,7 +210,7 @@ export function HomeHeaderSticky({
         { paddingTop: collapsedTopPadding, paddingBottom: 12 },
       ]}
     >
-      <Animated.View style={searchAnimatedStyle}>
+      <Animated.View style={searchAnimatedStyle} pointerEvents="box-none">
         <SearchBar
           value={searchValue}
           onChange={onSearchChange}
@@ -207,11 +221,15 @@ export function HomeHeaderSticky({
       </Animated.View>
 
       <Animated.View style={[styles.chipsContainer, chipsAnimatedStyle]}>
-        <CategoryChips
-          categories={categories}
-          selected={selectedCategory}
-          onSelect={onCategorySelect}
-        />
+        {isCategoriesLoading ? (
+          <CategoryChipsSkeleton />
+        ) : (
+          <CategoryChips
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={onCategorySelect}
+          />
+        )}
       </Animated.View>
     </Animated.View>
   );
@@ -234,6 +252,8 @@ export function HomeHeader(props: HomeHeaderProps) {
         onFilterPress={props.onFilterPress}
         isFilterActive={props.isFilterActive}
         scrollY={props.scrollY}
+        categories={props.categories}
+        isCategoriesLoading={props.isCategoriesLoading}
       />
     </View>
   );
@@ -246,6 +266,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   stickyContainer: {
     backgroundColor: theme.colors.headerBackground,
+    position: "relative",
     paddingTop: theme.spacing.xs,
     paddingBottom: theme.spacing.xl,
     gap: theme.spacing.sm,
@@ -253,6 +274,7 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomRightRadius: theme.radius.xxl,
     borderCurve: "continuous",
     zIndex: 20,
+    elevation: 8,
   },
   topRow: {
     alignItems: "center",

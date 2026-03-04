@@ -29,3 +29,15 @@ If you see "Invalid hook call" on mobile, it is usually Metro resolving multiple
 - Event cards use shared tags from `apps/mobile/lib/event-transition.ts` and pass tags through navigation params.
 - Event details consumes the shared tag in `apps/mobile/app/(main)/event/[id].tsx`.
 - Keep gesture dismissal disabled on `event/[id]` shared transitions unless explicitly requested.
+
+## Data caching
+
+- Default to stale-while-revalidate for list-like data in mobile hooks.
+- Use two layers for UX: in-memory cache first, MMKV persisted cache second.
+- Keep TTL based on data volatility:
+  - Events: short TTL (minutes)
+  - Categories/lookups: long TTL (days)
+- Hook loading semantics should distinguish:
+  - `isLoading`: no live data and no cached data
+  - `isRefreshing`: no live data yet, but cached data is shown
+- Avoid blocking controls during refresh; prefer partial skeletons only for unresolved content regions.

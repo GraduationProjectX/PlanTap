@@ -9,12 +9,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 import { EventCard } from "@/components/events/EventCard";
+import { EventListSkeleton } from "@/components/events/EventListSkeleton";
 import { FilterButton } from "@/components/ui/FilterButton";
 import { SearchBar } from "@/components/ui/SearchBar";
+import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransition";
+import { useCategories } from "@/hooks/use-categories";
+import { useEvents, type EventDoc, type EventCollections } from "@/hooks/use-events";
 import { applyEventFilters, isDefaultEventFilters, type FilterType } from "@/lib/event-filters";
 import { normalizeEventListType, type EventListType } from "@/lib/event-list-type";
-import type { EventRecord } from "@/lib/events/event-contracts";
-import { getEventsForListType, MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
@@ -25,6 +27,14 @@ import { useEventFiltersStore } from "@/stores/event-filters-store";
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
 const ALL_CITIES_VALUE = "__all_cities__";
+
+function getEventsForListType(collections: EventCollections | null, type: EventListType): EventDoc[] {
+  if (!collections) return [];
+  if (type === "ongoing") return collections.ongoing;
+  if (type === "upcoming") return collections.upcoming;
+  if (type === "activity") return collections.activity;
+  return collections.all;
+}
 const NON_REMOVABLE_FILTER_TAG_IDS = new Set(["type:both", "category:any", "city:all"]);
 const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
   ongoing: "event",
@@ -33,8 +43,8 @@ const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
   all: "both",
 };
 
-function keyExtractor(item: EventRecord) {
-  return item.id;
+function keyExtractor(item: EventDoc) {
+  return item._id;
 }
 
 export default function ViewAllEventsScreen() {
@@ -49,18 +59,28 @@ export default function ViewAllEventsScreen() {
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
   const clearAppliedFilters = useEventFiltersStore((state) => state.clearAppliedFilters);
   const isArabic = i18n.language === "ar";
-  const [searchValue, setSearchValue] = useState("");
+  const { events: allEvents, collections, isLoading: isEventsLoading } = useEvents();
+  const { categories } = useCategories();
 
-  const { type, source, city } = useLocalSearchParams<{
+  const { type, source, city, homeCategory, category } = useLocalSearchParams<{
     type?: string | string[];
     source?: string | string[];
     city?: string | string[];
+    homeCategory?: string | string[];
+    category?: string | string[];
   }>();
   const eventType = normalizeEventListType(Array.isArray(type) ? type[0] : type);
   const sourceParam = Array.isArray(source) ? source[0] : source;
   const cityParam = Array.isArray(city) ? city[0] : city;
+  const homeCategoryParam = Array.isArray(homeCategory) ? homeCategory[0] : homeCategory;
+  const legacyCategoryParam = Array.isArray(category) ? category[0] : category;
+  const categoryParam = homeCategoryParam ?? legacyCategoryParam;
   const shouldApplyFilters = sourceParam === "filters";
-  const cityOptions = getCitiesForType(FILTER_TYPE_BY_EVENT_LIST_TYPE[eventType]);
+  const isInitialLoading = isEventsLoading;
+  const homeSelectedCategory =
+    !shouldApplyFilters && categoryParam && categoryParam !== "all" ? categoryParam : undefined;
+  const [searchValue, setSearchValue] = useState("");
+  const cityOptions = getCitiesForType(allEvents ?? [], FILTER_TYPE_BY_EVENT_LIST_TYPE[eventType]);
   const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
   const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
   const allCitiesLabel = t("filters.allCities");
@@ -77,17 +97,21 @@ export default function ViewAllEventsScreen() {
     all: `${t("home.viewAll")} `,
   };
 
-  const events = getEventsForListType(MOCK_EVENT_COLLECTIONS, eventType);
+  const events = getEventsForListType(collections, eventType);
   const filteredEvents = shouldApplyFilters ? applyEventFilters(events, appliedFilters) : events;
   const cityScopedEvents =
     !shouldApplyFilters && selectedCity
       ? filteredEvents.filter((event) => event.city === selectedCity)
       : filteredEvents;
+  const categoryScopedEvents =
+    !shouldApplyFilters && homeSelectedCategory
+      ? cityScopedEvents.filter((event) => event.categories.includes(homeSelectedCategory))
+      : cityScopedEvents;
   const query = searchValue.trim().toLowerCase();
   const visibleEvents =
     query.length === 0
-      ? cityScopedEvents
-      : cityScopedEvents.filter((event) => {
+      ? categoryScopedEvents
+      : categoryScopedEvents.filter((event) => {
           const fields = [
             event.title,
             event.titleAr,
@@ -105,10 +129,17 @@ export default function ViewAllEventsScreen() {
     filters: appliedFilters,
     t: (key) => t(key),
     isArabic,
+    categories,
   });
   const visibleFilterSummaryTags = filterSummaryTags.slice(0, 6);
   const hiddenFilterSummaryCount = Math.max(filterSummaryTags.length - visibleFilterSummaryTags.length, 0);
   const showFilterSummary = shouldApplyFilters;
+  const showCityEmptyState = selectedCity && query.length === 0 && !homeSelectedCategory;
+  const homeCategoryLabel = homeSelectedCategory
+    ? (categories.find((item) => item.key === homeSelectedCategory)?.[isArabic ? "labelAr" : "label"] ??
+        homeSelectedCategory)
+    : null;
+  const showHomeCategoryChip = !shouldApplyFilters && !!homeCategoryLabel;
 
   const handleEventPress = (id: string) => {
     const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
@@ -143,7 +174,7 @@ export default function ViewAllEventsScreen() {
     router.back();
   };
 
-  const renderItem = ({ item, index }: { item: EventRecord; index: number }) => {
+  const renderItem = ({ item, index }: { item: EventDoc; index: number }) => {
     const isRightColumn = index % 2 !== 0;
 
     return (
@@ -154,7 +185,16 @@ export default function ViewAllEventsScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <SkeletonScreenTransition
+      isLoading={isInitialLoading}
+      skeleton={
+        <EventListSkeleton
+          topInset={showHomeCategoryChip ? 112 : 72}
+          withFilterSummary={shouldApplyFilters}
+        />
+      }
+    >
+      <View style={styles.root}>
       <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}> 
         <Button
           isIconOnly
@@ -251,6 +291,17 @@ export default function ViewAllEventsScreen() {
         {!shouldApplyFilters && <FilterButton onPress={handleFilterPress} isActive={false} />}
       </View>
 
+      {showHomeCategoryChip && (
+        <View style={styles.homeContextContainer}>
+          <View style={styles.homeCategoryChip}>
+            <FontAwesome name="tag" size={12} color="#FFFFFF" />
+            <Text style={styles.homeCategoryChipText} numberOfLines={1}>
+              {homeCategoryLabel}
+            </Text>
+          </View>
+        </View>
+      )}
+
       {showFilterSummary && (
         <View style={styles.filterMetaContainer}>
           <Text style={styles.resultCountText}>{t("filters.resultsCount", { count: visibleEvents.length })}</Text>
@@ -310,22 +361,23 @@ export default function ViewAllEventsScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <FontAwesome
-              name={selectedCity && query.length === 0 ? "map-marker" : "calendar-times-o"}
+              name={showCityEmptyState ? "map-marker" : "calendar-times-o"}
               size={42}
               color={"gray"}
             />
             <Text style={styles.noResultText}>
-              {selectedCity && query.length === 0
+              {showCityEmptyState
                 ? t("home.noEventsInCity", { city: selectedCity })
                 : t("home.noResultsFound")}
             </Text>
-            {selectedCity && query.length === 0 && (
+            {showCityEmptyState && (
               <Text style={styles.emptyHintText}>{t("home.tryAnotherCity")}</Text>
             )}
           </View>
         }
       />
-    </View>
+      </View>
+    </SkeletonScreenTransition>
   );
 }
 
@@ -347,6 +399,28 @@ const styles = StyleSheet.create((theme) => ({
   },
   searchSlot: {
     flex: 1,
+  },
+  homeContextContainer: {
+    paddingTop: theme.spacing.sm,
+    paddingHorizontal: HORIZONTAL_PADDING,
+    paddingBottom: 4,
+  },
+  homeCategoryChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 6,
+    borderRadius: theme.radius.full,
+    borderCurve: "continuous",
+    backgroundColor: "#000",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    maxWidth: "100%",
+  },
+  homeCategoryChipText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.medium,
+    color: "#FFF",
   },
   filterMetaContainer: {
     paddingTop: theme.spacing.sm,

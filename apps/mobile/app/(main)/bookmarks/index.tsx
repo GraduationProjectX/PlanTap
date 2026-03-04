@@ -9,10 +9,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
 import { EventCard } from "@/components/events/EventCard";
+import { BookmarksSkeleton } from "@/components/bookmarks/BookmarksSkeleton";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
+import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransition";
+import { useBookmarks } from "@/hooks/use-bookmarks";
+import type { EventDoc } from "@/hooks/use-events";
 import { isEventLiveNow } from "@/lib/event-formatters";
-import type { EventRecord } from "@/lib/events/event-contracts";
-import { MOCK_EVENT_COLLECTIONS } from "@/lib/events/event-source";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
@@ -22,29 +24,26 @@ const DAY = 24 * HOUR;
 const HORIZONTAL_PADDING = 16;
 const GRID_GAP = 12;
 
-const ALL_BOOKMARKED = MOCK_EVENT_COLLECTIONS.all;
-const ALL_BOOKMARKED_IDS = new Set(ALL_BOOKMARKED.map((event) => event.id));
-
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 type GroupedEvents = {
-  happening: EventRecord[];
-  thisWeek: EventRecord[];
-  later: EventRecord[];
+  happening: EventDoc[];
+  thisWeek: EventDoc[];
+  later: EventDoc[];
 };
 
 type BookmarkListItem =
   | { id: string; kind: "empty" }
   | { id: string; kind: "header"; title: string; dateRange?: string; isFirstSection: boolean }
-  | { id: string; kind: "hero"; event: EventRecord }
-  | { id: string; kind: "grid-row"; events: EventRecord[] };
+  | { id: string; kind: "hero"; event: EventDoc }
+  | { id: string; kind: "grid-row"; events: EventDoc[] };
 
 type RenderedSections = {
   items: BookmarkListItem[];
   stickyHeaderIndices: number[];
 };
 
-function formatDateRange(events: EventRecord[]): string {
+function formatDateRange(events: EventDoc[]): string {
   if (events.length === 0) return "";
 
   const timestamps = events
@@ -70,21 +69,21 @@ function formatDateRange(events: EventRecord[]): string {
   return `${firstMonth} ${first.getDate()} - ${lastMonth} ${last.getDate()}`;
 }
 
-function chunkIntoRows(events: EventRecord[], size: number): EventRecord[][] {
-  const rows: EventRecord[][] = [];
+function chunkIntoRows(events: EventDoc[], size: number): EventDoc[][] {
+  const rows: EventDoc[][] = [];
   for (let index = 0; index < events.length; index += size) {
     rows.push(events.slice(index, index + size));
   }
   return rows;
 }
 
-function groupByTimePeriod(events: EventRecord[]): GroupedEvents {
+function groupByTimePeriod(events: EventDoc[]): GroupedEvents {
   const now = Date.now();
   const weekAhead = now + 7 * DAY;
 
-  const happening: EventRecord[] = [];
-  const thisWeek: EventRecord[] = [];
-  const later: EventRecord[] = [];
+  const happening: EventDoc[] = [];
+  const thisWeek: EventDoc[] = [];
+  const later: EventDoc[] = [];
 
   for (const event of events) {
     if (event.type === "activity" && event.startAt == null && event.endAt == null) {
@@ -147,7 +146,7 @@ function buildRenderedSections(
   if (happening.length > 0) {
     pushHeader(`${scope}:happening:header`, labels.happening);
     for (const event of happening) {
-      items.push({ id: `${scope}:happening:${event.id}`, kind: "hero", event });
+      items.push({ id: `${scope}:happening:${event._id}`, kind: "hero", event });
     }
   }
 
@@ -156,7 +155,7 @@ function buildRenderedSections(
     const rows = chunkIntoRows(thisWeek, 2);
     for (const row of rows) {
       items.push({
-        id: `${scope}:thisWeek:row:${row.map((event) => event.id).join("-")}`,
+        id: `${scope}:thisWeek:row:${row.map((event) => event._id).join("-")}`,
         kind: "grid-row",
         events: row,
       });
@@ -168,7 +167,7 @@ function buildRenderedSections(
     const rows = chunkIntoRows(later, 2);
     for (const row of rows) {
       items.push({
-        id: `${scope}:later:row:${row.map((event) => event.id).join("-")}`,
+        id: `${scope}:later:row:${row.map((event) => event._id).join("-")}`,
         kind: "grid-row",
         events: row,
       });
@@ -195,11 +194,10 @@ export default function BookmarksScreen() {
   const { isRTL } = useDirection();
 
   const [activeTab, setActiveTab] = useState("events");
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(() => new Set(ALL_BOOKMARKED_IDS));
+  const { bookmarkedEvents, bookmarkedIds, toggleBookmark, isLoading } = useBookmarks();
 
-  const bookmarked = ALL_BOOKMARKED.filter((event) => bookmarkedIds.has(event.id));
-  const eventItems = bookmarked.filter((event) => event.type === "event");
-  const activityItems = bookmarked.filter((event) => event.type === "activity");
+  const eventItems = bookmarkedEvents.filter((event) => event.type === "event");
+  const activityItems = bookmarkedEvents.filter((event) => event.type === "activity");
 
   const eventSections = buildRenderedSections(
     groupByTimePeriod(eventItems),
@@ -226,15 +224,7 @@ export default function BookmarksScreen() {
   };
 
   const handleBookmarkToggle = (id: string) => {
-    setBookmarkedIds((previous) => {
-      const next = new Set(previous);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    toggleBookmark(id as any);
   };
 
   const handleBack = () => {
@@ -276,7 +266,7 @@ export default function BookmarksScreen() {
             variant="bookmark-hero"
             onPress={handleEventPress}
             onBookmark={handleBookmarkToggle}
-            isBookmarked={bookmarkedIds.has(item.event.id)}
+            isBookmarked={bookmarkedIds.has(item.event._id)}
           />
         </View>
       );
@@ -287,12 +277,12 @@ export default function BookmarksScreen() {
         <View style={styles.gridRow}>
           {item.events.map((event) => (
             <EventCard
-              key={event.id}
+              key={event._id}
               event={event}
               variant="bookmark-grid"
               onPress={handleEventPress}
               onBookmark={handleBookmarkToggle}
-              isBookmarked={bookmarkedIds.has(event.id)}
+              isBookmarked={bookmarkedIds.has(event._id)}
             />
           ))}
           {item.events.length % 2 !== 0 && <View style={styles.gridSpacer} />}
@@ -302,7 +292,8 @@ export default function BookmarksScreen() {
   };
 
   return (
-    <View style={styles.root}>
+    <SkeletonScreenTransition isLoading={isLoading} skeleton={<BookmarksSkeleton topInset={94} />}>
+      <View style={styles.root}>
       <Tabs value={activeTab} onValueChange={setActiveTab} variant="secondary" style={styles.tabsRoot}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
           <View style={styles.titleRow}>
@@ -357,7 +348,8 @@ export default function BookmarksScreen() {
           </ScrollView>
         </Tabs.Content>
       </Tabs>
-    </View>
+      </View>
+    </SkeletonScreenTransition>
   );
 }
 

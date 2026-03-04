@@ -1,4 +1,5 @@
-import { CATEGORIES, MOCK_EVENTS } from "@/data/mock-events";
+import type { EventDoc } from "@/hooks/use-events";
+import type { CategoryDoc } from "@/hooks/use-categories";
 import type { FilterType } from "@/lib/event-filters";
 
 export type FilterOption = { id: string; label: string };
@@ -22,51 +23,28 @@ const SUPPORTED_CITIES = [
   "Yanbu",
 ] as const;
 
-const EVENTS_BY_TYPE = {
-  event: MOCK_EVENTS.filter((event) => event.type === "event"),
-  activity: MOCK_EVENTS.filter((event) => event.type === "activity"),
-  both: MOCK_EVENTS,
-} as const;
-
-const CATEGORY_IDS_BY_TYPE = {
-  event: uniqueSorted(EVENTS_BY_TYPE.event.flatMap((event) => event.categories)),
-  activity: uniqueSorted(EVENTS_BY_TYPE.activity.flatMap((event) => event.categories)),
-  both: uniqueSorted(EVENTS_BY_TYPE.both.flatMap((event) => event.categories)),
-} as const;
-
-const CITIES_BY_TYPE = {
-  event: uniqueSorted(EVENTS_BY_TYPE.event.map((event) => event.city)),
-  activity: uniqueSorted(EVENTS_BY_TYPE.activity.map((event) => event.city)),
-  both: uniqueSorted(EVENTS_BY_TYPE.both.map((event) => event.city)),
-} as const;
-
-const ALL_CITY_OPTIONS = uniqueSorted([
-  ...SUPPORTED_CITIES,
-  ...CITIES_BY_TYPE.event,
-  ...CITIES_BY_TYPE.activity,
-  ...CITIES_BY_TYPE.both,
-]);
-
-export function getCategoryLabelByIdMap(isArabic: boolean): Record<string, string> {
-  return Object.fromEntries(
-    CATEGORIES.filter((category) => category.id !== "all").map((category) => [
-      category.id,
-      isArabic ? category.labelAr : category.label,
-    ]),
-  ) as Record<string, string>;
-}
-
 function uniqueSorted(values: string[]): string[] {
   return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b));
 }
 
-export function getCategoryIdsForType(type: FilterType): string[] {
-  return CATEGORY_IDS_BY_TYPE[type];
+export function getCategoryLabelByIdMap(categories: CategoryDoc[], isArabic: boolean): Record<string, string> {
+  return Object.fromEntries(
+    categories.filter((c) => c.key !== "all").map((c) => [
+      c.key,
+      isArabic ? c.labelAr : c.label,
+    ]),
+  ) as Record<string, string>;
 }
 
-export function getCitiesForType(type: FilterType): string[] {
-  void type;
-  return ALL_CITY_OPTIONS;
+export function getCategoryIdsForType(events: EventDoc[], type: FilterType): string[] {
+  const filtered =
+    type === "both" ? events : events.filter((e) => e.type === type);
+  return uniqueSorted(filtered.flatMap((e) => e.categories));
+}
+
+export function getCitiesForType(events: EventDoc[], _type: FilterType): string[] {
+  const eventCities = uniqueSorted(events.map((e) => e.city));
+  return uniqueSorted([...SUPPORTED_CITIES, ...eventCities]);
 }
 
 export function toggleValue(values: string[], value: string): string[] {

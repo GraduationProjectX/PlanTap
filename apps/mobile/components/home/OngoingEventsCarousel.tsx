@@ -2,18 +2,18 @@ import { FlashList } from "@shopify/flash-list";
 import { View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { EventCard } from "@/components/events/EventCard";
-import type { EventRecord } from "@/lib/events/event-contracts";
+import type { EventDoc } from "@/hooks/use-events";
 
 type OngoingEventsCarouselProps = {
-  events: EventRecord[];
+  events: EventDoc[];
   onEventPress?: (id: string) => void;
 };
 
 const CARD_GAP = 12;
 const HORIZONTAL_PADDING = 16;
 
-function keyExtractor(item: EventRecord) {
-  return item.id;
+function keyExtractor(item: EventDoc) {
+  return item._id;
 }
 
 export function OngoingEventsCarousel({
@@ -24,7 +24,7 @@ export function OngoingEventsCarousel({
   const cardWidth = screenWidth * 0.75;
   const cardSizeWithGap = cardWidth + CARD_GAP;
 
-  const renderItem = ({ item }: { item: EventRecord }) => {
+  const renderItem = ({ item }: { item: EventDoc }) => {
     return <EventCard event={item} variant="hero" onPress={onEventPress} width={cardWidth} />;
   };
 

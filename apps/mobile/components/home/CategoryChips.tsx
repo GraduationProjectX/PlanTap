@@ -35,6 +35,7 @@ export function CategoryChips({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={styles.scrollContent}
     >
       {categories.map((cat) => {

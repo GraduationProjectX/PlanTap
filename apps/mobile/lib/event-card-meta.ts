@@ -1,4 +1,4 @@
-import type { EventRecord } from "@/lib/events/event-contracts";
+import type { EventDoc } from "@/hooks/use-events";
 import {
   formatEventDateTime,
   getCountdownToStartLabel,
@@ -28,7 +28,7 @@ export type EventCardMeta = {
   tagLabels: string[];
 };
 
-export function getEventCardMeta(event: EventRecord, options: EventCardMetaOptions = {}): EventCardMeta {
+export function getEventCardMeta(event: EventDoc, options: EventCardMetaOptions = {}): EventCardMeta {
   const {
     maxTags = 5,
     includeDate = false,
@@ -39,7 +39,7 @@ export function getEventCardMeta(event: EventRecord, options: EventCardMetaOptio
 
   const isActivity = event.type === "activity";
   const isLive = !isActivity && isEventLiveNow(event);
-  const locationLabel = event.location.address ?? event.city;
+  const locationLabel = event.locationAddress ?? event.city;
   const categoryLabel = event.categories[0]?.toUpperCase() ?? "";
   const tagLabels = isActivity ? [] : getEventTagLabels(event, maxTags);
   const dateLabel = includeDate

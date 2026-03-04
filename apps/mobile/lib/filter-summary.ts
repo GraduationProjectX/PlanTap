@@ -1,4 +1,4 @@
-import { CATEGORIES } from "@/data/mock-events";
+import type { CategoryDoc } from "@/hooks/use-categories";
 import type { EventFilters } from "@/lib/event-filters";
 
 type TranslateFn = (key: string) => string;
@@ -7,6 +7,7 @@ type BuildFilterSummaryTagsArgs = {
   filters: EventFilters | null;
   t: TranslateFn;
   isArabic: boolean;
+  categories: CategoryDoc[];
 };
 
 export type FilterSummaryTag = {
@@ -30,13 +31,13 @@ export function buildFilterSummaryTags({
   filters,
   t,
   isArabic,
+  categories,
 }: BuildFilterSummaryTagsArgs): FilterSummaryTag[] {
   if (!filters) return [];
 
   const tags: FilterSummaryTag[] = [];
-  const locale = isArabic ? "ar-SA" : "en-US";
   const categoryLabelById = Object.fromEntries(
-    CATEGORIES.map((category) => [category.id, isArabic ? category.labelAr : category.label]),
+    categories.map((c) => [c.key, isArabic ? c.labelAr : c.label]),
   ) as Record<string, string>;
 
   if (filters.type === "event") tags.push({ id: "type:event", label: t("filters.typeEvent") });
@@ -72,7 +73,7 @@ export function buildFilterSummaryTags({
     tags.push({ id: "date:next7Days", label: t("filters.dateNext7Days") });
   }
   if (filters.date === "specificDates") {
-    const dateRange = formatRange(filters.startDate, filters.endDate, locale);
+    const dateRange = formatRange(filters.startDate, filters.endDate, isArabic ? "ar-SA" : "en-US");
     if (dateRange) tags.push({ id: "date:specificDates", label: dateRange });
   }
 
