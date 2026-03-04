@@ -1,0 +1,49 @@
+/**
+ * Unified AI service entry-point.
+ *
+ * Call `getRecommendations()` and it will dispatch to whichever provider the
+ * user has selected in the AI settings store.
+ */
+
+export { type AiProvider, type EventSummary, type RecommendationResult, type UserContext } from "./types";
+export { getApiKey, setApiKey, clearApiKey } from "./secureKeys";
+
+import { useAiStore } from "@/stores/ai-store";
+import type { AiProvider as IAiProvider, EventSummary, RecommendationResult, UserContext } from "./types";
+import { GeminiProvider } from "./providers/gemini";
+import { OpenAIProvider } from "./providers/openai";
+import { ClaudeProvider } from "./providers/claude";
+import { LocalProvider } from "./providers/local";
+
+/**
+ * Return the correct provider instance based on the current store selection.
+ */
+export function getProvider(): IAiProvider {
+  const { provider, localModelPath } = useAiStore.getState();
+
+  switch (provider) {
+    case "gemini":
+      return new GeminiProvider();
+    case "openai":
+      return new OpenAIProvider();
+    case "claude":
+      return new ClaudeProvider();
+    case "local":
+      if (!localModelPath) throw new Error("No local model downloaded");
+      return new LocalProvider(localModelPath);
+    default:
+      throw new Error(`Unknown provider: ${provider}`);
+  }
+}
+
+/**
+ * High-level helper: get event recommendations using the active provider.
+ */
+export async function getRecommendations(
+  userContext: UserContext,
+  events: EventSummary[],
+  userMessage?: string,
+): Promise<RecommendationResult> {
+  const provider = getProvider();
+  return provider.generateEventRecommendations(userContext, events, userMessage);
+}
