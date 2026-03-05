@@ -1,26 +1,20 @@
 import { SkeletonGroup } from "heroui-native";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 const GRID_ROWS = 2;
 
 type BookmarksSkeletonProps = {
   topInset?: number;
-  includeSafeAreaInset?: boolean;
 };
 
 export function BookmarksSkeleton({
-  topInset = 96,
-  includeSafeAreaInset = true,
+  topInset = 0,
 }: BookmarksSkeletonProps) {
-  const insets = useSafeAreaInsets();
-  const topPadding = topInset + (includeSafeAreaInset ? insets.top : 0);
-
   return (
     <View style={styles.root}>
       <SkeletonGroup isLoading isSkeletonOnly>
-        <View style={[styles.content, { paddingTop: topPadding }]}>
+        <View style={[styles.content, { paddingTop: topInset }]}>
           <View style={styles.sectionHeader}>
             <SkeletonGroup.Item style={styles.sectionTitle} className="rounded-md" />
           </View>

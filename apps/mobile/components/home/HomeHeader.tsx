@@ -4,12 +4,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable } from "react-native-gesture-handler";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CategoryChips } from "./CategoryChips";
 import { CategoryChipsSkeleton } from "./CategoryChipsSkeleton";
-import { Button, Select } from "heroui-native";
+import { Select } from "heroui-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
-import type { SharedValue } from "react-native-reanimated";
 
 type HomeHeaderTopProps = {
   city?: string;
@@ -30,12 +30,9 @@ type HomeHeaderStickyProps = {
   onCategorySelect: (id: string) => void;
   onFilterPress?: () => void;
   isFilterActive?: boolean;
-  scrollY?: SharedValue<number>;
   categories?: CategoryItem[];
   isCategoriesLoading?: boolean;
 };
-
-type HomeHeaderProps = HomeHeaderTopProps & Omit<HomeHeaderStickyProps, "categories"> & { categories?: CategoryItem[] };
 
 export function HomeHeaderTop({
   city,
@@ -111,15 +108,15 @@ export function HomeHeaderTop({
           </Select>
         </View>
 
-        <Button
+        <Pressable
           onPress={onFavoritePress}
-          style={styles.favoriteButton}
           hitSlop={8}
-          isIconOnly
-          feedbackVariant="scale"
+          style={({ pressed }) => [styles.favoriteButton, pressed && styles.favoriteButtonPressed]}
+          accessibilityRole="button"
+          accessibilityLabel={t("bookmarks.title")}
         >
           <Fontisto name="bookmark" size={20} color={theme.colors.headerForeground} />
-        </Button>
+        </Pressable>
       </View>
     </View>
   );
@@ -132,7 +129,6 @@ export function HomeHeaderSticky({
   onCategorySelect,
   onFilterPress,
   isFilterActive,
-  scrollY: _scrollY,
   categories: categoryItems = [],
   isCategoriesLoading = false,
 }: HomeHeaderStickyProps) {
@@ -186,30 +182,6 @@ export function HomeHeaderSticky({
   );
 }
 
-export function HomeHeader(props: HomeHeaderProps) {
-  return (
-    <View>
-      <HomeHeaderTop
-        city={props.city}
-        cityOptions={props.cityOptions}
-        onFavoritePress={props.onFavoritePress}
-        onCitySelect={props.onCitySelect}
-      />
-      <HomeHeaderSticky
-        searchValue={props.searchValue}
-        onSearchChange={props.onSearchChange}
-        selectedCategory={props.selectedCategory}
-        onCategorySelect={props.onCategorySelect}
-        onFilterPress={props.onFilterPress}
-        isFilterActive={props.isFilterActive}
-        scrollY={props.scrollY}
-        categories={props.categories}
-        isCategoriesLoading={props.isCategoriesLoading}
-      />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create((theme) => ({
   topContainer: {
     backgroundColor: theme.colors.headerBackground,
@@ -234,7 +206,6 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: 12,
   },
   locationContainer: {
-    // flex: 1,
     minWidth: "25%",
     maxWidth: "75%",
   },
@@ -274,7 +245,6 @@ const styles = StyleSheet.create((theme) => ({
   cityOptionInner: {
     flexDirection: "row",
     alignItems: "center",
-    // gap: 10,
     flex: 1,
   },
   cityOptionIcon: {
@@ -287,6 +257,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.headerOverlay,
     alignItems: "center",
     justifyContent: "center",
+  },
+  favoriteButtonPressed: {
+    opacity: 0.75,
   },
   chipsContainer: {
     marginTop: 4,

@@ -11,7 +11,6 @@ import Fontisto from "@expo/vector-icons/Fontisto";
 import { EventCard } from "@/components/events/EventCard";
 import { BookmarksSkeleton } from "@/components/bookmarks/BookmarksSkeleton";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
-import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransition";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import type { EventDoc } from "@/hooks/use-events";
 import { isEventLiveNow } from "@/lib/event-formatters";
@@ -23,6 +22,7 @@ const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 const HORIZONTAL_PADDING = 16;
 const GRID_GAP = 12;
+const CONTENT_SKELETON_TOP_INSET = 16;
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -231,6 +231,23 @@ export default function BookmarksScreen() {
     router.back();
   };
 
+  const renderTabContent = (sections: RenderedSections) => {
+    if (isLoading) {
+      return <BookmarksSkeleton topInset={CONTENT_SKELETON_TOP_INSET} />;
+    }
+
+    return (
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={sections.stickyHeaderIndices}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
+      >
+        {sections.items.map((item) => renderListItem(item))}
+      </ScrollView>
+    );
+  };
+
   const renderListItem = (item: BookmarkListItem) => {
     if (item.kind === "empty") {
       return (
@@ -292,8 +309,7 @@ export default function BookmarksScreen() {
   };
 
   return (
-    <SkeletonScreenTransition isLoading={isLoading} skeleton={<BookmarksSkeleton topInset={94} />}>
-      <View style={styles.root}>
+    <View style={styles.root}>
       <Tabs value={activeTab} onValueChange={setActiveTab} variant="secondary" style={styles.tabsRoot}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
           <View style={styles.titleRow}>
@@ -327,29 +343,14 @@ export default function BookmarksScreen() {
         </View>
 
         <Tabs.Content value="events" style={styles.tabContent}>
-          <ScrollView
-            style={styles.scrollView}
-            showsVerticalScrollIndicator={false}
-            stickyHeaderIndices={eventSections.stickyHeaderIndices}
-            contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
-          >
-            {eventSections.items.map((item) => renderListItem(item))}
-          </ScrollView>
+          {renderTabContent(eventSections)}
         </Tabs.Content>
 
         <Tabs.Content value="activities" style={styles.tabContent}>
-          <ScrollView
-            style={styles.scrollView}
-            showsVerticalScrollIndicator={false}
-            stickyHeaderIndices={activitySections.stickyHeaderIndices}
-            contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
-          >
-            {activitySections.items.map((item) => renderListItem(item))}
-          </ScrollView>
+          {renderTabContent(activitySections)}
         </Tabs.Content>
       </Tabs>
-      </View>
-    </SkeletonScreenTransition>
+    </View>
   );
 }
 
