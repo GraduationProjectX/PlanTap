@@ -1,7 +1,7 @@
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { Pressable, ScrollView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Button } from "heroui-native";
 
 type Category = {
   id: string;
@@ -34,6 +34,7 @@ export function CategoryChips({
   return (
     <ScrollView
       horizontal
+      nestedScrollEnabled
       showsHorizontalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={styles.scrollContent}
@@ -42,11 +43,15 @@ export function CategoryChips({
         const isActive = cat.id === selected;
         const iconName = CATEGORY_ICONS[cat.id] ?? "circle";
         return (
-          <Button
+          <Pressable
             key={cat.id}
             onPress={() => onSelect(cat.id)}
-            style={[styles.chip, isActive ? styles.chipActive : styles.chipInactive]}
-            feedbackVariant="scale"
+            hitSlop={6}
+            style={({ pressed }) => [
+              styles.chip,
+              isActive ? styles.chipActive : styles.chipInactive,
+              pressed && styles.chipPressed,
+            ]}
           >
             <View style={styles.chipContent}>
               <FontAwesome
@@ -58,7 +63,7 @@ export function CategoryChips({
                 {cat.label}
               </Text>
             </View>
-          </Button>
+          </Pressable>
         );
       })}
     </ScrollView>
@@ -82,6 +87,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   chipInactive: {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
+  },
+  chipPressed: {
+    opacity: 0.78,
   },
   chipContent: {
     flexDirection: "row",

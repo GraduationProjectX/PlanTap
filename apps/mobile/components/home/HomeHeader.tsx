@@ -9,19 +9,14 @@ import { CategoryChips } from "./CategoryChips";
 import { CategoryChipsSkeleton } from "./CategoryChipsSkeleton";
 import { Button, Select } from "heroui-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
-import Animated, {
-  Extrapolation,
-  interpolate,
-  useDerivedValue,
-  useAnimatedStyle,
-  type SharedValue,
-} from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 
 type HomeHeaderTopProps = {
   city?: string;
   cityOptions: string[];
   onFavoritePress?: () => void;
   onCitySelect?: (city?: string) => void;
+  withSafeAreaTopInset?: boolean;
 };
 
 const ALL_CITIES_VALUE = "__all_cities__";
@@ -47,6 +42,7 @@ export function HomeHeaderTop({
   cityOptions,
   onFavoritePress,
   onCitySelect,
+  withSafeAreaTopInset = true,
 }: HomeHeaderTopProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -58,7 +54,7 @@ export function HomeHeaderTop({
   const selectedCityLabel = city ?? allCitiesLabel;
 
   return (
-    <View style={[styles.topContainer, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.topContainer, { paddingTop: (withSafeAreaTopInset ? insets.top : 0) + 8 }]}>
       <View style={[styles.topRow, { flexDirection }]}>
         <View style={styles.locationContainer}>
           <Select
@@ -136,15 +132,12 @@ export function HomeHeaderSticky({
   onCategorySelect,
   onFilterPress,
   isFilterActive,
-  scrollY,
+  scrollY: _scrollY,
   categories: categoryItems = [],
   isCategoriesLoading = false,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
-  const collapsedTopPadding = insets.top + 6;
-  const expandedTopPadding = 4;
-  const topInsetDelta = Math.max(0, collapsedTopPadding - expandedTopPadding);
+  const stickyTopPadding = 6;
 
   const isAr = i18n.language === "ar";
   const categories = categoryItems
@@ -161,56 +154,14 @@ export function HomeHeaderSticky({
     })
     .filter((item): item is { id: string; label: string } => item !== null);
 
-  const collapseProgress = useDerivedValue(() => {
-    const offsetY = scrollY?.get() ?? 0;
-    return interpolate(offsetY, [0, 120], [0, 1], Extrapolation.CLAMP);
-  });
-
-  const searchAnimatedStyle = useAnimatedStyle(() => {
-    const progress = collapseProgress.get();
-
-    return {
-      opacity: interpolate(progress, [0, 1], [1, 0.98], Extrapolation.CLAMP),
-      transform: [
-        {
-          translateY: interpolate(
-            progress,
-            [0, 1],
-            [-topInsetDelta, -2],
-            Extrapolation.CLAMP,
-          ),
-        },
-        { scale: interpolate(progress, [0, 1], [1, 0.985], Extrapolation.CLAMP) },
-      ],
-    };
-  });
-
-  const chipsAnimatedStyle = useAnimatedStyle(() => {
-    const progress = collapseProgress.get();
-
-    return {
-      opacity: interpolate(progress, [0, 1], [1, 0.9], Extrapolation.CLAMP),
-      transform: [
-        {
-          translateY: interpolate(
-            progress,
-            [0, 1],
-            [-topInsetDelta * 0.65, -6],
-            Extrapolation.CLAMP,
-          ),
-        },
-      ],
-    };
-  });
-
   return (
-    <Animated.View
+    <View
       style={[
         styles.stickyContainer,
-        { paddingTop: collapsedTopPadding, paddingBottom: 12 },
+        { paddingTop: stickyTopPadding, paddingBottom: 12 },
       ]}
     >
-      <Animated.View style={searchAnimatedStyle} pointerEvents="box-none">
+      <View>
         <SearchBar
           value={searchValue}
           onChange={onSearchChange}
@@ -218,9 +169,9 @@ export function HomeHeaderSticky({
           onFilterPress={onFilterPress}
           isFilterActive={isFilterActive}
         />
-      </Animated.View>
+      </View>
 
-      <Animated.View style={[styles.chipsContainer, chipsAnimatedStyle]}>
+      <View style={styles.chipsContainer}>
         {isCategoriesLoading ? (
           <CategoryChipsSkeleton />
         ) : (
@@ -230,8 +181,8 @@ export function HomeHeaderSticky({
             onSelect={onCategorySelect}
           />
         )}
-      </Animated.View>
-    </Animated.View>
+      </View>
+    </View>
   );
 }
 
@@ -274,7 +225,7 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomRightRadius: theme.radius.xxl,
     borderCurve: "continuous",
     zIndex: 20,
-    elevation: 8,
+    elevation: 0,
   },
   topRow: {
     alignItems: "center",

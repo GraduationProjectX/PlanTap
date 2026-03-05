@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Button } from "heroui-native";
 import { useTranslation } from "react-i18next";
 import { View, type StyleProp, type ViewStyle } from "react-native";
+import { Pressable } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 
 type FilterButtonVariant = "search" | "topbar";
@@ -26,21 +26,21 @@ export function FilterButton({
   const { t } = useTranslation();
 
   return (
-    <Button
-      isIconOnly
-      feedbackVariant="scale"
+    <Pressable
       onPress={onPress}
       hitSlop={hitSlop}
-      style={[
+      style={({ pressed }) => [
         styles.buttonBase,
         variant === "search" ? styles.buttonSearch : styles.buttonTopbar,
+        pressed && styles.buttonPressed,
         style,
       ]}
+      accessibilityRole="button"
       accessibilityLabel={t("home.filterEvents")}
     >
       <FontAwesome name="sliders" size={iconSize} color="#FFFFFF" />
       {isActive && <View style={styles.activeDot} />}
-    </Button>
+    </Pressable>
   );
 }
 
@@ -62,6 +62,9 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.full,
     borderCurve: "continuous",
     backgroundColor: "rgba(255, 255, 255, 0.12)",
+  },
+  buttonPressed: {
+    opacity: 0.75,
   },
   activeDot: {
     position: "absolute",

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Text, View, useWindowDimensions } from "react-native";
+import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
 import { useRouter, type Href } from "expo-router";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
 import { HomeSkeleton } from "@/components/home/HomeSkeleton";
@@ -25,15 +25,19 @@ const COLUMN_GAP = 12;
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const scrollY = useSharedValue(0);
-  const scrollRef = useRef<Animated.ScrollView>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
 
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
-  const { events, collections, isLoading: isEventsLoading } = useEvents();
+  const {
+    events,
+    collections,
+    isLoading: isEventsLoading,
+  } = useEvents();
   const { categories, isLoading: isCategoriesLoading } = useCategories();
   const cityOptions = getCitiesForType(events ?? [], "both");
 
@@ -60,10 +64,6 @@ export default function HomeScreen() {
   }, [events]);
 
   const isInitialLoading = isEventsLoading;
-
-  const onScroll = useAnimatedScrollHandler((event) => {
-    scrollY.set(event.contentOffset.y);
-  });
 
   const handleEventPress = (id: string) => {
     const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
@@ -137,9 +137,11 @@ export default function HomeScreen() {
   const ongoingEvents = (collections?.ongoing ?? []).filter(matchesHomeHeaderFilters);
   const upcomingEvents = (collections?.upcoming ?? []).filter(matchesHomeHeaderFilters);
   const activityEvents = (collections?.activity ?? []).filter(matchesHomeHeaderFilters);
+
   const hasAnyVisibleEvents =
     ongoingEvents.length > 0 || upcomingEvents.length > 0 || activityEvents.length > 0;
   const hasSearchOrCategoryFilter = query.length > 0 || selectedCategory !== "all";
+
   const emptyStateMessage =
     selectedCity && !hasSearchOrCategoryFilter
       ? t("home.noEventsInCity", { city: selectedCity })
@@ -157,24 +159,30 @@ export default function HomeScreen() {
     : t("home.activities");
 
   return (
-    <View style={styles.root}>
-      <Animated.ScrollView
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      {insets.top > 0 && (
+        <View
+          pointerEvents="none"
+          style={[styles.statusBarBackground, { height: insets.top }]}
+        />
+      )}
+      <ScrollView
         ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         stickyHeaderIndices={[1]}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        nestedScrollEnabled
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-        onScroll={onScroll}
-        scrollEventThrottle={16}
       >
         <HomeHeaderTop
           city={selectedCity}
           cityOptions={cityOptions}
           onFavoritePress={() => router.push("/bookmarks" as Href)}
           onCitySelect={setSelectedCity}
+          withSafeAreaTopInset={false}
         />
         <HomeHeaderSticky
           searchValue={searchValue}
@@ -183,7 +191,6 @@ export default function HomeScreen() {
           onCategorySelect={handleCategorySelect}
           onFilterPress={handleFilterPress}
           isFilterActive={false}
-          scrollY={scrollY}
           categories={categories}
           isCategoriesLoading={isCategoriesLoading}
         />
@@ -199,7 +206,10 @@ export default function HomeScreen() {
                   actionLabel={t("home.viewAll")}
                   onAction={handleViewAllOngoing}
                 />
-                <OngoingEventsCarousel events={ongoingEvents} onEventPress={handleEventPress} />
+                <OngoingEventsCarousel
+                  events={ongoingEvents}
+                  onEventPress={handleEventPress}
+                />
               </View>
             )}
 
@@ -231,7 +241,10 @@ export default function HomeScreen() {
                   actionLabel={t("home.viewAll")}
                   onAction={handleViewAllUpcoming}
                 />
-                <UpcomingEventsList events={upcomingEvents} onEventPress={handleEventPress} />
+                <UpcomingEventsList
+                  events={upcomingEvents}
+                  onEventPress={handleEventPress}
+                />
               </View>
             )}
 
@@ -245,7 +258,7 @@ export default function HomeScreen() {
         )}
 
         <View style={styles.bottomSpacer} />
-      </Animated.ScrollView>
+      </ScrollView>
     </View>
   );
 }
@@ -257,6 +270,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   scroll: {
     flex: 1,
+  },
+  statusBarBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.headerBackground,
   },
   scrollContent: {
     flexGrow: 1,

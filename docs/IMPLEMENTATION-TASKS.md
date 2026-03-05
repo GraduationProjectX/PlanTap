@@ -11,7 +11,7 @@
 
 ### 1.1 Monorepo Setup
 
-- [ ] Verify clean branching strategy + CI hooks
+- [x] Verify clean branching strategy + CI hooks
 - [x] Create root `package.json` with workspaces
 - [x] Install Turborepo
 - [x] Create `turbo.json` configuration
@@ -146,7 +146,7 @@
 ## Phase 3: Core Screens
 
 - [] Theming need to be fixed and changes only via Settings(Light,Dark, System options). 
-- [] Add app Icon in Login  and app Logo.
+- [] Add app Icon in Login and app Logo.
 ### 3.2 Onboarding Flow
 
 - [ ] Check react-native-onboarding
@@ -165,22 +165,16 @@
 
 ### 3.3 Home Tab
 
-- [ ] Create home screen layout
-- [ ] Implement search bar
-- [ ] Create horizontal section component
-- [ ] Create event poster card component
-- [ ] Implement sections:
-  - [ ] Tonight / This Weekend
-  - [ ] Near You (needs location)
-  - [ ] Trending in City
-  - [ ] Family Picks
-  - [ ] Upcoming Events
-- [ ] Integrate FlashList for horizontal scrolling
+- [x] Create home screen layout
+- [x] Implement search bar
+- [x] Create horizontal section component
+- [x] Create event poster card component
+- [x] Integrate FlashList for horizontal scrolling
 - [ ] Add pull-to-refresh
-- [ ] Add loading skeletons
-- [ ] Add empty states per section
-- [ ] Implement filter modal
-- [ ] Connect to Convex queries
+- [x] Add loading skeletons
+- [x] Add empty states per section
+- [x] Implement filter modal
+- [x] Connect to Convex queries
 
 ### 3.4 Event Detail Screen
 

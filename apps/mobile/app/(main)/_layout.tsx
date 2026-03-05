@@ -37,7 +37,6 @@ export default function MainLayout() {
         name="filters/index"
         options={{
           headerShown: false,
-          animation: "none",
         }}
       />
       <Stack.Screen
