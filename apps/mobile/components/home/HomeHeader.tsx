@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+﻿import { View, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -41,21 +41,21 @@ export function HomeHeaderTop({
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
-  const cityListBottomPadding = 100;
 
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = city ?? allCitiesLabel;
+  const citySelectValue = {
+    value: city ?? ALL_CITIES_VALUE,
+    label: selectedCityLabel,
+  };
 
   return (
-    <View style={[styles.topContainer, { paddingTop: 8 }]}>
+    <View style={styles.topContainer}>
       <View style={[styles.topRow, { flexDirection }]}>
         <View style={styles.locationContainer}>
           <Select
             presentation="bottom-sheet"
-            value={{
-              value: city ?? ALL_CITIES_VALUE,
-              label: selectedCityLabel,
-            }}
+            value={citySelectValue}
             onValueChange={(option) => {
               onCitySelect(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
             }}
@@ -63,10 +63,12 @@ export function HomeHeaderTop({
             <Select.Trigger style={styles.locationTrigger}>
               <Text style={styles.locationLabel}>{t("filters.city").toUpperCase()}</Text>
               <View style={[styles.cityRow, { flexDirection }]}>
-                <FontAwesome name="map-marker" size={14} color={theme.colors.headerForeground} />
-                <Text style={[styles.cityText, { textAlign }]} numberOfLines={1}>
-                  {selectedCityLabel}
-                </Text>
+                <View style={[styles.cityValueRow, { flexDirection }]}>
+                  <FontAwesome name="map-marker" size={18} color={theme.colors.headerForeground} />
+                  <Text style={[styles.cityText, { textAlign }]} numberOfLines={1}>
+                    {selectedCityLabel}
+                  </Text>
+                </View>
                 <FontAwesome name="chevron-down" size={10} color={theme.colors.headerMuted} />
               </View>
             </Select.Trigger>
@@ -80,25 +82,13 @@ export function HomeHeaderTop({
                 }}
                 style={styles.cityOverlay}
               />
-              <Select.Content presentation="bottom-sheet">
+              <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
                 <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
-                  <View style={styles.cityOptionInner}>
-                    <FontAwesome name="globe" size={14} color={theme.colors.text} />
-                    <Select.ItemLabel />
-                  </View>
-                  <Select.ItemIndicator />
-                </Select.Item>
+                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel} />
                 {cityOptions.map((cityOption) => (
-                  <Select.Item key={cityOption} value={cityOption} label={cityOption}>
-                    <View style={styles.cityOptionInner}>
-                      <FontAwesome name="globe" size={14} color={theme.colors.text} />
-                      <Select.ItemLabel />
-                    </View>
-                    <Select.ItemIndicator />
-                  </Select.Item>
+                  <Select.Item key={cityOption} value={cityOption} label={cityOption} />
                 ))}
-                <View style={{ height: cityListBottomPadding }} />
+                <View style={{ height: 100 }} />
               </Select.Content>
             </Select.Portal>
           </Select>
@@ -129,7 +119,6 @@ export function HomeHeaderSticky({
   isCategoriesLoading = false,
 }: HomeHeaderStickyProps) {
   const { t, i18n } = useTranslation();
-  const stickyTopPadding = 6;
 
   const isAr = i18n.language === "ar";
   const categories = categoryItems.map((category) => ({
@@ -138,12 +127,7 @@ export function HomeHeaderSticky({
   }));
 
   return (
-    <View
-      style={[
-        styles.stickyContainer,
-        { paddingTop: stickyTopPadding, paddingBottom: 12 },
-      ]}
-    >
+    <View style={styles.stickyContainer}>
       <View>
         <SearchBar
           value={searchValue}
@@ -172,13 +156,14 @@ export function HomeHeaderSticky({
 const styles = StyleSheet.create((theme) => ({
   topContainer: {
     backgroundColor: theme.colors.headerBackground,
+    paddingTop: 8,
     paddingBottom: theme.spacing.sm,
   },
   stickyContainer: {
     backgroundColor: theme.colors.headerBackground,
     position: "relative",
-    paddingTop: theme.spacing.xs,
-    paddingBottom: theme.spacing.xl,
+    paddingTop: 6,
+    paddingBottom: 12,
     gap: theme.spacing.sm,
     borderBottomLeftRadius: theme.radius.xxl,
     borderBottomRightRadius: theme.radius.xxl,
@@ -218,18 +203,19 @@ const styles = StyleSheet.create((theme) => ({
   },
   cityRow: {
     alignItems: "center",
-    gap: 4,
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  cityValueRow: {
+    alignItems: "center",
+    gap: 8,
+    flexShrink: 1,
   },
   cityText: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
     color: theme.colors.headerForeground,
     flexShrink: 1,
-  },
-  cityOptionInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
   },
   favoriteButton: {
     width: 40,
@@ -246,4 +232,3 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: 4,
   },
 }));
-
