@@ -50,11 +50,7 @@ export default function MainLayout() {
         options={({ route }) => {
           const params = route.params as Record<string, unknown> | undefined;
           const routeId = typeof params?.id === "string" ? params.id : undefined;
-          const sharedBoundTagFromParams =
-            typeof params?.sharedBoundTag === "string"
-              ? params.sharedBoundTag
-              : undefined;
-          const sharedBoundTag = sharedBoundTagFromParams ?? (routeId ? getEventSharedBoundTag(routeId) : undefined);
+          const sharedBoundTag = routeId ? getEventSharedBoundTag(routeId) : undefined;
 
           if (sharedBoundTag) {
             return {
@@ -89,3 +85,4 @@ export default function MainLayout() {
     </Stack>
   );
 }
+

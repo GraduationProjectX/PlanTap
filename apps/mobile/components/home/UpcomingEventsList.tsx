@@ -6,7 +6,7 @@ import type { EventDoc } from "@/hooks/use-events";
 
 type UpcomingEventsListProps = {
   events: EventDoc[];
-  onEventPress?: (id: string) => void;
+  onEventPress: (id: string) => void;
 };
 
 function keyExtractor(item: EventDoc) {
@@ -45,3 +45,4 @@ const styles = StyleSheet.create((theme) => ({
 function Separator() {
   return <View style={styles.separator} />;
 }
+

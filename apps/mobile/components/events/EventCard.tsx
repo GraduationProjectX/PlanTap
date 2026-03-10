@@ -2,7 +2,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
 import { Button, Card, Chip } from "heroui-native";
 import { useTranslation } from "react-i18next";
-import { Pressable as RNPressable, Text, type GestureResponderEvent, View } from "react-native";
+import {
+  Pressable as RNPressable,
+  Text,
+  type GestureResponderEvent,
+  View,
+} from "react-native";
 import Transition from "react-native-screen-transitions";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -25,11 +30,12 @@ type EventCardProps = {
   event: EventDoc;
   variant: EventCardVariant;
   width?: number;
-  onPress?: (id: string) => void;
+  onPress: (id: string) => void;
   onBookmark?: (id: string) => void;
   isBookmarked?: boolean;
   showCountdown?: boolean;
 };
+
 
 function EventCardComponent({
   event,
@@ -62,7 +68,7 @@ function EventCardComponent({
   const sharedBoundTag = getEventSharedBoundTag(event._id);
 
   const handleCardPress = () => {
-    onPress?.(event._id);
+    onPress(event._id);
   };
 
   const handleBookmarkPress = (pressEvent: GestureResponderEvent) => {
@@ -371,7 +377,6 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.xl,
     borderCurve: "continuous",
     overflow: "hidden",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
   },
   heroImage: {
     position: "absolute",
@@ -773,3 +778,4 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
 }));
+

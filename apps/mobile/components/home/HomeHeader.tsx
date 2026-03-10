@@ -3,7 +3,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Pressable } from "react-native-gesture-handler";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CategoryChips } from "./CategoryChips";
@@ -11,17 +10,16 @@ import { CategoryChipsSkeleton } from "./CategoryChipsSkeleton";
 import { Select } from "heroui-native";
 import Fontisto from "@expo/vector-icons/Fontisto";
 
+import type { CategoryDoc } from "@/hooks/use-categories";
+
 type HomeHeaderTopProps = {
   city?: string;
   cityOptions: string[];
-  onFavoritePress?: () => void;
-  onCitySelect?: (city?: string) => void;
-  withSafeAreaTopInset?: boolean;
+  onFavoritePress: () => void;
+  onCitySelect: (city?: string) => void;
 };
 
 const ALL_CITIES_VALUE = "__all_cities__";
-
-type CategoryItem = { key?: string; id?: string; label: string; labelAr: string };
 
 type HomeHeaderStickyProps = {
   searchValue: string;
@@ -30,7 +28,7 @@ type HomeHeaderStickyProps = {
   onCategorySelect: (id: string) => void;
   onFilterPress?: () => void;
   isFilterActive?: boolean;
-  categories?: CategoryItem[];
+  categories?: CategoryDoc[];
   isCategoriesLoading?: boolean;
 };
 
@@ -39,19 +37,17 @@ export function HomeHeaderTop({
   cityOptions,
   onFavoritePress,
   onCitySelect,
-  withSafeAreaTopInset = true,
 }: HomeHeaderTopProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
-  const insets = useSafeAreaInsets();
   const cityListBottomPadding = 100;
 
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = city ?? allCitiesLabel;
 
   return (
-    <View style={[styles.topContainer, { paddingTop: (withSafeAreaTopInset ? insets.top : 0) + 8 }]}>
+    <View style={[styles.topContainer, { paddingTop: 8 }]}>
       <View style={[styles.topRow, { flexDirection }]}>
         <View style={styles.locationContainer}>
           <Select
@@ -61,13 +57,13 @@ export function HomeHeaderTop({
               label: selectedCityLabel,
             }}
             onValueChange={(option) => {
-              onCitySelect?.(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
+              onCitySelect(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
             }}
           >
             <Select.Trigger style={styles.locationTrigger}>
               <Text style={styles.locationLabel}>{t("filters.city").toUpperCase()}</Text>
               <View style={[styles.cityRow, { flexDirection }]}>
-                <Text style={styles.locationIcon}>📍</Text>
+                <FontAwesome name="map-marker" size={14} color={theme.colors.headerForeground} />
                 <Text style={[styles.cityText, { textAlign }]} numberOfLines={1}>
                   {selectedCityLabel}
                 </Text>
@@ -86,23 +82,23 @@ export function HomeHeaderTop({
               />
               <Select.Content presentation="bottom-sheet">
                 <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                  <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                  <View style={styles.cityOptionInner}>
+                    <FontAwesome name="globe" size={14} color={theme.colors.text} />
+                    <Select.ItemLabel />
+                  </View>
+                  <Select.ItemIndicator />
+                </Select.Item>
+                {cityOptions.map((cityOption) => (
+                  <Select.Item key={cityOption} value={cityOption} label={cityOption}>
                     <View style={styles.cityOptionInner}>
-                      <Text style={styles.cityOptionIcon}>🌍</Text>
+                      <FontAwesome name="globe" size={14} color={theme.colors.text} />
                       <Select.ItemLabel />
                     </View>
                     <Select.ItemIndicator />
                   </Select.Item>
-                  {cityOptions.map((cityOption) => (
-                    <Select.Item key={cityOption} value={cityOption} label={cityOption}>
-                      <View style={styles.cityOptionInner}>
-                        <Text style={styles.cityOptionIcon}>🏢</Text>
-                        <Select.ItemLabel />
-                      </View>
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  ))}
-                  <View style={{ height: cityListBottomPadding }} />
+                ))}
+                <View style={{ height: cityListBottomPadding }} />
               </Select.Content>
             </Select.Portal>
           </Select>
@@ -136,19 +132,10 @@ export function HomeHeaderSticky({
   const stickyTopPadding = 6;
 
   const isAr = i18n.language === "ar";
-  const categories = categoryItems
-    .map((c) => {
-      const normalizedId = c.key ?? c.id ?? c.label.trim().toLowerCase().replace(/\s+/g, "-");
-      if (!normalizedId) {
-        return null;
-      }
-
-      return {
-        id: normalizedId,
-        label: isAr ? c.labelAr : c.label,
-      };
-    })
-    .filter((item): item is { id: string; label: string } => item !== null);
+  const categories = categoryItems.map((category) => ({
+    id: category.key,
+    label: isAr ? category.labelAr : category.label,
+  }));
 
   return (
     <View
@@ -233,9 +220,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: 4,
   },
-  locationIcon: {
-    fontSize: 14,
-  },
   cityText: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
@@ -246,9 +230,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-  },
-  cityOptionIcon: {
-    fontSize: 18,
   },
   favoriteButton: {
     width: 40,
@@ -265,3 +246,4 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: 4,
   },
 }));
+

@@ -20,7 +20,6 @@ import { normalizeEventListType, type EventListType } from "@/lib/event-list-typ
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
-import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
@@ -142,8 +141,7 @@ export default function ViewAllEventsScreen() {
   const showHomeCategoryChip = !shouldApplyFilters && !!homeCategoryLabel;
 
   const handleEventPress = (id: string) => {
-    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
-    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
+    router.push(`/event/${id}` as Href);
   };
 
   const handleFilterPress = () => {
@@ -179,7 +177,12 @@ export default function ViewAllEventsScreen() {
 
     return (
       <View style={[styles.itemCell, isRightColumn && styles.itemCellOffset]}>
-        <EventCard event={item} variant="medium" width={cardWidth} onPress={handleEventPress} />
+        <EventCard
+          event={item}
+          variant="medium"
+          width={cardWidth}
+          onPress={handleEventPress}
+        />
       </View>
     );
   };
@@ -548,3 +551,4 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.font.family.medium,
   },
 }));
+

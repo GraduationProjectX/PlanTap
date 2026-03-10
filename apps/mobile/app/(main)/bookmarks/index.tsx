@@ -15,7 +15,6 @@ import { useBookmarks } from "@/hooks/use-bookmarks";
 import type { EventDoc } from "@/hooks/use-events";
 import { isEventLiveNow } from "@/lib/event-formatters";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
-import { getEventSharedBoundTag } from "@/lib/event-transition";
 import { useDirection } from "@/rtl";
 
 const HOUR = 60 * 60 * 1000;
@@ -219,8 +218,7 @@ export default function BookmarksScreen() {
   );
 
   const handleEventPress = (id: string) => {
-    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
-    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
+    router.push(`/event/${id}` as Href);
   };
 
   const handleBookmarkToggle = (id: string) => {
@@ -461,3 +459,4 @@ const emptyStyles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.xl,
   },
 }));
+

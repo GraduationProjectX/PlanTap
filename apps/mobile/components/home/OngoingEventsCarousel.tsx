@@ -6,7 +6,7 @@ import type { EventDoc } from "@/hooks/use-events";
 
 type OngoingEventsCarouselProps = {
   events: EventDoc[];
-  onEventPress?: (id: string) => void;
+  onEventPress: (id: string) => void;
 };
 
 const CARD_GAP = 12;
@@ -25,7 +25,14 @@ export function OngoingEventsCarousel({
   const cardSizeWithGap = cardWidth + CARD_GAP;
 
   const renderItem = ({ item }: { item: EventDoc }) => {
-    return <EventCard event={item} variant="hero" onPress={onEventPress} width={cardWidth} />;
+    return (
+      <EventCard
+        event={item}
+        variant="hero"
+        onPress={onEventPress}
+        width={cardWidth}
+      />
+    );
   };
 
   return (
@@ -58,3 +65,4 @@ const styles = StyleSheet.create(() => ({
 function Separator() {
   return <View style={styles.separator} />;
 }
+

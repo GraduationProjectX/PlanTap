@@ -2,20 +2,19 @@ import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 import Transition from "react-native-screen-transitions";
 import { StyleSheet } from "react-native-unistyles";
+
 import { getEventSharedBoundTag } from "@/lib/event-transition";
 
 export default function EventDetailsScreen() {
-  const { id, sharedBoundTag } = useLocalSearchParams<{ id: string; sharedBoundTag?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const normalizedId = Array.isArray(id) ? id[0] : id;
-  const normalizedSharedBoundTag = Array.isArray(sharedBoundTag) ? sharedBoundTag[0] : sharedBoundTag;
-  const resolvedSharedBoundTag =
-    normalizedSharedBoundTag ?? (normalizedId ? getEventSharedBoundTag(normalizedId) : undefined);
+  const sharedBoundTag = normalizedId ? getEventSharedBoundTag(normalizedId) : undefined;
   const eventLabel = normalizedId ?? "unknown";
 
   return (
     <View style={styles.container}>
-      {resolvedSharedBoundTag ? (
-        <Transition.View sharedBoundTag={resolvedSharedBoundTag} style={styles.contentCard}>
+      {sharedBoundTag ? (
+        <Transition.View sharedBoundTag={sharedBoundTag} collapsable={false} style={styles.contentCard}>
           <Text style={styles.title}>Event</Text>
           <Text style={styles.subtitle}>ID: {eventLabel}</Text>
         </Transition.View>
@@ -60,3 +59,4 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.textSecondary,
   },
 }));
+

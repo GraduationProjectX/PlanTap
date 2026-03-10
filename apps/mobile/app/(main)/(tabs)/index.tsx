@@ -15,7 +15,6 @@ import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useCategories } from "@/hooks/use-categories";
 import { getCitiesForType } from "@/lib/filters-screen-utils";
 import { detectCityFromUserLocation } from "@/lib/location-city";
-import { getEventSharedBoundTag } from "@/lib/event-transition";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
@@ -42,13 +41,12 @@ export default function HomeScreen() {
   const cityOptions = getCitiesForType(events ?? [], "both");
 
   useEffect(() => {
-    const cityOptionsForDetection = getCitiesForType(events ?? [], "both");
-    if (cityOptionsForDetection.length === 0) return;
+    if (cityOptions.length === 0) return;
 
     let isMounted = true;
 
     const detectCity = async () => {
-      const detectedCity = await detectCityFromUserLocation(cityOptionsForDetection);
+      const detectedCity = await detectCityFromUserLocation(cityOptions);
       if (!isMounted || !detectedCity) {
         return;
       }
@@ -63,11 +61,8 @@ export default function HomeScreen() {
     };
   }, [events]);
 
-  const isInitialLoading = isEventsLoading;
-
   const handleEventPress = (id: string) => {
-    const sharedBoundTag = encodeURIComponent(getEventSharedBoundTag(id));
-    router.push(`/event/${id}?sharedBoundTag=${sharedBoundTag}` as Href);
+    router.push(`/event/${id}` as Href);
   };
 
   const query = searchValue.trim().toLowerCase();
@@ -86,9 +81,6 @@ export default function HomeScreen() {
     router.push(`/event?${params.toString()}` as Href);
   };
 
-  const handleViewAllOngoing = () => handleViewAll("ongoing");
-  const handleViewAllUpcoming = () => handleViewAll("upcoming");
-  const handleViewAllActivity = () => handleViewAll("activity");
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     scrollRef.current?.scrollTo({ y: 0, animated: true });
@@ -182,7 +174,6 @@ export default function HomeScreen() {
           cityOptions={cityOptions}
           onFavoritePress={() => router.push("/bookmarks" as Href)}
           onCitySelect={setSelectedCity}
-          withSafeAreaTopInset={false}
         />
         <HomeHeaderSticky
           searchValue={searchValue}
@@ -195,7 +186,7 @@ export default function HomeScreen() {
           isCategoriesLoading={isCategoriesLoading}
         />
 
-        {isInitialLoading ? (
+        {isEventsLoading ? (
           <HomeSkeleton />
         ) : (
           <>
@@ -204,7 +195,7 @@ export default function HomeScreen() {
                 <SectionHeader
                   title={ongoingTitle}
                   actionLabel={t("home.viewAll")}
-                  onAction={handleViewAllOngoing}
+                  onAction={() => handleViewAll("ongoing")}
                 />
                 <OngoingEventsCarousel
                   events={ongoingEvents}
@@ -218,7 +209,7 @@ export default function HomeScreen() {
                 <SectionHeader
                   title={activitiesTitle}
                   actionLabel={t("home.viewAll")}
-                  onAction={handleViewAllActivity}
+                  onAction={() => handleViewAll("activity")}
                 />
                 <View style={styles.activitiesGrid}>
                   {activityEvents.slice(0, 4).map((event) => (
@@ -239,7 +230,7 @@ export default function HomeScreen() {
                 <SectionHeader
                   title={upcomingTitle}
                   actionLabel={t("home.viewAll")}
-                  onAction={handleViewAllUpcoming}
+                  onAction={() => handleViewAll("upcoming")}
                 />
                 <UpcomingEventsList
                   events={upcomingEvents}
@@ -313,3 +304,4 @@ const styles = StyleSheet.create((theme) => ({
     height: theme.spacing.xl,
   },
 }));
+
