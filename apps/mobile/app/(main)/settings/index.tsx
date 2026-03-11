@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useClerk } from "@clerk/clerk-expo";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
@@ -7,8 +9,25 @@ const THEME_OPTIONS: AppThemeMode[] = ["system", "light", "dark"];
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
+  const { signOut } = useClerk();
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const themeMode = useUIStore((state) => state.themeMode);
   const setThemeMode = useUIStore((state) => state.setThemeMode);
+
+  const handleTemporaryLogout = async () => {
+    if (isSigningOut) {
+      return;
+    }
+
+    try {
+      setIsSigningOut(true);
+      await signOut();
+    } catch (error) {
+      console.error("Temporary sign out failed", error);
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -40,6 +59,22 @@ export default function SettingsScreen() {
           })}
         </View>
       </View>
+
+      <View style={styles.section}>
+        <Text style={styles.title}>{t("settings.temporaryLogout.label")}</Text>
+        <Text style={styles.subtitle}>{t("settings.temporaryLogout.hint")}</Text>
+
+        <Pressable
+          style={[styles.logoutButton, isSigningOut && styles.logoutButtonDisabled]}
+          onPress={handleTemporaryLogout}
+          disabled={isSigningOut}
+          accessibilityRole="button"
+        >
+          <Text style={styles.logoutButtonLabel}>
+            {isSigningOut ? t("settings.temporaryLogout.loading") : t("settings.temporaryLogout.action")}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -49,6 +84,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: theme.spacing.lg,
+    gap: theme.spacing.md,
   },
   section: {
     backgroundColor: theme.colors.surface,
@@ -115,5 +151,24 @@ const styles = StyleSheet.create((theme) => ({
     height: 10,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.primary,
+  },
+  logoutButton: {
+    marginTop: theme.spacing.xs,
+    minHeight: theme.button.md,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.error,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+  },
+  logoutButtonDisabled: {
+    opacity: 0.65,
+  },
+  logoutButtonLabel: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
+    color: theme.colors.error,
   },
 }));

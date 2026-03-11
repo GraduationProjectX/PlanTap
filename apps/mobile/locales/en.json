@@ -107,6 +107,12 @@
   "settings": {
     "title": "Settings",
     "appearanceDescription": "Choose how PlanTap looks across the app.",
+    "temporaryLogout": {
+      "label": "Temporary logout",
+      "hint": "Use this to quickly return to sign in while testing.",
+      "action": "Log out",
+      "loading": "Signing out..."
+    },
     "themeMode": {
       "system": {
         "label": "Use device theme",

@@ -1,15 +1,13 @@
-import { useOAuth } from "@clerk/clerk-expo";
+import { useSSO } from "@clerk/clerk-expo";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { Button, Spinner } from "heroui-native";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FadeIn, LinearTransition } from "react-native-reanimated";
 
 export default function GoogleAuthButton() {
-  const router = useRouter();
   const { theme } = useUnistyles();
-  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+  const { startSSOFlow } = useSSO();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePress = async () => {
@@ -17,11 +15,10 @@ export default function GoogleAuthButton() {
 
     try {
       setIsLoading(true);
-      const { createdSessionId, setActive } = await startOAuthFlow();
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy: "oauth_google" });
 
       if (createdSessionId) {
         await setActive?.({ session: createdSessionId });
-        router.replace("/");
       }
     } catch (error) {
       console.error("Google sign-in failed", error);

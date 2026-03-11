@@ -179,6 +179,8 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
 
+      <Stack.Screen name="sso-callback" />
+
       <Stack.Screen name="+not-found" options={{ headerShown: true }} />
     </Stack>
   );

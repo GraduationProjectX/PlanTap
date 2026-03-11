@@ -1,12 +1,12 @@
 import AppleAuthButton from "@/components/auth/AppleAuthButton";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 import { Separator } from "heroui-native";
-import * as WebBrowser from "expo-web-browser";
+// import * as WebBrowser from "expo-web-browser";
 import { Image, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
-WebBrowser.maybeCompleteAuthSession();
+// WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen() {
   return (
