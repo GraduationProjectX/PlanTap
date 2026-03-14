@@ -1,4 +1,5 @@
-﻿import { View, Text } from "react-native";
+﻿// City Selector Modal need Work, fix bottom padding and add icon for each city and make the modal look better in general.
+import { View, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -200,6 +201,7 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.font.family.medium,
     color: theme.colors.headerMuted,
     letterSpacing: theme.font.letterSpacing.widest,
+    paddingRight: 4,
   },
   cityRow: {
     alignItems: "center",
