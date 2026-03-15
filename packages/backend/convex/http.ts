@@ -143,7 +143,8 @@ http.route({
 });
 
 async function validateRequest(request: Request): Promise<ClerkWebhookEvent | null> {
-  const webhookSecret = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
+  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
+
   if (!webhookSecret) {
     console.error("MISSING CLERK_WEBHOOK_SIGNING_SECRET");
     return null;

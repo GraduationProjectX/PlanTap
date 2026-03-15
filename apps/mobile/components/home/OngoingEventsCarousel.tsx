@@ -28,7 +28,7 @@ export function OngoingEventsCarousel({
     return (
       <EventCard
         event={item}
-        variant="hero"
+        variant="medium"
         onPress={onEventPress}
         width={cardWidth}
       />
