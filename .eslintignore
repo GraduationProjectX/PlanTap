@@ -10,3 +10,4 @@ apps/mobile/android/
 apps/mobile/ios/
 apps/mobile/web-build/
 apps/mobile/dist/
+packages/backend/convex/_generated/*

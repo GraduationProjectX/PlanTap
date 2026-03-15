@@ -43,7 +43,7 @@ export function getEventCardMeta(event: EventDoc, options: EventCardMetaOptions 
   const categoryLabel = event.categories[0]?.toUpperCase() ?? "";
   const tagLabels = isActivity ? [] : getEventTagLabels(event, maxTags);
   const dateLabel = includeDate
-    ? event.startAt
+    ? event.startAt != null
       ? formatEventDateTime(event.startAt)
       : isActivity
         ? whenAllLabel ?? null

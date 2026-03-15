@@ -1,59 +1,79 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+
 import { mutation, query } from "./_generated/server";
+import { getUserByClerkId, requireCurrentUser } from "./lib/auth";
+import { eventFields } from "./schema";
 
-async function getAuthenticatedUser(ctx: { auth: { getUserIdentity: () => Promise<{ subject: string } | null> }; db: any }) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Not authenticated");
+const eventDocumentFields = {
+  _id: v.id("events"),
+  _creationTime: v.number(),
+  ...eventFields,
+};
 
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_clerk_user_id", (q: any) => q.eq("clerkUserId", identity.subject))
-    .unique();
-  if (!user) throw new Error("User not found");
+const bookmarkedEventValidator = v.object({
+  ...eventDocumentFields,
+  bookmarkId: v.id("bookmarks"),
+  bookmarkedAt: v.number(),
+});
 
-  return user;
-}
+const toggleBookmarkResultValidator = v.object({
+  bookmarked: v.boolean(),
+});
+
+const MAX_BOOKMARKS = 500;
 
 export const listForUser = query({
   args: {},
+  returns: v.array(bookmarkedEventValidator),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
+    if (!identity) {
+      throw new ConvexError("Not authenticated");
+    }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", identity.subject))
-      .unique();
-    if (!user) return [];
+    const user = await getUserByClerkId(ctx, identity.subject);
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
 
     const bookmarks = await ctx.db
       .query("bookmarks")
-      .withIndex("by_user", (q) => q.eq("userId", user._id))
-      .collect();
+      .withIndex("by_userid_and_createdat", (q) => q.eq("userId", user._id))
+      .order("desc")
+      .take(MAX_BOOKMARKS);
 
-    const events = await Promise.all(
-      bookmarks.map(async (bookmark) => {
-        const event = await ctx.db.get(bookmark.eventId);
-        return event ? { ...event, bookmarkId: bookmark._id, bookmarkedAt: bookmark.createdAt } : null;
-      }),
-    );
+    const bookmarkedEvents = [];
+    for (const bookmark of bookmarks) {
+      const event = await ctx.db.get(bookmark.eventId);
+      if (event) {
+        bookmarkedEvents.push({
+          ...event,
+          bookmarkId: bookmark._id,
+          bookmarkedAt: bookmark.createdAt,
+        });
+      }
+    }
 
-    return events.filter((e) => e !== null);
+    return bookmarkedEvents;
   },
 });
 
 export const toggle = mutation({
   args: { eventId: v.id("events") },
+  returns: toggleBookmarkResultValidator,
   handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
+    const user = await requireCurrentUser(ctx);
 
     const existing = await ctx.db
       .query("bookmarks")
-      .withIndex("by_user_event", (q) => q.eq("userId", user._id).eq("eventId", args.eventId))
-      .unique();
+      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("eventId"), args.eventId))
+      .first();
 
     const event = await ctx.db.get(args.eventId);
-    if (!event) throw new Error("Event not found");
+    if (!event || event.status !== "approved") {
+      throw new ConvexError("Event not found");
+    }
 
     if (existing) {
       await ctx.db.delete(existing._id);
@@ -77,20 +97,23 @@ export const toggle = mutation({
 
 export const isBookmarked = query({
   args: { eventId: v.id("events") },
+  returns: v.boolean(),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return false;
+    if (!identity) {
+      throw new ConvexError("Not authenticated");
+    }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", identity.subject))
-      .unique();
-    if (!user) return false;
+    const user = await getUserByClerkId(ctx, identity.subject);
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
 
     const bookmark = await ctx.db
       .query("bookmarks")
-      .withIndex("by_user_event", (q) => q.eq("userId", user._id).eq("eventId", args.eventId))
-      .unique();
+      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", user._id))
+      .filter((q) => q.eq(q.field("eventId"), args.eventId))
+      .first();
 
     return bookmark !== null;
   },

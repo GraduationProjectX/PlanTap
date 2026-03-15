@@ -3,18 +3,49 @@ import { internalMutation } from "./_generated/server";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
-export const seedEvents = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const existingEvents = await ctx.db.query("events").first();
-    if (existingEvents) {
-      console.log("Events already seeded, skipping.");
-      return;
-    }
+type SeedEvent = {
+  title: string;
+  titleAr: string;
+  descriptionShort?: string;
+  descriptionShortAr?: string;
+  type: "event" | "activity";
+  categories: string[];
+  tags: string[];
+  startAt?: number;
+  endAt?: number;
+  city: string;
+  locationLat: number;
+  locationLng: number;
+  locationAddress?: string;
+  locationAddressAr?: string;
+  priceMin?: number;
+  priceMax?: number;
+  indoorOutdoor: "indoor" | "outdoor" | "mixed" | "unknown";
+  familyFriendly?: boolean;
+  images: string[];
+  favoritesCount: number;
+  status: "pending" | "approved" | "rejected";
+  rating?: number;
+};
 
-    const now = Date.now();
+function withEventDefaults(event: SeedEvent) {
+  return {
+    descriptionShort: null,
+    descriptionShortAr: null,
+    startAt: null,
+    endAt: null,
+    locationAddress: null,
+    locationAddressAr: null,
+    priceMin: null,
+    priceMax: null,
+    familyFriendly: null,
+    rating: null,
+    ...event,
+  };
+}
 
-    const events = [
+function createSeedEvents(now: number) {
+  return [
       {
         title: "Summer Jazz Festival",
         titleAr: "مهرجان الجاز الصيفي",
@@ -439,13 +470,10 @@ export const seedEvents = internalMutation({
         status: "approved" as const,
         rating: 4.6,
       },
-    ];
+    ].map(withEventDefaults);
+}
 
-    for (const event of events) {
-      await ctx.db.insert("events", event);
-    }
-
-    const categories = [
+const seedCategories = [
       { key: "all", label: "All", labelAr: "الكل", icon: "grid", sortOrder: 0 },
       { key: "sports", label: "Sports", labelAr: "رياضة", icon: "sports", sortOrder: 1 },
       { key: "adventure", label: "Adventure", labelAr: "مغامرة", icon: "adventure", sortOrder: 2 },
@@ -457,10 +485,28 @@ export const seedEvents = internalMutation({
       { key: "wellness", label: "Wellness", labelAr: "صحة", icon: "wellness", sortOrder: 8 },
     ];
 
-    for (const category of categories) {
+export const seedEvents = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const existingEvents = await ctx.db.query("events").first();
+    if (existingEvents) {
+      console.log("Events already seeded, skipping.");
+      return;
+    }
+
+    const now = Date.now();
+    const events = createSeedEvents(now);
+
+    for (const event of events) {
+      await ctx.db.insert("events", event);
+    }
+
+    for (const category of seedCategories) {
       await ctx.db.insert("categories", category);
     }
 
-    console.log(`Seeded ${events.length} events and ${categories.length} categories.`);
+    console.log(`Seeded ${events.length} events and ${seedCategories.length} categories.`);
   },
 });
+
+

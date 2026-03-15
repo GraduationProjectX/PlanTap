@@ -1,11 +1,11 @@
 type EventTimeFields = {
-  startAt?: number;
-  endAt?: number;
+  startAt: number | null;
+  endAt: number | null;
 };
 
 type EventTagFields = {
   tags?: string[];
-  familyFriendly?: boolean;
+  familyFriendly: boolean | null;
   indoorOutdoor?: string;
 };
 
@@ -39,14 +39,14 @@ export function getEventTagLabels(event: EventTagFields, maxTags: number): strin
   return Array.from(new Set([...derivedTags, ...sourceTags])).slice(0, maxTags);
 }
 
-export function getDateBadgeParts(timestamp?: number): { day: number; month: string } {
-  if (!timestamp) return { day: 0, month: "" };
+export function getDateBadgeParts(timestamp: number | null): { day: number; month: string } {
+  if (timestamp == null) return { day: 0, month: "" };
   const date = new Date(timestamp);
   return { day: date.getDate(), month: MONTH_SHORT[date.getMonth()] ?? "" };
 }
 
-export function getCountdownToStartLabel(startAt?: number): string | null {
-  if (!startAt) return null;
+export function getCountdownToStartLabel(startAt: number | null): string | null {
+  if (startAt == null) return null;
 
   const diff = startAt - Date.now();
   if (diff <= 0) return null;
@@ -60,8 +60,8 @@ export function getCountdownToStartLabel(startAt?: number): string | null {
   return `${minutes}m`;
 }
 
-export function formatEventDateTime(timestamp?: number): string | null {
-  if (!timestamp) return null;
+export function formatEventDateTime(timestamp: number | null): string | null {
+  if (timestamp == null) return null;
 
   const date = new Date(timestamp);
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -72,11 +72,11 @@ export function formatEventDateTime(timestamp?: number): string | null {
   const ampm = hours >= 12 ? "PM" : "AM";
   const h = hours % 12 || 12;
   const m = String(minutes).padStart(2, "0");
-  return `${month}/${day}/${year} • ${h}:${m} ${ampm}`;
+  return `${month}/${day}/${year} â€¢ ${h}:${m} ${ampm}`;
 }
 
-export function getTimeRemainingLabel(endAt?: number): string | null {
-  if (!endAt) return null;
+export function getTimeRemainingLabel(endAt: number | null): string | null {
+  if (endAt == null) return null;
 
   const diff = endAt - Date.now();
   if (diff <= 0) return null;

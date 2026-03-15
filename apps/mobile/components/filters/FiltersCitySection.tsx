@@ -69,7 +69,7 @@ export function FiltersCitySection({
       >
         <Select.Trigger style={styles.selectTrigger}>
           <View style={[styles.selectInner, { flexDirection }]}>
-            <Text style={styles.selectEmoji}>🏢</Text>
+            <FontAwesome name="building-o" size={16} />
             <Select.Value placeholder={t("filters.selectCity")} />
           </View>
           <Select.TriggerIndicator animation={CITY_SELECT_INDICATOR_ANIMATION}>
@@ -93,7 +93,7 @@ export function FiltersCitySection({
             <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
             <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
               <View style={styles.selectItemInner}>
-                <Text style={styles.selectEmoji}>🌍</Text>
+                <FontAwesome name="globe" size={16} />
                 <Select.ItemLabel />
               </View>
               <Select.ItemIndicator />
@@ -101,7 +101,7 @@ export function FiltersCitySection({
             {cityOptions.map((city) => (
               <Select.Item key={city} value={city} label={city}>
                 <View style={styles.selectItemInner}>
-                  <Text style={styles.selectEmoji}>🏢</Text>
+                  <FontAwesome name="building-o" size={16} />
                   <Select.ItemLabel />
                 </View>
                 <Select.ItemIndicator />

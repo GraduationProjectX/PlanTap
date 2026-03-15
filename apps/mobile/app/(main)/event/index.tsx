@@ -243,7 +243,7 @@ export default function ViewAllEventsScreen() {
             >
               <Select.Trigger style={styles.citySelectTrigger}>
                 <View style={[styles.cityRow, { flexDirection }]}> 
-                  <Text style={styles.cityIcon}>📍</Text>
+                  <FontAwesome name="map-marker" size={14} color="#FFFFFF" />
                   <Text style={styles.cityText} numberOfLines={1}>
                     {selectedCityLabel}
                   </Text>
@@ -270,7 +270,7 @@ export default function ViewAllEventsScreen() {
                   <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
                   <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
                     <View style={styles.cityOptionInner}>
-                      <Text style={styles.cityOptionIcon}>🌍</Text>
+                      <FontAwesome name="globe" size={16} />
                       <Select.ItemLabel />
                     </View>
                     <Select.ItemIndicator />
@@ -278,7 +278,7 @@ export default function ViewAllEventsScreen() {
                   {cityOptions.map((cityOption) => (
                     <Select.Item key={cityOption} value={cityOption} label={cityOption}>
                       <View style={styles.cityOptionInner}>
-                        <Text style={styles.cityOptionIcon}>🏢</Text>
+                        <FontAwesome name="building-o" size={16} />
                         <Select.ItemLabel />
                       </View>
                       <Select.ItemIndicator />
