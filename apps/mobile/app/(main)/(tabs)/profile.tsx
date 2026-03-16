@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { useRouter, type Href } from "expo-router";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
 import { useDirection } from "@/rtl";
@@ -13,7 +13,7 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <Text style={[styles.title, { textAlign }]}>{t("tabs.profile")}</Text>
       <Text style={[styles.subtitle, { textAlign }]}>{t("common.comingSoon")}</Text>
-      <Pressable style={styles.settingsButton} onPress={() => router.push("/settings" as Href)}>
+      <Pressable style={styles.settingsButton} onPress={() => router.push("/settings")}>
         <Text style={styles.settingsButtonLabel}>{t("settings.title")}</Text>
       </Pressable>
     </View>

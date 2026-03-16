@@ -28,7 +28,7 @@ type FiltersDateSectionProps = {
 };
 
 const TODAY_STR = toLocalDateString(new Date());
-const QUICK_DATE_OPTIONS = ["today", "thisWeekend"] as const;
+const QUICK_DATE_OPTIONS: Array<FilterDate> = ["today", "thisWeekend"];
 
 export function FiltersDateSection({
   activeDate,

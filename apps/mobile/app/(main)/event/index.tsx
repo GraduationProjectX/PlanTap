@@ -1,6 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams, useRouter, type Href } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Button, Select } from "heroui-native";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -26,6 +26,11 @@ import { useEventFiltersStore } from "@/stores/event-filters-store";
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
 const ALL_CITIES_VALUE = "__all_cities__";
+const CITY_OVERLAY_OPACITY_VALUES: [number, number, number] = [0, 1, 0];
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0;
+}
 
 function getEventsForListType(collections: EventCollections | null, type: EventListType): EventDoc[] {
   if (!collections) return [];
@@ -119,7 +124,7 @@ export default function ViewAllEventsScreen() {
             event.city,
             ...event.categories,
             ...event.tags,
-          ].filter(Boolean) as string[];
+          ].filter(isNonEmptyString);
 
           return fields.some((field) => field.toLowerCase().includes(query));
         });
@@ -141,11 +146,11 @@ export default function ViewAllEventsScreen() {
   const showHomeCategoryChip = !shouldApplyFilters && !!homeCategoryLabel;
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    router.push({ pathname: "/event/[id]", params: { id } });
   };
 
   const handleFilterPress = () => {
-    router.push(`/filters?targetType=${eventType}` as Href);
+    router.push({ pathname: "/filters", params: { targetType: eventType } });
   };
 
   const handleRemoveFilterTag = (tagId: string) => {
@@ -165,7 +170,7 @@ export default function ViewAllEventsScreen() {
 
   const handleBackPress = () => {
     if (shouldApplyFilters) {
-      router.replace("/" as Href);
+      router.replace("/");
       return;
     }
 
@@ -261,7 +266,7 @@ export default function ViewAllEventsScreen() {
                 <Select.Overlay
                   animation={{
                     opacity: {
-                      value: [0, 1, 0] as [number, number, number],
+                      value: CITY_OVERLAY_OPACITY_VALUES,
                     },
                   }}
                   style={styles.cityOverlay}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
-import { useRouter, type Href } from "expo-router";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HomeHeaderSticky, HomeHeaderTop } from "@/components/home/HomeHeader";
@@ -20,6 +20,10 @@ type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0;
+}
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -59,26 +63,26 @@ export default function HomeScreen() {
     return () => {
       isMounted = false;
     };
-  }, [events]);
+  }, [cityOptions]);
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    router.push({ pathname: "/event/[id]", params: { id } });
   };
 
   const query = searchValue.trim().toLowerCase();
 
   const handleViewAll = (type: ViewAllEventType) => {
-    const params = new URLSearchParams({ type });
+    const params: Record<string, string> = { type };
 
     if (selectedCity) {
-      params.set("city", selectedCity);
+      params.city = selectedCity;
     }
 
     if (selectedCategory !== "all") {
-      params.set("homeCategory", selectedCategory);
+      params.homeCategory = selectedCategory;
     }
 
-    router.push(`/event?${params.toString()}` as Href);
+    router.push({ pathname: "/event", params });
   };
 
   const handleCategorySelect = (categoryId: string) => {
@@ -87,7 +91,7 @@ export default function HomeScreen() {
   };
 
   const handleFilterPress = () => {
-    router.push("/filters?targetType=all" as Href);
+    router.push({ pathname: "/filters", params: { targetType: "all" } });
   };
 
   const matchesSearch = (event: EventDoc) => {
@@ -103,7 +107,7 @@ export default function HomeScreen() {
       event.city,
       ...event.categories,
       ...event.tags,
-    ].filter(Boolean) as string[];
+    ].filter(isNonEmptyString);
 
     return fields.some((field) => field.toLowerCase().includes(query));
   };
@@ -172,7 +176,7 @@ export default function HomeScreen() {
         <HomeHeaderTop
           city={selectedCity}
           cityOptions={cityOptions}
-          onFavoritePress={() => router.push("/bookmarks" as Href)}
+          onFavoritePress={() => router.push("/bookmarks")}
           onCitySelect={setSelectedCity}
         />
         <HomeHeaderSticky

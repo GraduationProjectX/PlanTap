@@ -75,7 +75,7 @@ export function useCategories() {
     );
   }
 
-  const rawCategories = useQuery(api.categories.list) as RawCategoryDoc[] | undefined;
+  const rawCategories: RawCategoryDoc[] | undefined = useQuery(api.categories.categoriesList);
   const liveCategories = rawCategories === undefined ? null : normalizeCategories(rawCategories);
 
   useEffect(() => {

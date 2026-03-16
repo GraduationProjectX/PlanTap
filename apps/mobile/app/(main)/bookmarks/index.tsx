@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useRouter, type Href } from "expo-router";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
@@ -218,11 +218,11 @@ export default function BookmarksScreen() {
   );
 
   const handleEventPress = (id: string) => {
-    router.push(`/event/${id}` as Href);
+    router.push({ pathname: "/event/[id]", params: { id } });
   };
 
-  const handleBookmarkToggle = (id: string) => {
-    toggleBookmark(id as any);
+  const handleBookmarkToggle = (id: EventDoc["_id"]) => {
+    toggleBookmark(id);
   };
 
   const handleBack = () => {

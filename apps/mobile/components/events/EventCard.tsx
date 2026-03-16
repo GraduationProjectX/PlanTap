@@ -26,12 +26,14 @@ export type EventCardVariant =
   | "bookmark-hero"
   | "bookmark-grid";
 
+type EventId = EventDoc["_id"];
+
 type EventCardProps = {
   event: EventDoc;
   variant: EventCardVariant;
   width?: number;
-  onPress: (id: string) => void;
-  onBookmark?: (id: string) => void;
+  onPress: (id: EventId) => void;
+  onBookmark?: (id: EventId) => void;
   isBookmarked?: boolean;
   showCountdown?: boolean;
 };

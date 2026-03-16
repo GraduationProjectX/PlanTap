@@ -48,10 +48,13 @@ export default function MainLayout() {
       <Stack.Screen
         name="event/[id]"
         options={({ route }) => {
-          const baseOptions = { headerShown: true, title: "Event" } as const;
-          const { id } = (route.params ?? {}) as { id?: string | string[] };
-          const routeId = Array.isArray(id) ? id[0] : id;
+          const baseOptions = { headerShown: true, title: "Event" };
+          if (!route.params || !("id" in route.params)) {
+            return baseOptions;
+          }
 
+          const { id } = route.params;
+          const routeId = Array.isArray(id) ? id[0] : id;
           if (!routeId) {
             return baseOptions;
           }
@@ -60,7 +63,7 @@ export default function MainLayout() {
             ...baseOptions,
             enableTransitions: true,
             ...Transition.Presets.SharedXImage({
-              sharedBoundTag: getEventSharedBoundTag(routeId),
+              sharedBoundTag: getEventSharedBoundTag(`${routeId}`),
             }),
             gestureEnabled: false,
           };

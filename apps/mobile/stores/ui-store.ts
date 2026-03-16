@@ -23,13 +23,33 @@ type UIState = {
   resetHomeFilters: () => void;
 };
 
-const initialState = {
+type PersistedUIState = Partial<{
+  hasCompletedOnboarding: boolean;
+  languageOverride: AppLanguage | null;
+  themeMode: AppThemeMode;
+  notificationsEnabled: boolean;
+  homeSearch: string;
+  selectedCategories: string[];
+}>;
+
+function isPersistedUIState(value: unknown): value is PersistedUIState {
+  return !!value && typeof value === "object";
+}
+
+const initialState: {
+  hasCompletedOnboarding: boolean;
+  languageOverride: AppLanguage | null;
+  themeMode: AppThemeMode;
+  notificationsEnabled: boolean;
+  homeSearch: string;
+  selectedCategories: string[];
+} = {
   hasCompletedOnboarding: false,
   languageOverride: null,
-  themeMode: "system" as AppThemeMode,
+  themeMode: "system",
   notificationsEnabled: true,
   homeSearch: "",
-  selectedCategories: [] as string[],
+  selectedCategories: [],
 };
 
 export const useUIStore = create<UIState>()(
@@ -59,20 +79,20 @@ export const useUIStore = create<UIState>()(
       storage: createJSONStorage(() => zustandMMKVStorage),
       version: 2,
       migrate: (persistedState, version) => {
-        if (!persistedState || typeof persistedState !== "object") {
+        if (!isPersistedUIState(persistedState)) {
           return {
             ...initialState,
           };
         }
 
-        const state = persistedState as Partial<UIState>;
+        const state = persistedState;
         const hasValidThemeMode =
           state.themeMode === "system" || state.themeMode === "light" || state.themeMode === "dark";
 
         if (version < 2 || !hasValidThemeMode) {
           return {
             ...state,
-            themeMode: "system" as AppThemeMode,
+            themeMode: "system",
           };
         }
 

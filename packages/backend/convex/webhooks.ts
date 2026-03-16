@@ -107,13 +107,13 @@ export const processClerkEvent = internalMutation({
       .first();
 
     if (existing) {
-      return { accepted: false as const };
+      return { accepted: false };
     }
 
     if (eventType === "user.deleted") {
       await deleteClerkUser(ctx, data.id);
     } else {
-      await upsertClerkUser(ctx, data as ClerkUserData);
+      await upsertClerkUser(ctx, data);
     }
 
     await ctx.db.insert("webhookEvents", {
@@ -124,6 +124,6 @@ export const processClerkEvent = internalMutation({
       processedAt: Date.now(),
     });
 
-    return { accepted: true as const };
+    return { accepted: true };
   },
 });

@@ -1,4 +1,4 @@
-﻿// City Selector Modal need Work, fix bottom padding and add icon for each city and make the modal look better in general.
+// City Selector Modal need Work, fix bottom padding and add icon for each city and make the modal look better in general.
 import { View, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -21,6 +21,7 @@ type HomeHeaderTopProps = {
 };
 
 const ALL_CITIES_VALUE = "__all_cities__";
+const CITY_OVERLAY_OPACITY_VALUES: [number, number, number] = [0, 1, 0];
 
 type HomeHeaderStickyProps = {
   searchValue: string;
@@ -78,7 +79,7 @@ export function HomeHeaderTop({
               <Select.Overlay
                 animation={{
                   opacity: {
-                    value: [0, 1, 0] as [number, number, number],
+                    value: CITY_OVERLAY_OPACITY_VALUES,
                   },
                 }}
                 style={styles.cityOverlay}

@@ -12,8 +12,8 @@ export function useBookmarks() {
   const toggleMutation = useMutation(api.bookmarks.toggle);
   const isLoading = data === undefined;
 
-  const bookmarkedEvents = (data ?? []) as BookmarkedEvent[];
-  const bookmarkedIds = new Set(bookmarkedEvents.map((e) => e._id as string));
+  const bookmarkedEvents: BookmarkedEvent[] = data ?? [];
+  const bookmarkedIds = new Set(bookmarkedEvents.map((event) => event._id));
 
   const toggleBookmark = (eventId: Id<"events">) => {
     void toggleMutation({ eventId });

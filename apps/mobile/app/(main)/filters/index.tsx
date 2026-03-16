@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter, type Href } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -56,7 +56,7 @@ export default function FiltersScreen() {
 
   const handleApply = () => {
     setAppliedFilters(draft);
-    router.replace(`/event?type=${normalizedTargetType}&source=filters` as Href);
+    router.replace({ pathname: "/event", params: { type: normalizedTargetType, source: "filters" } });
   };
 
   const handleBack = () => {

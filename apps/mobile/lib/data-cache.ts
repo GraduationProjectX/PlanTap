@@ -10,16 +10,19 @@ type CacheEnvelope<T> = {
 
 const memoryCache = new Map<string, CacheEnvelope<unknown>>();
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object";
+}
+
 function isValidEnvelope<T>(value: unknown): value is CacheEnvelope<T> {
-  if (!value || typeof value !== "object") {
+  if (!isRecord(value)) {
     return false;
   }
 
-  const envelope = value as Partial<CacheEnvelope<T>>;
   return (
-    envelope.version === CACHE_SCHEMA_VERSION &&
-    typeof envelope.updatedAt === "number" &&
-    "data" in envelope
+    value.version === CACHE_SCHEMA_VERSION &&
+    typeof value.updatedAt === "number" &&
+    "data" in value
   );
 }
 
@@ -39,7 +42,7 @@ export function readCachedData<T>(key: string, ttlMs: number): T | null {
   }
 
   try {
-    const parsed = JSON.parse(persistedRaw) as unknown;
+    const parsed = JSON.parse(persistedRaw);
     if (!isValidEnvelope<T>(parsed) || !isFresh(parsed.updatedAt, ttlMs)) {
       return null;
     }
@@ -58,7 +61,7 @@ export function writeCachedData<T>(key: string, data: T) {
     data,
   };
 
-  memoryCache.set(key, envelope as CacheEnvelope<unknown>);
+  memoryCache.set(key, envelope);
 
   try {
     storage.set(key, JSON.stringify(envelope));

@@ -19,11 +19,12 @@ type AuthState = {
   _setHasHydrated: (value: boolean) => void;
 };
 
-const initialAuthState = {
-  user: null as AuthUserCache | null,
-  isSignedIn: false,
-  _hasHydrated: false,
-};
+const initialAuthState: { user: AuthUserCache | null; isSignedIn: boolean; _hasHydrated: boolean } =
+  {
+    user: null,
+    isSignedIn: false,
+    _hasHydrated: false,
+  };
 
 export const useAuthStore = create<AuthState>()(
   persist(

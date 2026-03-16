@@ -12,6 +12,10 @@ PlanTap is a monorepo for an Expo (React Native) mobile app and a Convex backend
 - If install warns about ignored build scripts: `pnpm approve-builds` then `pnpm rebuild --pending`
 - We are using the React Compiler. It will add memoization to components and values within codebase. This eliminates the need for you to add any useMemo, useCallback, and React.memo hooks, so NEVER add any of these
 - Never typecast. Never use `as`
+- Prefer the smallest safe fix; avoid refactors and unrelated cleanup.
+- Use the smallest possible diff to maket this changes. Then think of how to make it smaller and do that again.
+- No typeof checks.
+- No backwards compat. 
 
 ## More docs
 

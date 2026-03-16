@@ -11,7 +11,7 @@ const categoryValidator = v.object({
 
 const MAX_CATEGORIES = 100;
 
-export const list = query({
+export const categoriesList = query({
   args: {},
   returns: v.array(categoryValidator),
   handler: async (ctx) => {

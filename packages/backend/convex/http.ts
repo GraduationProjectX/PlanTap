@@ -14,10 +14,21 @@ type ClerkUserWebhookData = {
   email_addresses: Array<{ email_address: string; id: string }> | null;
 };
 
+type ClerkWebhookEventData = {
+  id?: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  image_url?: string | null;
+  email_address?: string | null;
+  primary_email_address_id?: string | null;
+  email_addresses?: Array<{ email_address?: string | null; id?: string | null }> | null;
+  [key: string]: unknown;
+};
+
 type ClerkWebhookEvent = {
   id: string;
   type: string;
-  data: Record<string, unknown>;
+  data: ClerkWebhookEventData;
 };
 
 const http = httpRouter();
@@ -27,49 +38,39 @@ const webhookCorsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, svix-id, svix-timestamp, svix-signature",
 };
 
-function parseEmailAddresses(value: unknown): ClerkUserWebhookData["email_addresses"] {
-  const emailAddressItems = (Array.isArray(value) ? value : []) as Array<{
-    email_address?: string | null;
-    id?: string | null;
-  }>;
+function parseEmailAddresses(value: ClerkWebhookEventData["email_addresses"]): ClerkUserWebhookData["email_addresses"] {
+  if (!Array.isArray(value)) {
+    return null;
+  }
 
-  const emailAddresses = emailAddressItems
-    .map((email) => ({
-      email_address: email.email_address ?? "",
-      id: email.id ?? "",
-    }))
-    .filter((email) => email.email_address && email.id);
+  const emailAddresses: Array<{ email_address: string; id: string }> = [];
+  for (const item of value) {
+    const emailAddress = item.email_address?.trim();
+    const id = item.id?.trim();
+    if (!emailAddress || !id) {
+      continue;
+    }
+
+    emailAddresses.push({ email_address: emailAddress, id });
+  }
 
   return emailAddresses.length > 0 ? emailAddresses : null;
 }
 
-function parseClerkUserData(payload: Record<string, unknown>): ClerkUserWebhookData | null {
-  const userData = payload as Partial<ClerkUserWebhookData> | null;
-  if (!userData?.id) {
+function parseClerkUserData(payload: ClerkWebhookEventData): ClerkUserWebhookData | null {
+  const id = payload.id;
+  if (!id) {
     return null;
   }
 
   return {
-    id: userData.id,
-    first_name: userData.first_name ?? null,
-    last_name: userData.last_name ?? null,
-    image_url: userData.image_url ?? null,
-    email_address: userData.email_address ?? null,
-    primary_email_address_id: userData.primary_email_address_id ?? null,
-    email_addresses: parseEmailAddresses(userData.email_addresses),
-  };
-}
-
-function parseClerkWebhookEvent(payload: unknown, messageId: string): ClerkWebhookEvent | null {
-  const event = payload as Partial<ClerkWebhookEvent> | null;
-  if (!event?.type || !event.data) {
-    return null;
-  }
-
-  return {
-    id: messageId,
-    type: event.type,
-    data: event.data as Record<string, unknown>,
+    id,
+    first_name: payload.first_name ?? null,
+    last_name: payload.last_name ?? null,
+    image_url: payload.image_url ?? null,
+    email_address: payload.email_address ?? null,
+    primary_email_address_id: payload.primary_email_address_id ?? null,
+    email_addresses: parseEmailAddresses(payload.email_addresses),
   };
 }
 
@@ -113,7 +114,7 @@ http.route({
       }
 
       case "user.deleted": {
-        const clerkUserId = ((event.data as { id?: string }).id ?? "").trim();
+        const clerkUserId = event.data.id?.trim() ?? "";
         if (!clerkUserId) {
           return new Response("Missing user id in payload", {
             status: 400,
@@ -146,7 +147,7 @@ async function validateRequest(request: Request): Promise<ClerkWebhookEvent | nu
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.error("MISSING CLERK_WEBHOOK_SIGNING_SECRET");
+    console.error("MISSING CLERK_WEBHOOK_SECRET");
     return null;
   }
 
@@ -169,13 +170,17 @@ async function validateRequest(request: Request): Promise<ClerkWebhookEvent | nu
       "svix-signature": svixSignature,
     });
 
-    const event = parseClerkWebhookEvent(JSON.parse(payload) as unknown, svixId);
-    if (!event) {
+    const parsedPayload: { type?: string; data?: ClerkWebhookEventData } = JSON.parse(payload);
+    if (!parsedPayload.type || !parsedPayload.data) {
       console.error("Invalid Clerk webhook payload shape");
       return null;
     }
 
-    return event;
+    return {
+      id: svixId,
+      type: parsedPayload.type,
+      data: parsedPayload.data,
+    };
   } catch (error) {
     console.error("Error verifying Clerk webhook", error);
     return null;

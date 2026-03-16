@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Select } from "heroui-native";
 import { useTranslation } from "react-i18next";
-import { Platform, Text, View } from "react-native";
+import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -13,10 +13,12 @@ import { FilterSection } from "./FilterSection";
 type SelectValue = { value: string; label: string } | undefined;
 
 const ALL_CITIES_VALUE = "__all_cities__";
+const CITY_SELECT_INDICATOR_ROTATION_VALUES: [number, number] = [0, -180];
+const CITY_SELECT_OVERLAY_OPACITY_VALUES: [number, number, number] = [0, 1, 0];
 
 const CITY_SELECT_INDICATOR_ANIMATION = {
   rotation: {
-    value: [0, -180] as [number, number],
+    value: CITY_SELECT_INDICATOR_ROTATION_VALUES,
     springConfig: {
       damping: 80,
       stiffness: 900,
@@ -27,7 +29,7 @@ const CITY_SELECT_INDICATOR_ANIMATION = {
 
 const CITY_SELECT_OVERLAY_ANIMATION = {
   opacity: {
-    value: [0, 1, 0] as [number, number, number],
+    value: CITY_SELECT_OVERLAY_OPACITY_VALUES,
   },
 };
 

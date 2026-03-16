@@ -36,9 +36,10 @@ export function buildFilterSummaryTags({
   if (!filters) return [];
 
   const tags: FilterSummaryTag[] = [];
-  const categoryLabelById = Object.fromEntries(
-    categories.map((c) => [c.key, isArabic ? c.labelAr : c.label]),
-  ) as Record<string, string>;
+  const categoryLabelById: Record<string, string> = {};
+  for (const category of categories) {
+    categoryLabelById[category.key] = isArabic ? category.labelAr : category.label;
+  }
 
   if (filters.type === "event") tags.push({ id: "type:event", label: t("filters.typeEvent") });
   if (filters.type === "activity") {

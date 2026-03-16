@@ -21,19 +21,24 @@ const SUPPORTED_CITIES = [
   "Al Ahsa",
   "Al Jubail",
   "Yanbu",
-] as const;
+];
 
 function uniqueSorted(values: string[]): string[] {
   return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b));
 }
 
 export function getCategoryLabelByIdMap(categories: CategoryDoc[], isArabic: boolean): Record<string, string> {
-  return Object.fromEntries(
-    categories.filter((c) => c.key !== "all").map((c) => [
-      c.key,
-      isArabic ? c.labelAr : c.label,
-    ]),
-  ) as Record<string, string>;
+  const categoryLabelById: Record<string, string> = {};
+
+  for (const category of categories) {
+    if (category.key === "all") {
+      continue;
+    }
+
+    categoryLabelById[category.key] = isArabic ? category.labelAr : category.label;
+  }
+
+  return categoryLabelById;
 }
 
 export function getCategoryIdsForType(events: EventDoc[], type: FilterType): string[] {
@@ -111,9 +116,9 @@ export const CALENDAR_THEME = {
   textDisabledColor: "#D1D1D6",
   arrowColor: "#000000",
   monthTextColor: "#000000",
-  textDayFontWeight: "400" as const,
-  textMonthFontWeight: "700" as const,
-  textDayHeaderFontWeight: "500" as const,
+  textDayFontWeight: "400",
+  textMonthFontWeight: "700",
+  textDayHeaderFontWeight: "500",
   textDayFontSize: 16,
   textMonthFontSize: 17,
   textDayHeaderFontSize: 13,

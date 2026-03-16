@@ -10,7 +10,7 @@ import i18n from "./i18n";
 
 // Get the current language
 export const getCurrentLanguage = (): "ar" | "en" => {
-  return i18n.language as "ar" | "en";
+  return i18n.language === "en" ? "en" : "ar";
 };
 
 // Check if current language is RTL
@@ -59,6 +59,8 @@ export const useDirection = () => {
   const { i18n: i18nInstance } = useTranslation();
   const isRtl = i18nInstance.dir(i18nInstance.language) === "rtl";
   const direction = isRtl ? "rtl" : "ltr";
+  const textAlign: "left" | "right" = isRtl ? "right" : "left";
+  const flexDirection: "row" | "row-reverse" = isRtl ? "row-reverse" : "row";
 
   return {
     direction,
@@ -66,9 +68,9 @@ export const useDirection = () => {
     // Utility for flipping horizontal values
     flipIfRTL: (value: number) => (isRtl ? -value : value),
     // Text alignment
-    textAlign: isRtl ? ("right" as const) : ("left" as const),
+    textAlign,
     // Flex direction
-    flexDirection: isRtl ? ("row-reverse" as const) : ("row" as const),
+    flexDirection,
   };
 };
 

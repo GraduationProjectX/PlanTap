@@ -140,7 +140,7 @@ const tokens = {
     popover: 1500,
     toast: 1600,
   },
-} as const;
+};
 
 // Light theme colors (extracted from Figma)
 const lightTheme = {
@@ -209,7 +209,7 @@ const lightTheme = {
     skeleton: "#E5E5E5",
     skeletonHighlight: "#F5F5F5",
   },
-} as const;
+};
 
 // Dark theme colors
 const darkTheme = {
@@ -278,7 +278,7 @@ const darkTheme = {
     skeleton: "#262626",
     skeletonHighlight: "#404040",
   },
-} as const;
+};
 
 // Breakpoints for responsive design (based on common device widths)
 const breakpoints = {
@@ -286,7 +286,7 @@ const breakpoints = {
   sm: 390, // iPhone 14/15
   md: 428, // iPhone 14/15 Plus, Pro Max
   lg: 768, // Tablets (disabled but kept for future)
-} as const;
+};
 
 // Define theme types
 type AppThemes = {
