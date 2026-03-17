@@ -131,9 +131,6 @@ const styles = StyleSheet.create(() => ({
     gap: 10,
     flex: 1,
   },
-  selectEmoji: {
-    fontSize: 18,
-  },
   selectItemInner: {
     flexDirection: "row",
     alignItems: "center",
