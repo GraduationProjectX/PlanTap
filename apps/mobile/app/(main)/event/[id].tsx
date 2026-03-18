@@ -14,7 +14,7 @@ export default function EventDetailsScreen() {
   return (
     <View style={styles.container}>
       {sharedBoundTag ? (
-        <Transition.View sharedBoundTag={sharedBoundTag} collapsable={false} style={styles.contentCard}>
+        <Transition.View collapsable={false} style={styles.contentCard}>
           <Text style={styles.title}>Event</Text>
           <Text style={styles.subtitle}>ID: {eventLabel}</Text>
         </Transition.View>

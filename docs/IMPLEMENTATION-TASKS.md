@@ -664,6 +664,8 @@
 
 ### Mobile Testing
 
+- [ ] Improve the transition performance between tabs.
+
 - [ ] Check Maestro and https://github.com/bamlab/flashlight
 - [ ] Test auth flow end-to-end
 - [ ] Test onboarding flow
