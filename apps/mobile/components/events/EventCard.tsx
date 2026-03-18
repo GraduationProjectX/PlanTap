@@ -14,8 +14,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { DateBadge } from "@/components/home/DateBadge";
 import { LiveBadge } from "@/components/home/LiveBadge";
 import type { EventDoc } from "@/hooks/use-events";
-import { getEventCardMeta } from "@/lib/event-card-meta";
-import { getEventSharedBoundTag } from "@/lib/event-transition";
+import { getEventCardMeta, getEventSharedBoundTag } from "@/lib/event-ui";
 import { useDirection } from "@/rtl";
 
 export type EventCardVariant =
@@ -84,6 +83,7 @@ function EventCardComponent({
     return (
       <Transition.Pressable
         sharedBoundTag={sharedBoundTag}
+        collapsable={false}
         onPress={handleCardPress}
         style={[styles.previewCard, isGrid && styles.previewCardGrid]}
       >
@@ -131,6 +131,7 @@ function EventCardComponent({
     return (
       <Transition.Pressable
         sharedBoundTag={sharedBoundTag}
+        collapsable={false}
         onPress={handleCardPress}
         style={styles.bookmarkGridCard}
       >
@@ -186,6 +187,7 @@ function EventCardComponent({
     return (
       <Transition.Pressable
         sharedBoundTag={sharedBoundTag}
+        collapsable={false}
         onPress={handleCardPress}
         style={styles.bookmarkHeroCard}
       >
@@ -254,6 +256,7 @@ function EventCardComponent({
     return (
       <Transition.Pressable
         sharedBoundTag={sharedBoundTag}
+        collapsable={false}
         onPress={handleCardPress}
         style={[styles.mediumContainer, width != null ? { width } : null]}
       >
@@ -320,6 +323,7 @@ function EventCardComponent({
   return (
     <Transition.Pressable
       sharedBoundTag={sharedBoundTag}
+      collapsable={false}
       onPress={handleCardPress}
       style={[styles.heroCard, width != null ? { width } : null]}
     >

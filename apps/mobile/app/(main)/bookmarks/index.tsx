@@ -13,7 +13,7 @@ import { BookmarksSkeleton } from "@/components/bookmarks/BookmarksSkeleton";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import type { EventDoc } from "@/hooks/use-events";
-import { isEventLiveNow } from "@/lib/event-formatters";
+import { isEventLiveNow } from "@/lib/events-data";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { useDirection } from "@/rtl";
 
@@ -23,7 +23,20 @@ const HORIZONTAL_PADDING = 16;
 const GRID_GAP = 12;
 const CONTENT_SKELETON_TOP_INSET = 16;
 
-const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 type GroupedEvents = {
   happening: EventDoc[];
@@ -308,7 +321,12 @@ export default function BookmarksScreen() {
 
   return (
     <View style={styles.root}>
-      <Tabs value={activeTab} onValueChange={setActiveTab} variant="secondary" style={styles.tabsRoot}>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        variant="secondary"
+        style={styles.tabsRoot}
+      >
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
           <View style={styles.titleRow}>
             <Button
@@ -332,10 +350,14 @@ export default function BookmarksScreen() {
           <Tabs.List style={styles.tabsList}>
             <Tabs.Indicator style={styles.tabsIndicator} />
             <Tabs.Trigger value="events">
-              <Tabs.Label className="text-white font-bold text-lg">{t("bookmarks.events")}</Tabs.Label>
+              <Tabs.Label className="text-white font-bold text-lg">
+                {t("bookmarks.events")}
+              </Tabs.Label>
             </Tabs.Trigger>
             <Tabs.Trigger value="activities">
-              <Tabs.Label className="text-white font-bold text-lg">{t("bookmarks.activities")}</Tabs.Label>
+              <Tabs.Label className="text-white font-bold text-lg">
+                {t("bookmarks.activities")}
+              </Tabs.Label>
             </Tabs.Trigger>
           </Tabs.List>
         </View>
@@ -459,4 +481,3 @@ const emptyStyles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.xl,
   },
 }));
-

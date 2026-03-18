@@ -15,7 +15,7 @@ import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransiti
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents } from "@/hooks/use-events";
 import { useFiltersDraft } from "@/hooks/use-filters-draft";
-import { normalizeEventListType } from "@/lib/event-list-type";
+import { normalizeEventListType } from "@/lib/events-data";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
 export default function FiltersScreen() {
@@ -56,7 +56,10 @@ export default function FiltersScreen() {
 
   const handleApply = () => {
     setAppliedFilters(draft);
-    router.replace({ pathname: "/event", params: { type: normalizedTargetType, source: "filters" } });
+    router.replace({
+      pathname: "/event",
+      params: { type: normalizedTargetType, source: "filters" },
+    });
   };
 
   const handleBack = () => {
@@ -64,14 +67,14 @@ export default function FiltersScreen() {
   };
 
   return (
-    <SkeletonScreenTransition isLoading={isInitialLoading} skeleton={<FiltersSkeleton topInset={88} />}>
+    <SkeletonScreenTransition
+      isLoading={isInitialLoading}
+      skeleton={<FiltersSkeleton topInset={88} />}
+    >
       <View style={styles.root}>
         <FiltersTopBar onBack={handleBack} onClearAll={clearAll} />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={scrollContentStyle}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={scrollContentStyle}>
           <FiltersTypeSection selectedType={draft.type} onSelectType={selectType} />
 
           <FiltersCategorySection

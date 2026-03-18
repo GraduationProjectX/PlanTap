@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import type { FilterType } from "@/lib/event-filters";
+import type { FilterType } from "@/lib/events-data";
 
 import { FilterPill } from "./FilterPill";
 import { FilterSection } from "./FilterSection";
@@ -12,10 +12,7 @@ type FiltersTypeSectionProps = {
   onSelectType: (type: FilterType) => void;
 };
 
-export function FiltersTypeSection({
-  selectedType,
-  onSelectType,
-}: FiltersTypeSectionProps) {
+export function FiltersTypeSection({ selectedType, onSelectType }: FiltersTypeSectionProps) {
   const { t } = useTranslation();
 
   const typeOptions: { id: FilterType; label: string }[] = [

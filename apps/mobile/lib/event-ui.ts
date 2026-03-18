@@ -6,7 +6,7 @@ import {
   getEventTagLabels,
   getTimeRemainingLabel,
   isEventLiveNow,
-} from "@/lib/event-formatters";
+} from "@/lib/events-data";
 
 type EventCardMetaOptions = {
   maxTags?: number;
@@ -28,7 +28,10 @@ export type EventCardMeta = {
   tagLabels: string[];
 };
 
-export function getEventCardMeta(event: EventDoc, options: EventCardMetaOptions = {}): EventCardMeta {
+export function getEventCardMeta(
+  event: EventDoc,
+  options: EventCardMetaOptions = {},
+): EventCardMeta {
   const {
     maxTags = 5,
     includeDate = false,
@@ -46,7 +49,7 @@ export function getEventCardMeta(event: EventDoc, options: EventCardMetaOptions 
     ? event.startAt != null
       ? formatEventDateTime(event.startAt)
       : isActivity
-        ? whenAllLabel ?? null
+        ? (whenAllLabel ?? null)
         : null
     : null;
   const countdownLabel = includeCountdown ? getCountdownToStartLabel(event.startAt) : null;
@@ -63,4 +66,8 @@ export function getEventCardMeta(event: EventDoc, options: EventCardMetaOptions 
     remainingLabel,
     tagLabels,
   };
+}
+
+export function getEventSharedBoundTag(eventId: string): string {
+  return `event-card-${eventId}`;
 }

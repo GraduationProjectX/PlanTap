@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { EventFilters } from "@/lib/event-filters";
+import type { EventFilters } from "@/lib/events-data";
 
 type EventFiltersState = {
   appliedFilters: EventFilters | null;

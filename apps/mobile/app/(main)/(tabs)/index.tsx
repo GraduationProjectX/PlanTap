@@ -13,17 +13,13 @@ import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { EventCard } from "@/components/events/EventCard";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useCategories } from "@/hooks/use-categories";
-import { getCitiesForType } from "@/lib/filters-screen-utils";
+import { getCityOptions } from "@/lib/filters-screen-utils";
 import { detectCityFromUserLocation } from "@/lib/location-city";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
 const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.length > 0;
-}
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -42,7 +38,7 @@ export default function HomeScreen() {
     isLoading: isEventsLoading,
   } = useEvents();
   const { categories, isLoading: isCategoriesLoading } = useCategories();
-  const cityOptions = getCitiesForType(events ?? [], "both");
+  const cityOptions = getCityOptions(events ?? []);
 
   useEffect(() => {
     if (cityOptions.length === 0) return;
@@ -107,7 +103,7 @@ export default function HomeScreen() {
       event.city,
       ...event.categories,
       ...event.tags,
-    ].filter(isNonEmptyString);
+    ].filter((field): field is string => field != null && field.length > 0);
 
     return fields.some((field) => field.toLowerCase().includes(query));
   };

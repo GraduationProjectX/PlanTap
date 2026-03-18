@@ -96,10 +96,6 @@ function RootLayout() {
 
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
-    // TODO: Download Baloo Bhaijaan 2  or any other font from Google Fonts and uncomment:
-    // "BalooBhaijaan2-Regular": require("../assets/fonts/BalooBhaijaan2-Regular.ttf"),
-    // "BalooBhaijaan2-Medium": require("../assets/fonts/BalooBhaijaan2-Medium.ttf"),
-    // "BalooBhaijaan2-Bold": require("../assets/fonts/BalooBhaijaan2-Bold.ttf"),
   });
 
   useEffect(() => {

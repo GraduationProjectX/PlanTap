@@ -6,7 +6,7 @@ import type { Doc } from "backend/convex/_generated/dataModel";
 import { readCachedData, writeCachedData } from "@/lib/data-cache";
 import { STORAGE_KEYS } from "@/storage/keys";
 
-type RawCategoryDoc = Partial<Doc<"categories">> & { id?: string };
+type RawCategoryDoc = Doc<"categories">;
 
 export type CategoryDoc = {
   key: string;
@@ -19,26 +19,21 @@ export type CategoryDoc = {
 const CATEGORIES_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function normalizeCategory(doc: RawCategoryDoc): CategoryDoc | null {
-  const key =
-    typeof doc.key === "string" && doc.key.length > 0
-      ? doc.key
-      : typeof doc.id === "string" && doc.id.length > 0
-        ? doc.id
-        : null;
+  const key = doc.key;
 
-  if (!key) {
+  if (key.length === 0) {
     return null;
   }
 
-  const label = typeof doc.label === "string" && doc.label.length > 0 ? doc.label : key;
-  const labelAr = typeof doc.labelAr === "string" && doc.labelAr.length > 0 ? doc.labelAr : label;
+  const label = doc.label.length > 0 ? doc.label : key;
+  const labelAr = doc.labelAr.length > 0 ? doc.labelAr : label;
 
   return {
     key,
     label,
     labelAr,
-    icon: typeof doc.icon === "string" && doc.icon.length > 0 ? doc.icon : "circle",
-    sortOrder: typeof doc.sortOrder === "number" ? doc.sortOrder : Number.MAX_SAFE_INTEGER,
+    icon: doc.icon.length > 0 ? doc.icon : "circle",
+    sortOrder: doc.sortOrder,
   };
 }
 
@@ -76,21 +71,21 @@ export function useCategories() {
   }
 
   const rawCategories: RawCategoryDoc[] | undefined = useQuery(api.categories.categoriesList);
-  const liveCategories = rawCategories === undefined ? null : normalizeCategories(rawCategories);
+  const normalizedCategories =
+    rawCategories === undefined ? undefined : normalizeCategories(rawCategories);
 
   useEffect(() => {
-    if (rawCategories === undefined) {
+    if (normalizedCategories === undefined) {
       return;
     }
 
-    const normalizedCategories = normalizeCategories(rawCategories);
     writeCachedData(STORAGE_KEYS.CATEGORIES_CACHE, normalizedCategories);
     cachedCategoriesRef.current = normalizedCategories;
-  }, [rawCategories]);
+  }, [normalizedCategories]);
 
-  const categories = liveCategories ?? cachedCategoriesRef.current ?? [];
-  const isLoading = liveCategories === null && cachedCategoriesRef.current === null;
-  const isRefreshing = liveCategories === null && cachedCategoriesRef.current !== null;
+  const categories = normalizedCategories ?? cachedCategoriesRef.current ?? [];
+  const isLoading = normalizedCategories === undefined && cachedCategoriesRef.current === null;
+  const isRefreshing = normalizedCategories === undefined && cachedCategoriesRef.current !== null;
 
   return { categories, isLoading, isRefreshing };
 }

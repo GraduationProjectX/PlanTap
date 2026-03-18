@@ -1,6 +1,6 @@
 import type { EventDoc } from "@/hooks/use-events";
 import type { CategoryDoc } from "@/hooks/use-categories";
-import type { FilterType } from "@/lib/event-filters";
+import type { FilterType } from "@/lib/events-data";
 
 export type FilterOption = { id: string; label: string };
 
@@ -27,7 +27,10 @@ function uniqueSorted(values: string[]): string[] {
   return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b));
 }
 
-export function getCategoryLabelByIdMap(categories: CategoryDoc[], isArabic: boolean): Record<string, string> {
+export function getCategoryLabelByIdMap(
+  categories: CategoryDoc[],
+  isArabic: boolean,
+): Record<string, string> {
   const categoryLabelById: Record<string, string> = {};
 
   for (const category of categories) {
@@ -42,12 +45,11 @@ export function getCategoryLabelByIdMap(categories: CategoryDoc[], isArabic: boo
 }
 
 export function getCategoryIdsForType(events: EventDoc[], type: FilterType): string[] {
-  const filtered =
-    type === "both" ? events : events.filter((e) => e.type === type);
+  const filtered = type === "both" ? events : events.filter((e) => e.type === type);
   return uniqueSorted(filtered.flatMap((e) => e.categories));
 }
 
-export function getCitiesForType(events: EventDoc[], _type: FilterType): string[] {
+export function getCityOptions(events: EventDoc[]): string[] {
   const eventCities = uniqueSorted(events.map((e) => e.city));
   return uniqueSorted([...SUPPORTED_CITIES, ...eventCities]);
 }

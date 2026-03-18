@@ -5,7 +5,7 @@ import type { CategoryDoc } from "@/hooks/use-categories";
 import {
   getCategoryIdsForType,
   getCategoryLabelByIdMap,
-  getCitiesForType,
+  getCityOptions,
   toggleValue,
   type FilterOption,
 } from "@/lib/filters-screen-utils";
@@ -14,7 +14,7 @@ import {
   type EventFilters,
   type FilterDate,
   type FilterType,
-} from "@/lib/event-filters";
+} from "@/lib/events-data";
 
 type UseFiltersDraftArgs = {
   initialFilters: EventFilters | null;
@@ -35,7 +35,12 @@ type UseFiltersDraftResult = {
   clearAll: () => void;
 };
 
-export function useFiltersDraft({ initialFilters, isArabic, events, categories }: UseFiltersDraftArgs): UseFiltersDraftResult {
+export function useFiltersDraft({
+  initialFilters,
+  isArabic,
+  events,
+  categories,
+}: UseFiltersDraftArgs): UseFiltersDraftResult {
   const [draft, setDraft] = useState<EventFilters>(initialFilters ?? DEFAULT_EVENT_FILTERS);
 
   const categoryLabelById = getCategoryLabelByIdMap(categories, isArabic);
@@ -45,11 +50,11 @@ export function useFiltersDraft({ initialFilters, isArabic, events, categories }
     label: categoryLabelById[id] ?? id,
   }));
 
-  const cityOptions = getCitiesForType(events, draft.type);
+  const cityOptions = getCityOptions(events);
 
   const selectType = (type: FilterType) => {
     const nextCategories = getCategoryIdsForType(events, type);
-    const nextCities = getCitiesForType(events, type);
+    const nextCities = getCityOptions(events);
 
     setDraft((prev) => ({
       ...prev,

@@ -15,10 +15,14 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransition";
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents, type EventDoc, type EventCollections } from "@/hooks/use-events";
-import { applyEventFilters, isDefaultEventFilters, type FilterType } from "@/lib/event-filters";
-import { normalizeEventListType, type EventListType } from "@/lib/event-list-type";
+import {
+  applyEventFilters,
+  isDefaultEventFilters,
+  normalizeEventListType,
+  type EventListType,
+} from "@/lib/events-data";
 import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
-import { getCitiesForType } from "@/lib/filters-screen-utils";
+import { getCityOptions } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
@@ -28,11 +32,10 @@ const COLUMN_GAP = 12;
 const ALL_CITIES_VALUE = "__all_cities__";
 const CITY_OVERLAY_OPACITY_VALUES: [number, number, number] = [0, 1, 0];
 
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.length > 0;
-}
-
-function getEventsForListType(collections: EventCollections | null, type: EventListType): EventDoc[] {
+function getEventsForListType(
+  collections: EventCollections | null,
+  type: EventListType,
+): EventDoc[] {
   if (!collections) return [];
   if (type === "ongoing") return collections.ongoing;
   if (type === "upcoming") return collections.upcoming;
@@ -40,13 +43,6 @@ function getEventsForListType(collections: EventCollections | null, type: EventL
   return collections.all;
 }
 const NON_REMOVABLE_FILTER_TAG_IDS = new Set(["type:both", "category:any", "city:all"]);
-const FILTER_TYPE_BY_EVENT_LIST_TYPE: Record<EventListType, FilterType> = {
-  ongoing: "event",
-  upcoming: "event",
-  activity: "activity",
-  all: "both",
-};
-
 function keyExtractor(item: EventDoc) {
   return item._id;
 }
@@ -84,7 +80,7 @@ export default function ViewAllEventsScreen() {
   const homeSelectedCategory =
     !shouldApplyFilters && categoryParam && categoryParam !== "all" ? categoryParam : undefined;
   const [searchValue, setSearchValue] = useState("");
-  const cityOptions = getCitiesForType(allEvents ?? [], FILTER_TYPE_BY_EVENT_LIST_TYPE[eventType]);
+  const cityOptions = getCityOptions(allEvents ?? []);
   const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
   const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
   const allCitiesLabel = t("filters.allCities");
@@ -124,7 +120,7 @@ export default function ViewAllEventsScreen() {
             event.city,
             ...event.categories,
             ...event.tags,
-          ].filter(isNonEmptyString);
+          ].filter((field): field is string => field != null && field.length > 0);
 
           return fields.some((field) => field.toLowerCase().includes(query));
         });
@@ -136,12 +132,16 @@ export default function ViewAllEventsScreen() {
     categories,
   });
   const visibleFilterSummaryTags = filterSummaryTags.slice(0, 6);
-  const hiddenFilterSummaryCount = Math.max(filterSummaryTags.length - visibleFilterSummaryTags.length, 0);
+  const hiddenFilterSummaryCount = Math.max(
+    filterSummaryTags.length - visibleFilterSummaryTags.length,
+    0,
+  );
   const showFilterSummary = shouldApplyFilters;
   const showCityEmptyState = selectedCity && query.length === 0 && !homeSelectedCategory;
   const homeCategoryLabel = homeSelectedCategory
-    ? (categories.find((item) => item.key === homeSelectedCategory)?.[isArabic ? "labelAr" : "label"] ??
-        homeSelectedCategory)
+    ? (categories.find((item) => item.key === homeSelectedCategory)?.[
+        isArabic ? "labelAr" : "label"
+      ] ?? homeSelectedCategory)
     : null;
   const showHomeCategoryChip = !shouldApplyFilters && !!homeCategoryLabel;
 
@@ -182,12 +182,7 @@ export default function ViewAllEventsScreen() {
 
     return (
       <View style={[styles.itemCell, isRightColumn && styles.itemCellOffset]}>
-        <EventCard
-          event={item}
-          variant="medium"
-          width={cardWidth}
-          onPress={handleEventPress}
-        />
+        <EventCard event={item} variant="medium" width={cardWidth} onPress={handleEventPress} />
       </View>
     );
   };
@@ -203,187 +198,193 @@ export default function ViewAllEventsScreen() {
       }
     >
       <View style={styles.root}>
-      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}> 
-        <Button
-          isIconOnly
-          feedbackVariant="scale"
-          onPress={handleBackPress}
-          style={styles.iconButton}
-        >
-          <FontAwesome
-            name={isRTL ? "chevron-right" : "chevron-left"}
-            size={ICON_SIZES.chevronNav}
-            color={ICON_COLORS.chevronOnDark}
-          />
-        </Button>
-
-        {shouldApplyFilters ? (
-          <View style={styles.searchSlot}>
-            <SearchBar
-              value={searchValue}
-              onChange={setSearchValue}
-              placeholder={t("home.search")}
-              onFilterPress={handleFilterPress}
-              isFilterActive={!!appliedFilters}
-              withHorizontalPadding={false}
+        <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+          <Button
+            isIconOnly
+            feedbackVariant="scale"
+            onPress={handleBackPress}
+            style={styles.iconButton}
+          >
+            <FontAwesome
+              name={isRTL ? "chevron-right" : "chevron-left"}
+              size={ICON_SIZES.chevronNav}
+              color={ICON_COLORS.chevronOnDark}
             />
-          </View>
-        ) : (
-          <View style={[styles.titleAndCitySlot, { flexDirection }]}> 
-            <Text
-              style={[styles.topBarTitle, eventType === "activity" && styles.topBarTitleActivity, { textAlign }]}
-              numberOfLines={1}
-            >
-              {titlePrefixMap[eventType]}
-            </Text>
-            <Select
-              presentation="bottom-sheet"
-              value={{
-                value: selectedCity ?? ALL_CITIES_VALUE,
-                label: selectedCityLabel,
-              }}
-              onValueChange={(option) => {
-                setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
-              }}
-            >
-              <Select.Trigger style={styles.citySelectTrigger}>
-                <View style={[styles.cityRow, { flexDirection }]}> 
-                  <FontAwesome name="map-marker" size={14} color="#FFFFFF" />
-                  <Text style={styles.cityText} numberOfLines={1}>
-                    {selectedCityLabel}
-                  </Text>
-                </View>
-                <Select.TriggerIndicator>
-                  <FontAwesome
-                    name="chevron-down"
-                    size={ICON_SIZES.chevronDisclosure}
-                    color="rgba(255,255,255,0.84)"
-                  />
-                </Select.TriggerIndicator>
-              </Select.Trigger>
+          </Button>
 
-              <Select.Portal>
-                <Select.Overlay
-                  animation={{
-                    opacity: {
-                      value: CITY_OVERLAY_OPACITY_VALUES,
-                    },
-                  }}
-                  style={styles.cityOverlay}
-                />
-                <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
-                  <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                  <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
-                    <View style={styles.cityOptionInner}>
-                      <FontAwesome name="globe" size={16} />
-                      <Select.ItemLabel />
-                    </View>
-                    <Select.ItemIndicator />
-                  </Select.Item>
-                  {cityOptions.map((cityOption) => (
-                    <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+          {shouldApplyFilters ? (
+            <View style={styles.searchSlot}>
+              <SearchBar
+                value={searchValue}
+                onChange={setSearchValue}
+                placeholder={t("home.search")}
+                onFilterPress={handleFilterPress}
+                isFilterActive={!!appliedFilters}
+                withHorizontalPadding={false}
+              />
+            </View>
+          ) : (
+            <View style={[styles.titleAndCitySlot, { flexDirection }]}>
+              <Text
+                style={[
+                  styles.topBarTitle,
+                  eventType === "activity" && styles.topBarTitleActivity,
+                  { textAlign },
+                ]}
+                numberOfLines={1}
+              >
+                {titlePrefixMap[eventType]}
+              </Text>
+              <Select
+                presentation="bottom-sheet"
+                value={{
+                  value: selectedCity ?? ALL_CITIES_VALUE,
+                  label: selectedCityLabel,
+                }}
+                onValueChange={(option) => {
+                  setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
+                }}
+              >
+                <Select.Trigger style={styles.citySelectTrigger}>
+                  <View style={[styles.cityRow, { flexDirection }]}>
+                    <FontAwesome name="map-marker" size={14} color="#FFFFFF" />
+                    <Text style={styles.cityText} numberOfLines={1}>
+                      {selectedCityLabel}
+                    </Text>
+                  </View>
+                  <Select.TriggerIndicator>
+                    <FontAwesome
+                      name="chevron-down"
+                      size={ICON_SIZES.chevronDisclosure}
+                      color="rgba(255,255,255,0.84)"
+                    />
+                  </Select.TriggerIndicator>
+                </Select.Trigger>
+
+                <Select.Portal>
+                  <Select.Overlay
+                    animation={{
+                      opacity: {
+                        value: CITY_OVERLAY_OPACITY_VALUES,
+                      },
+                    }}
+                    style={styles.cityOverlay}
+                  />
+                  <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                    <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                    <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
                       <View style={styles.cityOptionInner}>
-                        <FontAwesome name="building-o" size={16} />
+                        <FontAwesome name="globe" size={16} />
                         <Select.ItemLabel />
                       </View>
                       <Select.ItemIndicator />
                     </Select.Item>
-                  ))}
-                  <View style={{ height: cityModalBottomSpacer }} />
-                </Select.Content>
-              </Select.Portal>
-            </Select>
+                    {cityOptions.map((cityOption) => (
+                      <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                        <View style={styles.cityOptionInner}>
+                          <FontAwesome name="building-o" size={16} />
+                          <Select.ItemLabel />
+                        </View>
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
+                    <View style={{ height: cityModalBottomSpacer }} />
+                  </Select.Content>
+                </Select.Portal>
+              </Select>
+            </View>
+          )}
+
+          {!shouldApplyFilters && <FilterButton onPress={handleFilterPress} isActive={false} />}
+        </View>
+
+        {showHomeCategoryChip && (
+          <View style={styles.homeContextContainer}>
+            <View style={styles.homeCategoryChip}>
+              <FontAwesome name="tag" size={12} color="#FFFFFF" />
+              <Text style={styles.homeCategoryChipText} numberOfLines={1}>
+                {homeCategoryLabel}
+              </Text>
+            </View>
           </View>
         )}
 
-        {!shouldApplyFilters && <FilterButton onPress={handleFilterPress} isActive={false} />}
-      </View>
-
-      {showHomeCategoryChip && (
-        <View style={styles.homeContextContainer}>
-          <View style={styles.homeCategoryChip}>
-            <FontAwesome name="tag" size={12} color="#FFFFFF" />
-            <Text style={styles.homeCategoryChipText} numberOfLines={1}>
-              {homeCategoryLabel}
+        {showFilterSummary && (
+          <View style={styles.filterMetaContainer}>
+            <Text style={styles.resultCountText}>
+              {t("filters.resultsCount", { count: visibleEvents.length })}
             </Text>
-          </View>
-        </View>
-      )}
+            {visibleFilterSummaryTags.length > 0 && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.filterTagsRow}
+              >
+                {visibleFilterSummaryTags.map((tag) => {
+                  if (NON_REMOVABLE_FILTER_TAG_IDS.has(tag.id)) {
+                    return (
+                      <View key={tag.id} style={styles.filterTag}>
+                        <Text style={styles.filterTagText} numberOfLines={1}>
+                          {tag.label}
+                        </Text>
+                      </View>
+                    );
+                  }
 
-      {showFilterSummary && (
-        <View style={styles.filterMetaContainer}>
-          <Text style={styles.resultCountText}>{t("filters.resultsCount", { count: visibleEvents.length })}</Text>
-          {visibleFilterSummaryTags.length > 0 && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterTagsRow}
-            >
-              {visibleFilterSummaryTags.map((tag) => {
-                if (NON_REMOVABLE_FILTER_TAG_IDS.has(tag.id)) {
                   return (
-                    <View key={tag.id} style={styles.filterTag}>
+                    <Pressable
+                      key={tag.id}
+                      onPress={() => handleRemoveFilterTag(tag.id)}
+                      style={styles.filterTag}
+                      accessibilityRole="button"
+                      accessibilityLabel={t("filters.removeFilter")}
+                    >
                       <Text style={styles.filterTagText} numberOfLines={1}>
                         {tag.label}
                       </Text>
-                    </View>
+                      <FontAwesome name="times" size={12} color="#FFF" />
+                    </Pressable>
                   );
-                }
-
-                return (
-                  <Pressable
-                    key={tag.id}
-                    onPress={() => handleRemoveFilterTag(tag.id)}
-                    style={styles.filterTag}
-                    accessibilityRole="button"
-                    accessibilityLabel={t("filters.removeFilter")}
-                  >
-                    <Text style={styles.filterTagText} numberOfLines={1}>
-                      {tag.label}
-                    </Text>
-                    <FontAwesome name="times" size={12} color="#FFF" />
-                  </Pressable>
-                );
-              })}
-              {hiddenFilterSummaryCount > 0 && (
-                <View style={styles.filterTag}>
-                  <Text style={styles.filterTagText}>+{hiddenFilterSummaryCount}</Text>
-                </View>
-              )}
-            </ScrollView>
-          )}
-        </View>
-      )}
-
-      {showFilterSummary && <View style={styles.summarySeparator} />}
-
-      <FlashList
-        data={visibleEvents}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        numColumns={2}
-        getItemType={() => "event-grid-card"}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
-        drawDistance={900}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <FontAwesome
-              name={showCityEmptyState ? "map-marker" : "calendar-times-o"}
-              size={42}
-              color={"gray"}
-            />
-            <Text style={styles.noResultText}>
-              {showCityEmptyState
-                ? t("home.noEventsInCity", { city: selectedCity })
-                : t("home.noResultsFound")}
-            </Text>
-            {showCityEmptyState && (
-              <Text style={styles.emptyHintText}>{t("home.tryAnotherCity")}</Text>
+                })}
+                {hiddenFilterSummaryCount > 0 && (
+                  <View style={styles.filterTag}>
+                    <Text style={styles.filterTagText}>+{hiddenFilterSummaryCount}</Text>
+                  </View>
+                )}
+              </ScrollView>
             )}
           </View>
-        }
-      />
+        )}
+
+        {showFilterSummary && <View style={styles.summarySeparator} />}
+
+        <FlashList
+          data={visibleEvents}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          numColumns={2}
+          getItemType={() => "event-grid-card"}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
+          drawDistance={900}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <FontAwesome
+                name={showCityEmptyState ? "map-marker" : "calendar-times-o"}
+                size={42}
+                color={"gray"}
+              />
+              <Text style={styles.noResultText}>
+                {showCityEmptyState
+                  ? t("home.noEventsInCity", { city: selectedCity })
+                  : t("home.noResultsFound")}
+              </Text>
+              {showCityEmptyState && (
+                <Text style={styles.emptyHintText}>{t("home.tryAnotherCity")}</Text>
+              )}
+            </View>
+          }
+        />
       </View>
     </SkeletonScreenTransition>
   );
@@ -556,4 +557,3 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.font.family.medium,
   },
 }));
-

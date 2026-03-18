@@ -13,7 +13,7 @@ import {
   toLocalDateString,
 } from "@/lib/filters-screen-utils";
 import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
-import type { FilterDate } from "@/lib/event-filters";
+import type { FilterDate } from "@/lib/events-data";
 import { useDirection } from "@/rtl";
 
 import { FilterPill } from "./FilterPill";
@@ -132,7 +132,9 @@ export function FiltersDateSection({
             <BottomSheet.Overlay animation="disabled" />
             <BottomSheet.Content snapPoints={["65%"]} animation="disabled">
               <BottomSheet.Close />
-              <BottomSheet.Title style={styles.sheetTitle}>{t("filters.chooseDatesTitle")}</BottomSheet.Title>
+              <BottomSheet.Title style={styles.sheetTitle}>
+                {t("filters.chooseDatesTitle")}
+              </BottomSheet.Title>
               <BottomSheet.Description style={styles.sheetDesc}>
                 {t("filters.chooseDatesDesc")}
               </BottomSheet.Description>

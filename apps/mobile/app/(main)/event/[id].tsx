@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import Transition from "react-native-screen-transitions";
 import { StyleSheet } from "react-native-unistyles";
 
-import { getEventSharedBoundTag } from "@/lib/event-transition";
+import { getEventSharedBoundTag } from "@/lib/event-ui";
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

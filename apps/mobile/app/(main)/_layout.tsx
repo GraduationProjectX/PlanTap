@@ -3,7 +3,7 @@ import Transition from "react-native-screen-transitions";
 import { createNativeStackNavigator } from "react-native-screen-transitions/native-stack";
 import { useTranslation } from "react-i18next";
 import { useUnistyles } from "react-native-unistyles";
-import { getEventSharedBoundTag } from "@/lib/event-transition";
+import { getEventSharedBoundTag } from "@/lib/event-ui";
 
 const { Navigator } = createNativeStackNavigator();
 const Stack = withLayoutContext(Navigator);

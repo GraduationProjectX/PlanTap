@@ -1,5 +1,6 @@
 import type { CategoryDoc } from "@/hooks/use-categories";
-import type { EventFilters } from "@/lib/event-filters";
+import type { EventFilters } from "@/lib/events-data";
+import { formatRange, getCategoryLabelByIdMap } from "@/lib/filters-screen-utils";
 
 type TranslateFn = (key: string) => string;
 
@@ -15,18 +16,6 @@ export type FilterSummaryTag = {
   label: string;
 };
 
-function formatRange(start?: string, end?: string, locale = "en-US"): string | null {
-  if (!start) return null;
-
-  const formatDate = (value: string) => {
-    const date = new Date(`${value}T12:00:00`);
-    return date.toLocaleDateString(locale, { month: "short", day: "numeric" });
-  };
-
-  if (!end || end === start) return formatDate(start);
-  return `${formatDate(start)} — ${formatDate(end)}`;
-}
-
 export function buildFilterSummaryTags({
   filters,
   t,
@@ -36,10 +25,7 @@ export function buildFilterSummaryTags({
   if (!filters) return [];
 
   const tags: FilterSummaryTag[] = [];
-  const categoryLabelById: Record<string, string> = {};
-  for (const category of categories) {
-    categoryLabelById[category.key] = isArabic ? category.labelAr : category.label;
-  }
+  const categoryLabelById = getCategoryLabelByIdMap(categories, isArabic);
 
   if (filters.type === "event") tags.push({ id: "type:event", label: t("filters.typeEvent") });
   if (filters.type === "activity") {
