@@ -14,7 +14,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { DateBadge } from "@/components/home/DateBadge";
 import { LiveBadge } from "@/components/home/LiveBadge";
 import type { EventDoc } from "@/hooks/use-events";
-import { getEventCardMeta, getEventSharedBoundTag } from "@/lib/event-ui";
+import { getEventCardMeta, getEventSharedBoundTag } from "@/features/events/ui";
 import { useDirection } from "@/rtl";
 
 export type EventCardVariant =

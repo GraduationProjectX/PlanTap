@@ -2,9 +2,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { useDirection } from "@/rtl";
 
 type FiltersTopBarProps = {
@@ -15,6 +14,7 @@ type FiltersTopBarProps = {
 export function FiltersTopBar({ onBack, onClearAll }: FiltersTopBarProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
   const { isRTL, flexDirection } = useDirection();
 
   return (
@@ -35,8 +35,8 @@ export function FiltersTopBar({ onBack, onClearAll }: FiltersTopBarProps) {
           >
             <FontAwesome
               name={isRTL ? "chevron-right" : "chevron-left"}
-              size={ICON_SIZES.chevronNav}
-              color={ICON_COLORS.chevronOnDark}
+              size={theme.icon.sm}
+              color={theme.colors.headerForeground}
             />
           </Pressable>
         </View>

@@ -8,13 +8,13 @@ import {
   getCityOptions,
   toggleValue,
   type FilterOption,
-} from "@/lib/filters-screen-utils";
+} from "@/features/filters/utils";
 import {
   DEFAULT_EVENT_FILTERS,
   type EventFilters,
   type FilterDate,
   type FilterType,
-} from "@/lib/events-data";
+} from "@/features/events/data";
 
 type UseFiltersDraftArgs = {
   initialFilters: EventFilters | null;

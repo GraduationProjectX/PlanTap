@@ -1,5 +1,5 @@
 import type { EventDoc } from "@/hooks/use-events";
-import { toLocalDateString } from "@/lib/filters-screen-utils";
+import { toLocalDateString } from "@/features/filters/utils";
 
 type EventTimeFields = {
   startAt: number | null;

@@ -3,7 +3,7 @@ import { useQuery } from "convex/react";
 import { api } from "backend/convex/_generated/api";
 import type { Doc } from "backend/convex/_generated/dataModel";
 
-import { readCachedData, writeCachedData } from "@/lib/data-cache";
+import { readCachedData, writeCachedData } from "@/utils/data-cache";
 import { STORAGE_KEYS } from "@/storage/keys";
 
 export type EventDoc = Doc<"events">;

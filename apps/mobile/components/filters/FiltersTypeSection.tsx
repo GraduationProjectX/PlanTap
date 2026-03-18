@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import type { FilterType } from "@/lib/events-data";
+import type { FilterType } from "@/features/events/data";
 
 import { FilterPill } from "./FilterPill";
 import { FilterSection } from "./FilterSection";

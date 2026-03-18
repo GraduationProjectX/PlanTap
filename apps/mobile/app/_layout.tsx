@@ -31,7 +31,7 @@ import { UnistylesRuntime } from "react-native-unistyles";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import { convex } from "@/lib/convex";
+import { convex } from "@/services/convex";
 import { useUIStore } from "@/stores/ui-store";
 import { darkTheme, lightTheme } from "@/theme/unistyles";
 import * as Sentry from "@sentry/react-native";

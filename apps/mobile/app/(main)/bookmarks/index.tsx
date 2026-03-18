@@ -3,7 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Button, Tabs } from "heroui-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
@@ -13,8 +13,7 @@ import { BookmarksSkeleton } from "@/components/bookmarks/BookmarksSkeleton";
 import { BookmarkSectionHeader } from "@/components/bookmarks/BookmarkSectionHeader";
 import { useBookmarks } from "@/hooks/use-bookmarks";
 import type { EventDoc } from "@/hooks/use-events";
-import { isEventLiveNow } from "@/lib/events-data";
-import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
+import { isEventLiveNow } from "@/features/events/data";
 import { useDirection } from "@/rtl";
 
 const HOUR = 60 * 60 * 1000;
@@ -203,6 +202,7 @@ export default function BookmarksScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
   const { isRTL } = useDirection();
 
   const [activeTab, setActiveTab] = useState("events");
@@ -337,8 +337,8 @@ export default function BookmarksScreen() {
             >
               <FontAwesome
                 name={isRTL ? "chevron-right" : "chevron-left"}
-                size={ICON_SIZES.chevronNav}
-                color={ICON_COLORS.chevronOnDark}
+                size={theme.icon.sm}
+                color={theme.colors.headerForeground}
               />
             </Button>
 

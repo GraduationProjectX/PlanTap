@@ -3,9 +3,8 @@ import { Select } from "heroui-native";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
 import { useDirection } from "@/rtl";
 
 import { FilterSection } from "./FilterSection";
@@ -49,6 +48,7 @@ export function FiltersCitySection({
   onSelectCity,
 }: FiltersCitySectionProps) {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const { flexDirection } = useDirection();
   const insets = useSafeAreaInsets();
   const cityModalBottomSpacer =
@@ -77,8 +77,8 @@ export function FiltersCitySection({
           <Select.TriggerIndicator animation={CITY_SELECT_INDICATOR_ANIMATION}>
             <FontAwesome
               name="chevron-down"
-              size={ICON_SIZES.chevronDisclosure}
-              color={ICON_COLORS.chevronMuted}
+              size={theme.font.size.base}
+              color={theme.colors.textMuted}
             />
           </Select.TriggerIndicator>
         </Select.Trigger>

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { EventCard } from "@/components/events/EventCard";
 import { EventListSkeleton } from "@/components/events/EventListSkeleton";
@@ -20,10 +20,8 @@ import {
   isDefaultEventFilters,
   normalizeEventListType,
   type EventListType,
-} from "@/lib/events-data";
-import { buildFilterSummaryTags, removeFilterBySummaryTag } from "@/lib/filter-summary";
-import { getCityOptions } from "@/lib/filters-screen-utils";
-import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
+} from "@/features/events/data";
+import { buildFilterSummaryTags, getCityOptions, removeFilterBySummaryTag } from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
@@ -51,6 +49,7 @@ export default function ViewAllEventsScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
   const cityModalBottomSpacer =
     (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
   const { width: screenWidth } = useWindowDimensions();
@@ -207,8 +206,8 @@ export default function ViewAllEventsScreen() {
           >
             <FontAwesome
               name={isRTL ? "chevron-right" : "chevron-left"}
-              size={ICON_SIZES.chevronNav}
-              color={ICON_COLORS.chevronOnDark}
+              size={theme.icon.sm}
+              color={theme.colors.headerForeground}
             />
           </Button>
 
@@ -255,7 +254,7 @@ export default function ViewAllEventsScreen() {
                   <Select.TriggerIndicator>
                     <FontAwesome
                       name="chevron-down"
-                      size={ICON_SIZES.chevronDisclosure}
+                      size={theme.font.size.base}
                       color="rgba(255,255,255,0.84)"
                     />
                   </Select.TriggerIndicator>

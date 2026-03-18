@@ -6,7 +6,7 @@ import {
   getEventTagLabels,
   getTimeRemainingLabel,
   isEventLiveNow,
-} from "@/lib/events-data";
+} from "@/features/events/data";
 
 type EventCardMetaOptions = {
   maxTags?: number;

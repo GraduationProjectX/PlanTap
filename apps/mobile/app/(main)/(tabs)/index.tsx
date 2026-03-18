@@ -13,8 +13,8 @@ import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { EventCard } from "@/components/events/EventCard";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useCategories } from "@/hooks/use-categories";
-import { getCityOptions } from "@/lib/filters-screen-utils";
-import { detectCityFromUserLocation } from "@/lib/location-city";
+import { getCityOptions } from "@/features/filters/utils";
+import { detectCityFromUserLocation } from "@/services/location";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 

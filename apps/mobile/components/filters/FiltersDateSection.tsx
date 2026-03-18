@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import type { DateData } from "react-native-calendars";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import {
   CALENDAR_THEME,
   buildMarkedDates,
   formatRange,
   toLocalDateString,
-} from "@/lib/filters-screen-utils";
-import { ICON_COLORS, ICON_SIZES } from "@/lib/icon-tokens";
-import type { FilterDate } from "@/lib/events-data";
+} from "@/features/filters/utils";
+import type { FilterDate } from "@/features/events/data";
 import { useDirection } from "@/rtl";
 
 import { FilterPill } from "./FilterPill";
@@ -38,6 +37,7 @@ export function FiltersDateSection({
   onConfirmSpecificDates,
 }: FiltersDateSectionProps) {
   const { t, i18n } = useTranslation();
+  const { theme } = useUnistyles();
   const { isRTL, flexDirection } = useDirection();
 
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -122,8 +122,8 @@ export function FiltersDateSection({
 
               <FontAwesome
                 name={isRTL ? "chevron-left" : "chevron-right"}
-                size={ICON_SIZES.chevronDisclosure}
-                color={ICON_COLORS.chevronMuted}
+                size={theme.font.size.base}
+                color={theme.colors.textMuted}
               />
             </Pressable>
           </BottomSheet.Trigger>
