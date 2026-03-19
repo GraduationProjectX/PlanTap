@@ -48,20 +48,21 @@ export default function MainLayout() {
       <Stack.Screen
         name="event/[id]"
         options={({ route }) => {
-          const baseOptions = { headerShown: true, title: "Event" };
           if (!route.params || !("id" in route.params)) {
-            return baseOptions;
+            return { headerShown: false, title: "Event" };
           }
 
           const { id } = route.params;
           const routeId = Array.isArray(id) ? id[0] : id;
           if (!routeId) {
-            return baseOptions;
+            return { headerShown: false, title: "Event" };
           }
 
           return {
-            ...baseOptions,
+            headerShown: false,
+            title: "Event",
             enableTransitions: true,
+            contentStyle: { backgroundColor: "transparent" },
             ...Transition.Presets.SharedXImage({
               sharedBoundTag: getEventSharedBoundTag(`${routeId}`),
             }),

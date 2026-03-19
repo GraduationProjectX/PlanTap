@@ -157,8 +157,9 @@ Each review item should support:
 - [ ] Set `event/[id]` to `headerShown: false`
 - [ ] Keep `gestureEnabled: false`
 - [ ] Keep transition preset scoped to `event/[id]` only
+- [ ] Keep tab home route unchanged (`apps/mobile/app/(main)/(tabs)/index.tsx`) for back transition behavior
 - [ ] Change the shared transition source in `EventCard` so the tag is attached to the lead image region only
-- [ ] Reuse the same shared tag on the detail hero media container
+- [ ] Reuse the same shared tag on the detail hero media container by setting `sharedBoundTag={sharedBoundTag}` on `Transition.View` in `event/[id].tsx`
 
 ### 2. Screen skeleton
 

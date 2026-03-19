@@ -82,19 +82,23 @@ function EventCardComponent({
 
     return (
       <Transition.Pressable
-        sharedBoundTag={sharedBoundTag}
-        collapsable={false}
         onPress={handleCardPress}
         style={[styles.previewCard, isGrid && styles.previewCardGrid]}
       >
         <View style={[styles.previewRow, { flexDirection: isGrid ? "column" : flexDirection }]}> 
           <View style={[styles.previewImageContainer, isGrid && styles.previewImageContainerGrid]}>
-            <Image
-              source={{ uri: event.images[0] }}
-              style={styles.previewImage}
-              contentFit="cover"
-              transition={120}
-            />
+            <Transition.View
+              sharedBoundTag={sharedBoundTag}
+              collapsable={false}
+              style={styles.previewImageShared}
+            >
+              <Image
+                source={{ uri: event.images[0] }}
+                style={styles.previewImage}
+                contentFit="cover"
+                transition={120}
+              />
+            </Transition.View>
             <View style={styles.previewDateBadge}>
               <DateBadge day={meta.dateBadge.day} month={meta.dateBadge.month} />
             </View>
@@ -255,18 +259,22 @@ function EventCardComponent({
   if (variant === "medium") {
     return (
       <Transition.Pressable
-        sharedBoundTag={sharedBoundTag}
-        collapsable={false}
         onPress={handleCardPress}
         style={[styles.mediumContainer, width != null ? { width } : null]}
       >
         <Card style={styles.mediumCard} animation="disable-all" variant="transparent">
-          <Image
-            source={{ uri: event.images[0] }}
-            style={styles.mediumImage}
-            contentFit="cover"
-            transition={120}
-          />
+          <Transition.View
+            sharedBoundTag={sharedBoundTag}
+            collapsable={false}
+            style={styles.mediumMedia}
+          >
+            <Image
+              source={{ uri: event.images[0] }}
+              style={styles.mediumImageFill}
+              contentFit="cover"
+              transition={120}
+            />
+          </Transition.View>
           <View style={styles.mediumOverlay} />
 
           {liveBadgeLabel && (
@@ -475,12 +483,16 @@ const styles = StyleSheet.create((theme) => ({
     borderCurve: "continuous",
     overflow: "hidden",
   },
-  mediumImage: {
+  mediumMedia: {
     position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
+  },
+  mediumImageFill: {
+    width: "100%",
+    height: "100%",
   },
   mediumOverlay: {
     position: "absolute",
@@ -580,6 +592,10 @@ const styles = StyleSheet.create((theme) => ({
     aspectRatio: 1.25,
   },
   previewImage: {
+    width: "100%",
+    height: "100%",
+  },
+  previewImageShared: {
     width: "100%",
     height: "100%",
   },
