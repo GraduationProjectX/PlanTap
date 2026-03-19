@@ -103,6 +103,27 @@
     "remaining": "{{time}} remaining",
     "liveEvent": "LIVE EVENT"
   },
+  "eventDetail": {
+    "about": "About Event",
+    "addToBookmarks": "Add to Bookmarks",
+    "savedToBookmarks": "Saved to Bookmarks",
+    "notFoundTitle": "Event not found",
+    "notFoundDescription": "This event is unavailable or no longer exists.",
+    "more": "More options",
+    "share": "Share",
+    "favorite": "Favorite",
+    "location": "Location",
+    "openInMaps": "Open in Maps",
+    "reviews": "Reviews",
+    "reviewsCount": "{{count}} REVIEWS",
+    "writeReview": "Write Review",
+    "yourRating": "Your rating",
+    "reviewPlaceholder": "Share your experience...",
+    "submitReview": "Submit",
+    "loadMoreReviews": "Load More Reviews",
+    "noReviewsTitle": "No Reviews",
+    "noReviews": "No reviews yet. Be the first to share your experience."
+  },
   "settings": {
     "title": "Settings",
     "appearanceDescription": "Choose how PlanTap looks across the app.",

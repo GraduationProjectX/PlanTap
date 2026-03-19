@@ -103,6 +103,27 @@
     "remaining": "متبقي {{time}}",
     "liveEvent": "مباشر"
   },
+  "eventDetail": {
+    "about": "حول الفعالية",
+    "addToBookmarks": "أضف إلى المحفوظات",
+    "savedToBookmarks": "محفوظة في المحفوظات",
+    "notFoundTitle": "الفعالية غير موجودة",
+    "notFoundDescription": "هذه الفعالية غير متاحة أو لم تعد موجودة.",
+    "more": "خيارات إضافية",
+    "share": "مشاركة",
+    "favorite": "المفضلة",
+    "location": "الموقع",
+    "openInMaps": "فتح في الخريطة",
+    "reviews": "التقييمات",
+    "reviewsCount": "{{count}} تقييم",
+    "writeReview": "اكتب تقييم",
+    "yourRating": "تقييمك",
+    "reviewPlaceholder": "شاركنا تجربتك...",
+    "submitReview": "إرسال",
+    "loadMoreReviews": "عرض المزيد من التقييمات",
+    "noReviewsTitle": "لا توجد تقييمات",
+    "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته."
+  },
   "settings": {
     "title": "الإعدادات",
     "appearanceDescription": "اختر شكل تطبيق PlanTap في جميع الشاشات.",

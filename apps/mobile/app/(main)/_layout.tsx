@@ -62,7 +62,10 @@ export default function MainLayout() {
             headerShown: false,
             title: "Event",
             enableTransitions: true,
-            contentStyle: { backgroundColor: "transparent" },
+            contentStyle: {
+              backgroundColor: "transparent",
+              overflow: "hidden",
+            },
             ...Transition.Presets.SharedXImage({
               sharedBoundTag: getEventSharedBoundTag(`${routeId}`),
             }),

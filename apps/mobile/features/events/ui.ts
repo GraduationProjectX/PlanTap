@@ -21,7 +21,6 @@ export type EventCardMeta = {
   countdownLabel: string | null;
   dateBadge: { day: number; month: string };
   dateLabel: string | null;
-  isActivity: boolean;
   isLive: boolean;
   locationLabel: string;
   remainingLabel: string | null;
@@ -60,7 +59,6 @@ export function getEventCardMeta(
     countdownLabel,
     dateBadge: getDateBadgeParts(event.startAt),
     dateLabel,
-    isActivity,
     isLive,
     locationLabel,
     remainingLabel,

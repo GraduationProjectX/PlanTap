@@ -17,6 +17,13 @@ export const indoorOutdoorValidator = v.union(
   v.literal("mixed"),
   v.literal("unknown"),
 );
+export const reviewRatingValidator = v.union(
+  v.literal(1),
+  v.literal(2),
+  v.literal(3),
+  v.literal(4),
+  v.literal(5),
+);
 
 export const userFields = {
   clerkUserId: v.string(),
@@ -76,6 +83,15 @@ export const bookmarkFields = {
   createdAt: v.number(),
 };
 
+export const reviewFields = {
+  eventId: v.id("events"),
+  userId: v.id("users"),
+  rating: reviewRatingValidator,
+  body: v.string(),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+};
+
 export default defineSchema({
   users: defineTable(userFields).index("by_clerkuserid", ["clerkUserId"]),
 
@@ -96,4 +112,8 @@ export default defineSchema({
   bookmarks: defineTable(bookmarkFields)
     .index("by_userid_and_eventid", ["userId", "eventId"])
     .index("by_userid_and_createdat", ["userId", "createdAt"]),
+
+  reviews: defineTable(reviewFields)
+    .index("by_eventid_and_createdat", ["eventId", "createdAt"])
+    .index("by_userid_and_eventid", ["userId", "eventId"]),
 });

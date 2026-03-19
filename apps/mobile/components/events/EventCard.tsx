@@ -134,18 +134,23 @@ function EventCardComponent({
   if (variant === "bookmark-grid") {
     return (
       <Transition.Pressable
-        sharedBoundTag={sharedBoundTag}
         collapsable={false}
         onPress={handleCardPress}
         style={styles.bookmarkGridCard}
       >
         <View style={styles.bookmarkGridImageContainer}>
-          <Image
-            source={{ uri: event.images[0] }}
-            style={styles.bookmarkGridImage}
-            contentFit="cover"
-            transition={120}
-          />
+          <Transition.View
+            sharedBoundTag={sharedBoundTag}
+            collapsable={false}
+            style={styles.bookmarkGridImageShared}
+          >
+            <Image
+              source={{ uri: event.images[0] }}
+              style={styles.bookmarkGridImage}
+              contentFit="cover"
+              transition={120}
+            />
+          </Transition.View>
           <View style={styles.bookmarkGridOverlay} />
 
           {onBookmark && (
@@ -190,17 +195,22 @@ function EventCardComponent({
   if (variant === "bookmark-hero") {
     return (
       <Transition.Pressable
-        sharedBoundTag={sharedBoundTag}
         collapsable={false}
         onPress={handleCardPress}
         style={styles.bookmarkHeroCard}
       >
-        <Image
-          source={{ uri: event.images[0] }}
-          style={styles.bookmarkHeroImage}
-          contentFit="cover"
-          transition={160}
-        />
+        <Transition.View
+          sharedBoundTag={sharedBoundTag}
+          collapsable={false}
+          style={styles.bookmarkHeroImageShared}
+        >
+          <Image
+            source={{ uri: event.images[0] }}
+            style={styles.bookmarkHeroImage}
+            contentFit="cover"
+            transition={160}
+          />
+        </Transition.View>
         <View style={styles.bookmarkHeroOverlay} />
 
         <View style={[styles.bookmarkHeroTopRow, { flexDirection }]}> 
@@ -330,17 +340,22 @@ function EventCardComponent({
 
   return (
     <Transition.Pressable
-      sharedBoundTag={sharedBoundTag}
       collapsable={false}
       onPress={handleCardPress}
       style={[styles.heroCard, width != null ? { width } : null]}
     >
-      <Image
-        source={{ uri: event.images[0] }}
-        style={styles.heroImage}
-        contentFit="cover"
-        transition={160}
-      />
+      <Transition.View
+        sharedBoundTag={sharedBoundTag}
+        collapsable={false}
+        style={styles.heroImageShared}
+      >
+        <Image
+          source={{ uri: event.images[0] }}
+          style={styles.heroImage}
+          contentFit="cover"
+          transition={160}
+        />
+      </Transition.View>
       <View style={styles.heroOverlay} />
 
       {liveBadgeLabel && (
@@ -393,6 +408,13 @@ const styles = StyleSheet.create((theme) => ({
     overflow: "hidden",
   },
   heroImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  heroImageShared: {
     position: "absolute",
     top: 0,
     left: 0,
@@ -658,6 +680,13 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     bottom: 0,
   },
+  bookmarkHeroImageShared: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   bookmarkHeroOverlay: {
     position: "absolute",
     top: 0,
@@ -730,6 +759,13 @@ const styles = StyleSheet.create((theme) => ({
     position: "relative",
   },
   bookmarkGridImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  bookmarkGridImageShared: {
     position: "absolute",
     top: 0,
     left: 0,

@@ -12,8 +12,8 @@ Build the full event detail screen to match the reference direction:
 - immersive hero image with shared transition from event cards
 - custom overlay controls instead of the native stack header
 - overlapping white detail sheet
-- primary CTA changed to `Open in Google Maps`
-- reviews section replacing chat
+- primary CTA changed to `Add to bookmarks`
+- reviews section t
 - no custom bottom tab recreation inside this route
 
 This document covers only frontend structure, UI tasks, and expected hook contracts so the screen can be implemented cleanly before backend review data is wired up.

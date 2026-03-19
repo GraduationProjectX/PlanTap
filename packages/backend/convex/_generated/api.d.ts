@@ -13,6 +13,7 @@ import type * as categories from "../categories.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 import type * as usersInternal from "../usersInternal.js";
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   events: typeof events;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  reviews: typeof reviews;
   seed: typeof seed;
   users: typeof users;
   usersInternal: typeof usersInternal;

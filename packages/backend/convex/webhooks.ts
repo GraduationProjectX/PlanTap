@@ -101,9 +101,8 @@ export const processClerkEvent = internalMutation({
   handler: async (ctx, { eventId, eventType, receivedAt, data }) => {
     const existing = await ctx.db
       .query("webhookEvents")
-      .withIndex("by_provider_and_eventid", (q) =>
-        q.eq("provider", "clerk").eq("eventId", eventId),
-      )
+      .withIndex("by_provider_and_eventid", (q) => q.eq("provider", "clerk"))
+      .filter((q) => q.eq(q.field("eventId"), eventId))
       .first();
 
     if (existing) {

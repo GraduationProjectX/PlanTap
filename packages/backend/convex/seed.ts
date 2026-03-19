@@ -1,4 +1,4 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation, mutation, type MutationCtx } from "./_generated/server";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -26,6 +26,23 @@ type SeedEvent = {
   favoritesCount: number;
   status: "pending" | "approved" | "rejected";
   rating?: number;
+};
+
+type SeedUser = {
+  clerkUserId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  imageUrl?: string;
+  locale: string;
+};
+
+type SeedReview = {
+  eventTitle: string;
+  userIndex: number;
+  rating: 1 | 2 | 3 | 4 | 5;
+  body: string;
+  hoursAgo: number;
 };
 
 function withEventDefaults(event: SeedEvent) {
@@ -475,6 +492,136 @@ function createSeedEvents(now: number) {
   return seedEvents.map(withEventDefaults);
 }
 
+function createSeedUsers() {
+  const seedUsers: SeedUser[] = [
+    {
+      clerkUserId: "seed-user-sarah",
+      email: "sarah@example.com",
+      firstName: "Sarah",
+      lastName: "J.",
+      locale: "en",
+    },
+    {
+      clerkUserId: "seed-user-marcus",
+      email: "marcus@example.com",
+      firstName: "Marcus",
+      lastName: "L.",
+      locale: "en",
+    },
+    {
+      clerkUserId: "seed-user-elena",
+      email: "elena@example.com",
+      firstName: "Elena",
+      lastName: "K.",
+      locale: "en",
+    },
+    {
+      clerkUserId: "seed-user-james",
+      email: "james@example.com",
+      firstName: "James",
+      lastName: "T.",
+      locale: "en",
+    },
+    {
+      clerkUserId: "seed-user-amira",
+      email: "amira@example.com",
+      firstName: "Amira",
+      lastName: "R.",
+      locale: "en",
+    },
+    {
+      clerkUserId: "seed-user-david",
+      email: "david@example.com",
+      firstName: "David",
+      lastName: "M.",
+      locale: "en",
+    },
+  ];
+
+  return seedUsers.map((user) => ({
+    ...user,
+    imageUrl: user.imageUrl ?? null,
+  }));
+}
+
+function createSeedReviews() {
+  const seedReviews: SeedReview[] = [
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 0,
+      rating: 5,
+      body: "Absolutely incredible atmosphere. The lighting design was next level. Highly recommend catching the live set near the tunnel entrance.",
+      hoursAgo: 48,
+    },
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 1,
+      rating: 4,
+      body: "The art selection was diverse and the sound system was solid. Only docked a star because it got a bit too crowded around midnight.",
+      hoursAgo: 96,
+    },
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 2,
+      rating: 5,
+      body: "Best underground event I've been to this year. The vibe was excellent from start to finish.",
+      hoursAgo: 168,
+    },
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 3,
+      rating: 5,
+      body: "One of the most creative live events I've attended in Riyadh. I would book it again without hesitation.",
+      hoursAgo: 192,
+    },
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 4,
+      rating: 4,
+      body: "Great energy and talented performers. Would love to see more food options next time.",
+      hoursAgo: 240,
+    },
+    {
+      eventTitle: "Summer Jazz Festival",
+      userIndex: 5,
+      rating: 5,
+      body: "Went with friends and we all had an amazing time. Already looking forward to the next edition.",
+      hoursAgo: 288,
+    },
+    {
+      eventTitle: "Street Food Fiesta",
+      userIndex: 0,
+      rating: 5,
+      body: "The food stalls were well curated and the live music made the whole walk feel alive.",
+      hoursAgo: 24,
+    },
+    {
+      eventTitle: "Esports Arena Finals",
+      userIndex: 1,
+      rating: 4,
+      body: "The production value was strong and the fan zone was packed with good side activities.",
+      hoursAgo: 18,
+    },
+    {
+      eventTitle: "Sunset Kayak Session",
+      userIndex: 2,
+      rating: 5,
+      body: "The guides were patient, the route was calm, and sunset on the water was worth it.",
+      hoursAgo: 12,
+    },
+  ];
+
+  return seedReviews;
+}
+
+function roundAverageRating(total: number, count: number) {
+  if (count === 0) {
+    return null;
+  }
+
+  return Math.round((total / count) * 10) / 10;
+}
+
 const seedCategories = [
       { key: "all", label: "All", labelAr: "الكل", icon: "grid", sortOrder: 0 },
       { key: "sports", label: "Sports", labelAr: "رياضة", icon: "sports", sortOrder: 1 },
@@ -487,28 +634,143 @@ const seedCategories = [
       { key: "wellness", label: "Wellness", labelAr: "صحة", icon: "wellness", sortOrder: 8 },
     ];
 
-export const seedEvents = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const existingEvents = await ctx.db.query("events").first();
-    if (existingEvents) {
-      console.log("Events already seeded, skipping.");
-      return;
-    }
+async function seedAllData(ctx: MutationCtx) {
+  const [existingEvents, existingCategories, existingUsers] = await Promise.all([
+    ctx.db.query("events").collect(),
+    ctx.db.query("categories").collect(),
+    ctx.db.query("users").collect(),
+  ]);
 
-    const now = Date.now();
-    const events = createSeedEvents(now);
+  const now = Date.now();
+  const events = createSeedEvents(now);
+  const users = createSeedUsers();
+  const reviews = createSeedReviews();
+  const eventIdsByTitle = new Map<string, (typeof existingEvents)[number]["_id"]>();
+  let seededEventsCount = 0;
+  let seededCategoriesCount = 0;
+  let seededUsersCount = 0;
+  let seededReviewsCount = 0;
 
+  if (existingEvents.length === 0) {
     for (const event of events) {
-      await ctx.db.insert("events", event);
+      const eventId = await ctx.db.insert("events", event);
+      eventIdsByTitle.set(event.title, eventId);
+      seededEventsCount += 1;
     }
+  } else {
+    for (const event of existingEvents) {
+      if (!eventIdsByTitle.has(event.title)) {
+        eventIdsByTitle.set(event.title, event._id);
+      }
+    }
+  }
 
+  if (existingCategories.length === 0) {
     for (const category of seedCategories) {
       await ctx.db.insert("categories", category);
+      seededCategoriesCount += 1;
+    }
+  }
+
+  const existingUsersByClerkId = new Map(existingUsers.map((user) => [user.clerkUserId, user._id]));
+  const userIds: Array<(typeof existingUsers)[number]["_id"]> = [];
+
+  for (const user of users) {
+    const existingUserId = existingUsersByClerkId.get(user.clerkUserId);
+    if (existingUserId) {
+      userIds.push(existingUserId);
+      continue;
     }
 
-    console.log(`Seeded ${events.length} events and ${seedCategories.length} categories.`);
-  },
+    userIds.push(
+      await ctx.db.insert("users", {
+        ...user,
+        createdAt: now,
+        updatedAt: now,
+      }),
+    );
+    seededUsersCount += 1;
+  }
+
+  const availableEventIds = Array.from(eventIdsByTitle.values());
+  const touchedEventIds: Array<(typeof availableEventIds)[number]> = [];
+
+  for (const review of reviews) {
+    const eventId =
+      eventIdsByTitle.get(review.eventTitle) ??
+      availableEventIds[review.userIndex % availableEventIds.length];
+    const userId = userIds[review.userIndex];
+
+    if (!eventId || !userId) {
+      continue;
+    }
+
+    const existingReview = await ctx.db
+      .query("reviews")
+      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("eventId"), eventId))
+      .first();
+
+    if (!existingReview) {
+      const createdAt = now - review.hoursAgo * HOUR;
+      await ctx.db.insert("reviews", {
+        eventId,
+        userId,
+        rating: review.rating,
+        body: review.body,
+        createdAt,
+        updatedAt: createdAt,
+      });
+      seededReviewsCount += 1;
+    }
+
+    if (!touchedEventIds.includes(eventId)) {
+      touchedEventIds.push(eventId);
+    }
+  }
+
+  for (const eventId of touchedEventIds) {
+    const eventReviews = await ctx.db
+      .query("reviews")
+      .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", eventId))
+      .collect();
+    const totals = eventReviews.reduce(
+      (result, review) => ({
+        total: result.total + review.rating,
+        count: result.count + 1,
+      }),
+      { total: 0, count: 0 },
+    );
+    await ctx.db.patch(eventId, {
+      rating: roundAverageRating(totals.total, totals.count),
+    });
+  }
+
+  console.log(
+    `Seeded ${seededEventsCount} events, ${seededCategoriesCount} categories, ${seededUsersCount} users, and ${seededReviewsCount} reviews.`,
+  );
+
+  return {
+    seeded:
+      seededEventsCount > 0 ||
+      seededCategoriesCount > 0 ||
+      seededUsersCount > 0 ||
+      seededReviewsCount > 0,
+    events: seededEventsCount,
+    categories: seededCategoriesCount,
+    users: seededUsersCount,
+    reviews: seededReviewsCount,
+  };
+}
+
+export const seedEvents = internalMutation({
+  args: {},
+  handler: async (ctx) => await seedAllData(ctx),
+});
+
+export const run = mutation({
+  args: {},
+  handler: async (ctx) => await seedAllData(ctx),
 });
 
 
