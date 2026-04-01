@@ -12,6 +12,7 @@ export default defineSchema({
     lastName: v.union(v.string(), v.null()),
     avatarUrl: v.optional(v.union(v.string(), v.null())),
     updatedAt: v.number(),
+    isBanned: v.optional(v.boolean()),
     preferences: v.optional(
       v.object({
         likedTags: v.array(v.string()),
@@ -36,7 +37,7 @@ export default defineSchema({
     descriptionShort: v.optional(v.union(v.string(), v.null())),
     descriptionShortAr: v.optional(v.union(v.string(), v.null())),
     type: v.union(v.literal("event"), v.literal("activity")),
-    cellId: v.number(),
+    cellId: v.string(),
     categories: v.array(v.string()),
     tags: v.array(v.string()),
     startAt: v.optional(v.number()),

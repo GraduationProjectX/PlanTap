@@ -32,7 +32,7 @@ export const listHomeFeed = query({
 export const listNearby = query({
   args: { 
     city: v.string(), 
-    cellId: v.number() 
+    cellId: v.string() 
   },
   handler: async (ctx, args) => {
    
