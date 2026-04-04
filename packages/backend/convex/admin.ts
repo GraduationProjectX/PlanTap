@@ -139,6 +139,33 @@ export const deleteEvent = mutation({
     await ctx.db.delete(args.eventId);
   },
 });
+export const promoteToAdmin = mutation({
+  args: {
+    clerkUserId: v.string(),
+    role: v.optional(v.literal("admin")) 
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const targetedUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", args.clerkUserId))
+      .unique
+
+      if (!targetedUser){
+        throw new Error("not authorized: you are not an admin")
+      }
+      await ctx.db.patch("users", clerkUserId, {role: "admin"});
+  },
+});
+
+export const demoteToAdmin = mutation({
+  args: {
+    clerkUserId: v.string()
+  },
+  handler: async (ctx, args) => {
+
+  },
+});
 
 export const mergeEvents = mutation({
   args: { 

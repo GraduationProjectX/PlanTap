@@ -13,6 +13,7 @@ export default defineSchema({
     avatarUrl: v.optional(v.union(v.string(), v.null())),
     updatedAt: v.number(),
     isBanned: v.optional(v.boolean()),
+    role: v.optional(v.literal("admin")),
     preferences: v.optional(
       v.object({
         likedTags: v.array(v.string()),

@@ -1,6 +1,27 @@
 import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 
+
+async function userFetchHelper(ctx: any){ // added this shit to "simplify" querrying for both current function from clerk and for the getUser ;3
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null
+
+  return await ctx.db
+    .query("users")
+    .withIndex("by_clerk_user_id", (q: any) => q.eq("clerkUserId", identity.subject))
+    .unique();
+
+};
+
+async function getUser(ctx:any){
+  const user = userFetchHelper(ctx);
+  
+  if (!user){
+    throw new Error("Not authorized: you have to log in")
+  }
+  return user;
+}
+
 type ClerkEmailAddress = {
   email_address: string;
   id: string;
@@ -23,10 +44,7 @@ export const current = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
-    return await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", identity.subject))
-      .unique();
+    return await userFetchHelper(ctx);
   },
 });
 
