@@ -26,6 +26,8 @@ import {
   downloadModel,
   cancelDownload,
   deleteModel,
+  isModelDownloaded,
+  modelFilePath,
 } from "@/services/ai/modelDownloader";
 
 const THEME_OPTIONS: AppThemeMode[] = ["system", "light", "dark"];
@@ -175,15 +177,39 @@ function LocalModelSection() {
     isDownloading,
     downloadProgress,
   } = useAiStore();
+  const setDownloadComplete = useAiStore((s) => s.setDownloadComplete);
+
+  const [selectedModelId, setSelectedModelId] = useState(AVAILABLE_MODELS[0].id);
+  const [installed, setInstalled] = useState<Record<string, boolean>>({});
+
+  const selectedModel = AVAILABLE_MODELS.find((m) => m.id === selectedModelId) ?? AVAILABLE_MODELS[0];
+
+  const refreshInstalled = useCallback(async () => {
+    const entries = await Promise.all(
+      AVAILABLE_MODELS.map(async (m) => [m.id, await isModelDownloaded(m.filename)] as const),
+    );
+    setInstalled(Object.fromEntries(entries));
+  }, []);
+
+  useEffect(() => {
+    refreshInstalled();
+  }, [refreshInstalled]);
 
   const handleDownload = useCallback(async () => {
     try {
-      await downloadModel(AVAILABLE_MODELS[0]);
+      await downloadModel(selectedModel);
+      await refreshInstalled();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Download failed";
       Alert.alert("Download Error", msg);
     }
-  }, []);
+  }, [refreshInstalled, selectedModel]);
+
+  const handleUseModel = useCallback(() => {
+    const path = modelFilePath(selectedModel.filename);
+    setDownloadComplete(path);
+    Alert.alert("Local Model", `${selectedModel.label} is now active.`);
+  }, [selectedModel, setDownloadComplete]);
 
   const handleDelete = useCallback(async () => {
     Alert.alert("Delete Model", "Remove the downloaded model?", [
@@ -193,21 +219,47 @@ function LocalModelSection() {
         style: "destructive",
         onPress: async () => {
           try {
-            await deleteModel(AVAILABLE_MODELS[0].filename);
+            await deleteModel(selectedModel.filename);
+            await refreshInstalled();
           } catch {
             Alert.alert("Error", "Failed to delete model.");
           }
         },
       },
     ]);
-  }, []);
+  }, [refreshInstalled, selectedModel]);
+
+  const selectedModelPath = modelFilePath(selectedModel.filename);
+  const selectedModelInstalled = Boolean(installed[selectedModel.id]);
+  const selectedIsActive = localModelPath === selectedModelPath;
 
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Local Model</Text>
-      <Text style={styles.modelInfo}>
-        {AVAILABLE_MODELS[0].label} ({AVAILABLE_MODELS[0].sizeLabel})
-      </Text>
+
+      <View style={styles.modelList}>
+        {AVAILABLE_MODELS.map((model) => {
+          const isSelected = model.id === selectedModelId;
+          const isInstalled = Boolean(installed[model.id]);
+          const isActive = localModelPath === modelFilePath(model.filename);
+
+          return (
+            <Pressable
+              key={model.id}
+              style={[styles.modelRow, isSelected && styles.modelRowSelected]}
+              onPress={() => setSelectedModelId(model.id)}
+            >
+              <View style={styles.modelRowBody}>
+                <Text style={styles.modelRowTitle}>{model.label}</Text>
+                <Text style={styles.modelInfo}>{model.sizeLabel}</Text>
+              </View>
+              <Text style={styles.modelBadge}>
+                {isActive ? "Active" : isInstalled ? "Downloaded" : "Not installed"}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       {isDownloading && (
         <View style={styles.progressContainer}>
@@ -226,16 +278,22 @@ function LocalModelSection() {
         </View>
       )}
 
-      {!isDownloading && !localModelDownloaded && (
+      {!isDownloading && !selectedModelInstalled && (
         <Pressable style={styles.actionBtn} onPress={handleDownload}>
-          <Text style={styles.actionBtnText}>Download Model</Text>
+          <Text style={styles.actionBtnText}>Download Selected Model</Text>
         </Pressable>
       )}
 
-      {localModelDownloaded && (
+      {!isDownloading && selectedModelInstalled && !selectedIsActive && (
+        <Pressable style={styles.actionBtn} onPress={handleUseModel}>
+          <Text style={styles.actionBtnText}>Use Selected Model</Text>
+        </Pressable>
+      )}
+
+      {localModelDownloaded && localModelPath && (
         <View style={styles.modelReady}>
           <Text style={styles.modelReadyText}>
-            Model ready at{"\n"}
+            Active model path{"\n"}
             {localModelPath}
           </Text>
           <Pressable
@@ -245,6 +303,10 @@ function LocalModelSection() {
             <Text style={styles.smallBtnText}>Delete</Text>
           </Pressable>
         </View>
+      )}
+
+      {!localModelDownloaded && selectedModelInstalled && (
+        <Text style={styles.modelInfo}>Selected model is downloaded. Tap "Use Selected Model" to activate it.</Text>
       )}
     </View>
   );
@@ -484,6 +546,39 @@ const styles = StyleSheet.create((theme) => ({
   modelInfo: {
     fontSize: theme.font.size.base,
     fontFamily: theme.font.family.regular,
+    color: theme.colors.textSecondary,
+  },
+  modelList: {
+    gap: theme.spacing.xs,
+  },
+  modelRow: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+  },
+  modelRowSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + "14",
+  },
+  modelRowBody: {
+    flex: 1,
+    gap: 2,
+  },
+  modelRowTitle: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
+    color: theme.colors.text,
+  },
+  modelBadge: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.medium,
     color: theme.colors.textSecondary,
   },
   progressContainer: {

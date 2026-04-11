@@ -13,8 +13,8 @@
     "typecheck": "turbo run typecheck",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "android": "pnpm --filter mobile android",
+    "ios": "pnpm --filter mobile ios"
   },
   "dependencies": {
     "expo": "~55.0.2",

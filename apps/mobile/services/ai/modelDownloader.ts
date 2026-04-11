@@ -129,5 +129,8 @@ export async function deleteModel(filename: string): Promise<void> {
   if (await RNFS.exists(path)) {
     await RNFS.unlink(path);
   }
-  useAiStore.getState().deleteLocalModel();
+  const { localModelPath, deleteLocalModel } = useAiStore.getState();
+  if (localModelPath === path) {
+    deleteLocalModel();
+  }
 }
