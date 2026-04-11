@@ -12,6 +12,8 @@ export default function SuggestScreen() {
   const { t } = useTranslation();
   const { textAlign } = useDirection();
   const provider = useAiStore((s) => s.provider);
+  const localModelDownloaded = useAiStore((s) => s.localModelDownloaded);
+  const localModelPath = useAiStore((s) => s.localModelPath);
   const { eventIds, isLoading, error, recommend, recommendTest } =
     useEventRecommendations();
   const [userNote, setUserNote] = useState("");
@@ -27,6 +29,10 @@ export default function SuggestScreen() {
     : testData.events;
 
   const handleRun = () => {
+    if (provider === "local" && (!localModelDownloaded || !localModelPath)) {
+      return;
+    }
+
     if (useRealData && !convexData.isLoading && convexData.userContext && convexData.events) {
       recommend(convexData.userContext, convexData.events, userNote || undefined);
     } else {
@@ -43,6 +49,14 @@ export default function SuggestScreen() {
       <Text style={[styles.subtitle, { textAlign }]}>
         AI test — provider: {provider}
       </Text>
+
+      {provider === "local" && (!localModelDownloaded || !localModelPath) && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>
+            Local provider is selected, but no model is active. Go to Settings and download/use a local model first.
+          </Text>
+        </View>
+      )}
 
       {/* ---------- Data source toggle ---------- */}
       <View style={styles.toggleRow}>
@@ -112,7 +126,7 @@ export default function SuggestScreen() {
       <Pressable
         style={[styles.btn, isLoading && styles.btnDisabled]}
         onPress={handleRun}
-        disabled={isLoading}
+        disabled={isLoading || (provider === "local" && (!localModelDownloaded || !localModelPath))}
       >
         {isLoading ? (
           <ActivityIndicator color="#fff" size="small" />

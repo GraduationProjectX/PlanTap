@@ -8,13 +8,22 @@ import type {
 } from "../types";
 
 let _ctx: LlamaContext | null = null;
+let _ctxModelPath: string | null = null;
 
 /**
  * Initialise (or re-use) the llama.rn context for the given model file.
  * The first call loads the model into memory which may take a few seconds.
  */
 async function getContext(modelPath: string): Promise<LlamaContext> {
-  if (_ctx) return _ctx;
+  if (_ctx && _ctxModelPath === modelPath) {
+    return _ctx;
+  }
+
+  if (_ctx && _ctxModelPath !== modelPath) {
+    await _ctx.release();
+    _ctx = null;
+    _ctxModelPath = null;
+  }
 
   _ctx = await initLlama({
     model: modelPath,
@@ -22,6 +31,7 @@ async function getContext(modelPath: string): Promise<LlamaContext> {
     n_threads: 4,
     use_mlock: true,
   });
+  _ctxModelPath = modelPath;
   return _ctx;
 }
 
@@ -30,6 +40,7 @@ export async function releaseLocalModel(): Promise<void> {
   if (_ctx) {
     await _ctx.release();
     _ctx = null;
+    _ctxModelPath = null;
   }
 }
 
