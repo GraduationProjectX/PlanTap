@@ -149,21 +149,31 @@ export const promoteToAdmin = mutation({
     const targetedUser = await ctx.db
       .query("users")
       .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", args.clerkUserId))
-      .unique
+      .unique()
 
       if (!targetedUser){
         throw new Error("not authorized: you are not an admin")
       }
-      await ctx.db.patch("users", clerkUserId, {role: "admin"});
+      await ctx.db.patch(targetedUser._id, { role: "admin"});
   },
 });
 
 export const demoteToAdmin = mutation({
   args: {
-    clerkUserId: v.string()
+    clerkUserId: v.string(),
+    role: v.optional(v.literal("admin")) 
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const targetedUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_user_id", (q) => q.eq("clerkUserId", args.clerkUserId))
+      .unique()
 
+      if (!targetedUser){
+        throw new Error("not authorized: you are not an admin")
+      }
+      await ctx.db.patch(targetedUser._id, { role: undefined});
   },
 });
 
