@@ -110,7 +110,6 @@ export default function EventDetailsScreen() {
     try {
       await Share.share({ message: `${shareTitle}\nPlanTap` });
     } catch {
-      // sharing dismissed
     }
   };
 
@@ -156,7 +155,6 @@ export default function EventDetailsScreen() {
 
           <Card animation="disable-all" style={styles.sheetCard}>
             <Card.Body style={styles.sheetBody}>
-              {/* <View style={styles.sheetHandle} /> */}
               <View style={styles.sheetHeader}>
                 <SkeletonGroup.Item style={styles.skeletonTitleLineLg} className="rounded-md" />
                 <SkeletonGroup.Item style={styles.skeletonTitleLineSm} className="rounded-md" />
@@ -336,7 +334,7 @@ export default function EventDetailsScreen() {
               style={styles.primaryAction}
             >
               <FontAwesome
-                name={isBookmarked ? "bookmark" : "bookmark-o"}
+                name={isBookmarked ? "bookmark-o" : "bookmark"}
                 size={16}
                 color={theme.colors.primaryForeground}
               />

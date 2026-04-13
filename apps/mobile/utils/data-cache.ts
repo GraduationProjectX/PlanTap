@@ -66,6 +66,5 @@ export function writeCachedData<T>(key: string, data: T) {
   try {
     storage.set(key, JSON.stringify(envelope));
   } catch {
-    // Ignore persistence errors; keep memory cache alive.
   }
 }

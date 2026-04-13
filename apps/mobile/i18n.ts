@@ -10,7 +10,6 @@ const resources = {
   ar: { translation: ar },
 };
 
-// Get device locale, default to Arabic (primary language)
 const getDeviceLocale = (): string => {
   const locales = Localization.getLocales();
   const deviceLang = locales[0]?.languageCode ?? "ar";
@@ -20,7 +19,7 @@ const getDeviceLocale = (): string => {
 i18n.use(initReactI18next).init({
   resources,
   lng: getDeviceLocale(),
-  fallbackLng: "ar", // Arabic-first as per IMPLEMENTATION-PLAN
+  fallbackLng: "ar",
   interpolation: {
     escapeValue: false,
   },
