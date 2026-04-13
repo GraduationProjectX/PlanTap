@@ -23,7 +23,7 @@ export function FilterSection({
 
   return (
     <View style={styles.section}>
-      <View style={[styles.sectionHead, { flexDirection }]}> 
+      <View style={[styles.sectionHead, { flexDirection }]}>
         <StepNumber value={step} />
         <View style={styles.sectionHeadBody}>
           <Text style={[styles.sectionTitle, { textAlign }]}>{title}</Text>

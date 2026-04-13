@@ -304,4 +304,3 @@ const styles = StyleSheet.create((theme) => ({
     height: theme.spacing.xl,
   },
 }));
-

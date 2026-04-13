@@ -31,6 +31,14 @@ type RawEventReview = {
   createdAt: number;
 };
 
+function toReviewRating(rating: number) {
+  if (rating === 1 || rating === 2 || rating === 3 || rating === 4 || rating === 5) {
+    return rating;
+  }
+
+  return null;
+}
+
 export function useEventReviews(eventId?: EventId) {
   const { i18n } = useTranslation();
   const data = useQuery(api.reviews.getForEvent, eventId ? { eventId } : "skip");
@@ -55,9 +63,14 @@ export function useEventReviews(eventId?: EventId) {
       return;
     }
 
+    const nextRating = toReviewRating(rating);
+    if (!nextRating) {
+      return;
+    }
+
     await upsertReviewMutation({
       eventId,
-      rating,
+      rating: nextRating,
       body: body.trim(),
     });
   };

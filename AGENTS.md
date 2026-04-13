@@ -15,7 +15,7 @@ PlanTap is a monorepo for an Expo (React Native) mobile app and a Convex backend
 - Prefer the smallest safe fix; avoid refactors and unrelated cleanup.
 - Use the smallest possible diff to maket this changes. Then think of how to make it smaller and do that again.
 - No typeof checks.
-- No backwards compat. 
+- No backwards compat.
 - Read the skills installed in this project to follow best practices, Example: if you are working with Convex, read the convex skills in agents/skills. if you are working with React Native UI, read vercel-react-native-skills and building-native-ui. and if you work with React/React Native. Read no-use-effect skill.
 
 ## More docs

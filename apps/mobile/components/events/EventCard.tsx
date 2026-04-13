@@ -85,7 +85,7 @@ function EventCardComponent({
         onPress={handleCardPress}
         style={[styles.previewCard, isGrid && styles.previewCardGrid]}
       >
-        <View style={[styles.previewRow, { flexDirection: isGrid ? "column" : flexDirection }]}> 
+        <View style={[styles.previewRow, { flexDirection: isGrid ? "column" : flexDirection }]}>
           <View style={[styles.previewImageContainer, isGrid && styles.previewImageContainerGrid]}>
             <Transition.View
               sharedBoundTag={sharedBoundTag}
@@ -105,7 +105,7 @@ function EventCardComponent({
           </View>
 
           <View style={[styles.previewInfo, isGrid && styles.previewInfoGrid]}>
-            <View style={[styles.previewTopRow, { flexDirection }]}> 
+            <View style={[styles.previewTopRow, { flexDirection }]}>
               {countdownLabel && (
                 <Chip size="sm" variant="secondary" color="accent" animation="disable-all">
                   <Chip.Label style={styles.previewCountdownText}>{countdownLabel}</Chip.Label>
@@ -119,7 +119,7 @@ function EventCardComponent({
 
             <Text style={[styles.previewCategory, { textAlign }]}>{meta.categoryLabel}</Text>
 
-            <View style={[styles.previewLocationRow, { flexDirection }]}> 
+            <View style={[styles.previewLocationRow, { flexDirection }]}>
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={[styles.previewLocationText, { textAlign }]} numberOfLines={2}>
                 {meta.locationLabel}
@@ -213,7 +213,7 @@ function EventCardComponent({
         </Transition.View>
         <View style={styles.bookmarkHeroOverlay} />
 
-        <View style={[styles.bookmarkHeroTopRow, { flexDirection }]}> 
+        <View style={[styles.bookmarkHeroTopRow, { flexDirection }]}>
           {onBookmark && (
             <RNPressable
               onPress={handleBookmarkPress}
@@ -255,7 +255,7 @@ function EventCardComponent({
           <Text style={[styles.heroTitle, { textAlign }]} numberOfLines={2}>
             {event.title}
           </Text>
-          <View style={[styles.heroLocationRow, { flexDirection }]}> 
+          <View style={[styles.heroLocationRow, { flexDirection }]}>
             <Text style={styles.locationIcon}>📍</Text>
             <Text style={[styles.heroLocationText, { textAlign }]} numberOfLines={1}>
               {meta.locationLabel}
@@ -294,14 +294,14 @@ function EventCardComponent({
           )}
 
           <Card.Body style={styles.mediumContent}>
-            <View style={[styles.mediumLocationRow, { flexDirection }]}> 
+            <View style={[styles.mediumLocationRow, { flexDirection }]}>
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={[styles.mediumLocationText, { textAlign }]} numberOfLines={1}>
                 {meta.locationLabel}
               </Text>
             </View>
 
-            <View style={[styles.mediumTitleRow, { flexDirection }]}> 
+            <View style={[styles.mediumTitleRow, { flexDirection }]}>
               <Text style={[styles.mediumTitle, { textAlign }]} numberOfLines={3}>
                 {event.title}
               </Text>
@@ -317,7 +317,7 @@ function EventCardComponent({
             </View>
 
             {meta.tagLabels.length > 0 && (
-              <View style={[styles.mediumTagsContainer, { flexDirection }]}> 
+              <View style={[styles.mediumTagsContainer, { flexDirection }]}>
                 {meta.tagLabels.map((tag) => (
                   <Chip
                     key={`${event._id}-${tag}`}
@@ -365,13 +365,13 @@ function EventCardComponent({
       )}
 
       <View style={styles.heroContent}>
-        <View style={[styles.heroLocationRow, { flexDirection }]}> 
+        <View style={[styles.heroLocationRow, { flexDirection }]}>
           <Text style={styles.locationIcon}>📍</Text>
           <Text style={[styles.heroLocationText, { textAlign }]} numberOfLines={1}>
             {meta.locationLabel}
           </Text>
         </View>
-        <View style={[styles.heroTitleRow, { flexDirection }]}> 
+        <View style={[styles.heroTitleRow, { flexDirection }]}>
           <Text style={[styles.heroTitle, { textAlign }]} numberOfLines={1}>
             {event.title}
           </Text>
@@ -381,7 +381,7 @@ function EventCardComponent({
         </View>
 
         {meta.tagLabels.length > 0 && (
-          <View style={[styles.heroTagsContainer, { flexDirection }]}> 
+          <View style={[styles.heroTagsContainer, { flexDirection }]}>
             {meta.tagLabels.map((tag) => (
               <View key={`${event._id}-${tag}`} style={styles.heroTagChip}>
                 <Text style={styles.heroTagText}>{tag}</Text>
@@ -836,4 +836,3 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
 }));
-

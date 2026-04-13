@@ -45,4 +45,3 @@ const styles = StyleSheet.create((theme) => ({
 function Separator() {
   return <View style={styles.separator} />;
 }
-

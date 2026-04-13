@@ -15,7 +15,7 @@ export function FiltersSkeleton({ topInset = 92 }: FiltersSkeletonProps) {
   return (
     <View style={styles.root}>
       <SkeletonGroup isLoading isSkeletonOnly>
-        <View style={[styles.content, { paddingTop: topInset + insets.top }]}> 
+        <View style={[styles.content, { paddingTop: topInset + insets.top }]}>
           {Array.from({ length: SECTION_COUNT }).map((_, sectionIndex) => (
             <View key={`filters-skeleton-section-${sectionIndex}`} style={styles.section}>
               <View style={styles.sectionHead}>

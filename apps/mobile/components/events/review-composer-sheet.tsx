@@ -1,7 +1,7 @@
 import { BottomSheet, Button, TextArea } from "heroui-native";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { StarRating } from "@/components/events/star-rating";
 import { useDirection } from "@/rtl";
@@ -28,7 +28,6 @@ export function ReviewComposerSheet({
   isPending,
 }: ReviewComposerSheetProps) {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const { textAlign } = useDirection();
 
   return (
