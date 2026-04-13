@@ -47,9 +47,9 @@ const tokens = {
       base: 14, // Body text, buttons
       lg: 16, // Body large, H3 headings, input text
       xl: 18, // H2 headings, card titles
-      "2xl": 20, // H1 headings, section titles
-      "3xl": 28, // Display text
-      "4xl": 36, // Large display
+      xxl: 20, // H1 headings, section titles
+      xxxl: 28, // Display text
+      xxxxl: 36, // Large display
     },
     lineHeight: {
       tight: 1.125, // 12px text
@@ -140,7 +140,7 @@ const tokens = {
     popover: 1500,
     toast: 1600,
   },
-} as const;
+};
 
 // Light theme colors (extracted from Figma)
 const lightTheme = {
@@ -181,9 +181,9 @@ const lightTheme = {
     live: "#FFFFFF", // White dot for "live" status
 
     // UI elements
-    border: "#F5F5F5", // Card borders
-    borderStrong: "#E5E5E5", // Stronger borders
-    divider: "#F5F5F5",
+    border: "#DEDEDE", // Card borders
+    borderStrong: "#BDBDBD", // Stronger borders
+    divider: "#CECECE",
 
     // Overlays
     overlay: "rgba(0, 0, 0, 0.5)",
@@ -209,7 +209,7 @@ const lightTheme = {
     skeleton: "#E5E5E5",
     skeletonHighlight: "#F5F5F5",
   },
-} as const;
+};
 
 // Dark theme colors
 const darkTheme = {
@@ -250,9 +250,9 @@ const darkTheme = {
     live: "#FFFFFF",
 
     // UI elements
-    border: "#262626",
-    borderStrong: "#404040",
-    divider: "#262626",
+    border: "#454545",
+    borderStrong: "#757575",
+    divider: "#4A4A4A",
 
     // Overlays
     overlay: "rgba(0, 0, 0, 0.7)",
@@ -278,7 +278,7 @@ const darkTheme = {
     skeleton: "#262626",
     skeletonHighlight: "#404040",
   },
-} as const;
+};
 
 // Breakpoints for responsive design (based on common device widths)
 const breakpoints = {
@@ -286,7 +286,7 @@ const breakpoints = {
   sm: 390, // iPhone 14/15
   md: 428, // iPhone 14/15 Plus, Pro Max
   lg: 768, // Tablets (disabled but kept for future)
-} as const;
+};
 
 // Define theme types
 type AppThemes = {

@@ -1,6 +1,9 @@
 // Theme configuration - must be imported before any styled components
 import "@/theme/unistyles";
 
+// Uniwind / HeroUI Native styles
+import "../global.css";
+
 // i18n configuration
 import "@/i18n";
 
@@ -9,7 +12,12 @@ import { initializeRTL } from "@/rtl";
 initializeRTL();
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+  type Theme as NavigationTheme,
+} from "@react-navigation/native";
 import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
 import { Stack, useNavigationContainerRef } from "expo-router";
@@ -17,10 +25,15 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { HeroUINativeProvider } from "heroui-native";
+import { UnistylesRuntime } from "react-native-unistyles";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import { convex } from "@/lib/convex";
+import { convex } from "@/services/convex";
+import { useUIStore } from "@/stores/ui-store";
+import { darkTheme, lightTheme } from "@/theme/unistyles";
 import * as Sentry from "@sentry/react-native";
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -51,20 +64,62 @@ Sentry.init({
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+const navigationLightTheme: NavigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: lightTheme.colors.primary,
+    background: lightTheme.colors.background,
+    card: lightTheme.colors.surface,
+    text: lightTheme.colors.text,
+    border: lightTheme.colors.border,
+    notification: lightTheme.colors.error,
+  },
+};
+
+const navigationDarkTheme: NavigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: darkTheme.colors.primary,
+    background: darkTheme.colors.background,
+    card: darkTheme.colors.surface,
+    text: darkTheme.colors.text,
+    border: darkTheme.colors.border,
+    notification: darkTheme.colors.error,
+  },
+};
+
 function RootLayout() {
-  const colorScheme = useColorScheme();
+  const systemColorScheme = useColorScheme();
+  const themeMode = useUIStore((state) => state.themeMode);
 
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
-    // TODO: Download Baloo Bhaijaan 2  or any other font from Google Fonts and uncomment:
-    // "BalooBhaijaan2-Regular": require("../assets/fonts/BalooBhaijaan2-Regular.ttf"),
-    // "BalooBhaijaan2-Medium": require("../assets/fonts/BalooBhaijaan2-Medium.ttf"),
-    // "BalooBhaijaan2-Bold": require("../assets/fonts/BalooBhaijaan2-Bold.ttf"),
   });
 
   useEffect(() => {
     if (error) throw error;
   }, [error]);
+
+  const resolvedThemeName =
+    themeMode === "system" ? (systemColorScheme === "dark" ? "dark" : "light") : themeMode;
+
+  useEffect(() => {
+    if (themeMode === "system") {
+      UnistylesRuntime.setAdaptiveThemes(true);
+      return;
+    }
+
+    UnistylesRuntime.setAdaptiveThemes(false);
+    UnistylesRuntime.setTheme(themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    UnistylesRuntime.setRootViewBackgroundColor(
+      resolvedThemeName === "dark" ? darkTheme.colors.background : lightTheme.colors.background,
+    );
+  }, [resolvedThemeName]);
 
   if (!loaded) {
     return null;
@@ -76,13 +131,17 @@ function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          <RootNavigator />
-        </ConvexProviderWithClerk>
-      </ClerkProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}>
+        <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+            <HeroUINativeProvider>
+              <RootNavigator />
+            </HeroUINativeProvider>
+          </ConvexProviderWithClerk>
+        </ClerkProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -115,6 +174,8 @@ function RootNavigator() {
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
+
+      <Stack.Screen name="sso-callback" />
 
       <Stack.Screen name="+not-found" options={{ headerShown: true }} />
     </Stack>

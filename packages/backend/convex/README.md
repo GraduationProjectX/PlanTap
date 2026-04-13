@@ -6,7 +6,7 @@ This directory contains the Convex backend source for PlanTap.
 
 - `schema.ts`: database schema
 - `*.ts` function files: queries, mutations, actions, HTTP handlers
-- `_generated/`: Convex generated types and API bindings
+- `_generated/`: Convex generated types and API bindings (tracked in git)
 
 ## Local development
 

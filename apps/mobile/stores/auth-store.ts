@@ -10,8 +10,6 @@ export type AuthUserCache = {
 type AuthState = {
   user: AuthUserCache | null;
   isSignedIn: boolean;
-  // Hydration means the app is still loading and the local data didnt load yet. we can use _hasHydrated
-  // in the UI files to load skeleton or loading screen when the app run, instead of loading old data.
   _hasHydrated: boolean;
   setUser: (user: AuthUserCache | null) => void;
   setSignedIn: (value: boolean, user?: AuthUserCache) => void;
@@ -19,11 +17,12 @@ type AuthState = {
   _setHasHydrated: (value: boolean) => void;
 };
 
-const initialAuthState = {
-  user: null as AuthUserCache | null,
-  isSignedIn: false,
-  _hasHydrated: false,
-};
+const initialAuthState: { user: AuthUserCache | null; isSignedIn: boolean; _hasHydrated: boolean } =
+  {
+    user: null,
+    isSignedIn: false,
+    _hasHydrated: false,
+  };
 
 export const useAuthStore = create<AuthState>()(
   persist(

@@ -26,5 +26,5 @@ pnpm run dev
 
 ## Notes
 
-- `convex/` contains Convex code and `_generated/` types.
+- `convex/` contains Convex code and `_generated/` types (tracked in git).
 - Local Convex env/config lives in `.env.local` (ignored).

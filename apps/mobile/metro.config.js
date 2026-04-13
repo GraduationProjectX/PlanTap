@@ -1,5 +1,6 @@
 const path = require("path");
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
+const { withUniwindConfig } = require("uniwind/metro");
 
 // Monorepo metro config
 //
@@ -26,4 +27,6 @@ config.resolver.extraNodeModules = {
   "react-native": path.resolve(workspaceRoot, "node_modules/react-native"),
 };
 
-module.exports = config;
+module.exports = withUniwindConfig(config, {
+  cssEntryFile: "./global.css",
+});

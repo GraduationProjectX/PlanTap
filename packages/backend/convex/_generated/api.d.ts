@@ -8,9 +8,16 @@
  * @module
  */
 
+import type * as bookmarks from "../bookmarks.js";
+import type * as categories from "../categories.js";
+import type * as events from "../events.js";
 import type * as http from "../http.js";
-import type * as placeholder from "../placeholder.js";
+import type * as lib_auth from "../lib/auth.js";
+import type * as reviews from "../reviews.js";
+import type * as seed from "../seed.js";
 import type * as users from "../users.js";
+import type * as usersInternal from "../usersInternal.js";
+import type * as webhooks from "../webhooks.js";
 
 import type {
   ApiFromModules,
@@ -19,9 +26,16 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  bookmarks: typeof bookmarks;
+  categories: typeof categories;
+  events: typeof events;
   http: typeof http;
-  placeholder: typeof placeholder;
+  "lib/auth": typeof lib_auth;
+  reviews: typeof reviews;
+  seed: typeof seed;
   users: typeof users;
+  usersInternal: typeof usersInternal;
+  webhooks: typeof webhooks;
 }>;
 
 /**

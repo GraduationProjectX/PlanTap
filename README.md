@@ -55,29 +55,7 @@ pnpm --filter mobile android
 
 > **First run takes 5-10 minutes** as it builds the native Android project.
 
----
 
-## 📁 Project Structure
-
-```
-PlanTap/
-├── apps/
-│   └── mobile/          # 📱 Expo React Native app
-│       ├── app/         # Expo Router screens
-│       ├── components/  # Reusable UI components
-│       ├── theme/       # Unistyles design system
-│       ├── locales/     # i18n translations (ar, en)
-│       └── android/     # Native Android project (generated)
-├── packages/
-│   ├── backend/         # ⚙️ Convex backend
-│   └── shared/          # 📦 Shared types & utilities
-├── turbo.json           # Turborepo configuration
-├── package.json         # Root workspace config
-├── pnpm-workspace.yaml  # Workspace config
-└── pnpm-lock.yaml       # Lockfile
-```
-
----
 
 ## 📜 Available Scripts
 
