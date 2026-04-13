@@ -124,6 +124,16 @@
     "noReviewsTitle": "No Reviews",
     "noReviews": "No reviews yet. Be the first to share your experience."
   },
+  "map": {
+    "showDetails": "Show Details",
+    "myLocation": "My Location",
+    "allCategories": "All",
+    "markerEvent": "Event",
+    "markerActivity": "Activity",
+    "empty": "No events or activities match this category.",
+    "setupTitle": "Map setup needed",
+    "setupDescription": "Add EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN to load the map."
+  },
   "settings": {
     "title": "Settings",
     "appearanceDescription": "Choose how PlanTap looks across the app.",

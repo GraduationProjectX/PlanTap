@@ -170,7 +170,6 @@
 - [x] Create horizontal section component
 - [x] Create event poster card component
 - [x] Integrate FlashList for horizontal scrolling
-- [ ] Add pull-to-refresh
 - [x] Add loading skeletons
 - [x] Add empty states per section
 - [x] Implement filter modal

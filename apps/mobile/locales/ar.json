@@ -124,6 +124,16 @@
     "noReviewsTitle": "لا توجد تقييمات",
     "noReviews": "لا توجد تقييمات بعد. كن أول من يشارك تجربته."
   },
+  "map": {
+    "showDetails": "عرض التفاصيل",
+    "myLocation": "موقعي",
+    "allCategories": "الكل",
+    "markerEvent": "فعالية",
+    "markerActivity": "نشاط",
+    "empty": "لا توجد فعاليات أو أنشطة ضمن هذه الفئة.",
+    "setupTitle": "يلزم إعداد الخريطة",
+    "setupDescription": "أضف EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN لتشغيل الخريطة."
+  },
   "settings": {
     "title": "الإعدادات",
     "appearanceDescription": "اختر شكل تطبيق PlanTap في جميع الشاشات.",

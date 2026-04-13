@@ -17,14 +17,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "backend": "workspace:*",
     "@clerk/clerk-expo": "^2.19.21",
     "@expo/metro-runtime": "~55.0.6",
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5.2.8",
     "@react-navigation/native": "^7.1.8",
+    "@rnmapbox/maps": "^10.3.0",
     "@sentry/react-native": "~7.11.0",
     "@shopify/flash-list": "^2.2.3",
+    "backend": "workspace:*",
     "convex": "^1.33.1",
     "expo": "~55.0.2",
     "expo-constants": "~55.0.7",

@@ -31,6 +31,8 @@ type EventCardProps = {
   event: EventDoc;
   variant: EventCardVariant;
   width?: number;
+  height?: number;
+  marginBottom?: number;
   onPress: (id: EventId) => void;
   onBookmark?: (id: EventId) => void;
   isBookmarked?: boolean;
@@ -42,6 +44,8 @@ function EventCardComponent({
   event,
   variant,
   width,
+  height,
+  marginBottom,
   onPress,
   onBookmark,
   isBookmarked,
@@ -270,7 +274,12 @@ function EventCardComponent({
     return (
       <Transition.Pressable
         onPress={handleCardPress}
-        style={[styles.mediumContainer, width != null ? { width } : null]}
+        style={[
+          styles.mediumContainer,
+          width != null ? { width } : null,
+          height != null ? { height } : null,
+          marginBottom != null ? { marginBottom } : null,
+        ]}
       >
         <Card style={styles.mediumCard} animation="disable-all" variant="transparent">
           <Transition.View
