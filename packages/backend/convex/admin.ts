@@ -1,4 +1,4 @@
-import { query, mutation, action } from "./_generated/server";
+import { query, mutation, action, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 
@@ -311,5 +311,15 @@ export const closeFeedback = mutation({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     await ctx.db.patch(args.feedbackId, { status: "closed" });
+  },
+});
+
+// ===========================================
+
+// for scraper to actually add new events or stuff to the db ;D
+export const ingestEventInternal = internalMutation({
+  args: {eventData: v.any()},
+  handler: async (ctx, args) => {
+    await ctx.runMutation((api as any).admin.createEvent, args.eventData);
   },
 });

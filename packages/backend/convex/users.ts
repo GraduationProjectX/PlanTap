@@ -13,7 +13,7 @@ async function userFetchHelper(ctx: any){ // added this shit to "simplify" querr
 
 };
 
-async function getUser(ctx:any){
+export async function getUser(ctx:any){
   const user = userFetchHelper(ctx);
   
   if (!user){
@@ -73,12 +73,13 @@ export const addOrUpdateUser = internalMutation({
     const patch = {
       clerkUserId: userData.id,
       email: getPrimaryEmail(userData),
+      displayName: userData.first_name || "New User",
       firstName: userData.first_name ?? null,
       lastName: userData.last_name ?? null,
-      imageUrl: userData.image_url ?? null,
-      locale: null,
+      avatarUrl: userData.image_url ?? null,
+      locale: "en",
       updatedAt: now,
-    };
+    }as any; // i gave up, there is an error if i remove "as any" that would make the patch object error out with a type mismatch, its either this or i remove the patch and just write the changes with a function for each value
 
     const existUser = await ctx.db
       .query("users")
@@ -86,14 +87,11 @@ export const addOrUpdateUser = internalMutation({
       .unique();
 
     if (existUser) {
-      await ctx.db.patch(existUser._id, patch);
+      await ctx.db.patch(existUser._id, patch); // here is where id make the changes from patch object to just assigning each value into the updated values ex: instead of passing patch id pass firstName: userData.first_name
       return existUser._id;
     }
 
-    return await ctx.db.insert("users", {
-      ...patch,
-      createdAt: now,
-    });
+    return await ctx.db.insert("users", patch) // removed createdAt since convex adds it
   },
 });
 
