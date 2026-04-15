@@ -7,7 +7,7 @@ import {
 } from "@rnmapbox/maps";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image as ExpoImage } from "expo-image";
-import { type ElementRef, useRef, useState } from "react";
+import { type ElementRef, useMemo, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import {
@@ -31,6 +31,7 @@ type MapMarkersProps = {
   isArabic: boolean;
   onMarkerPress: (eventId: string) => void;
   primaryColor: string;
+  selectedAccentColor: string;
   selectedEventId?: string;
   textColor: string;
   visibleEvents: EventDoc[];
@@ -57,6 +58,7 @@ export function MapMarkers({
   isArabic,
   onMarkerPress,
   primaryColor,
+  selectedAccentColor,
   selectedEventId,
   textColor,
   visibleEvents,
@@ -64,17 +66,21 @@ export function MapMarkers({
   const markerImageRefs = useRef<Record<string, ElementRef<typeof MapboxImage> | null>>({});
   const shapeSourceRef = useRef<ShapeSource>(null);
   const [failedMarkerImages, setFailedMarkerImages] = useState<Record<string, true>>({});
-  const markerThumbnailEvents = visibleEvents.filter((event) => {
-    return event.images[0] && !failedMarkerImages[event._id];
-  });
+  const markerThumbnailEvents = useMemo(() => {
+    return visibleEvents.filter((event) => {
+      return event.images[0] && !failedMarkerImages[event._id];
+    });
+  }, [visibleEvents, failedMarkerImages]);
 
-  const markerFeatures = getMarkerFeatures(
-    visibleEvents,
-    isArabic,
-    eventTypeLabel,
-    activityTypeLabel,
-    failedMarkerImages,
-  );
+  const markerFeatures = useMemo(() => {
+    return getMarkerFeatures(
+      visibleEvents,
+      isArabic,
+      eventTypeLabel,
+      activityTypeLabel,
+      failedMarkerImages,
+    );
+  }, [visibleEvents, isArabic, eventTypeLabel, activityTypeLabel, failedMarkerImages]);
 
   const handleMarkersPress = async (event: { features: Array<GeoJSON.Feature> }) => {
     const pressedFeature = event.features[0];
@@ -119,17 +125,13 @@ export function MapMarkers({
           </View>
         </MapboxImage>
         {markerThumbnailEvents.map((event) => (
-          <MapboxImage
-            key={event._id}
-            ref={(instance) => {
-              markerImageRefs.current[event._id] = instance;
-
-              if (instance) {
-                instance.refresh();
-              }
-            }}
-            name={getMarkerThumbnailName(event._id)}
-          >
+            <MapboxImage
+              key={event._id}
+              ref={(instance) => {
+                markerImageRefs.current[event._id] = instance;
+              }}
+              name={getMarkerThumbnailName(event._id)}
+            >
             <View
               collapsable={false}
               style={[styles.markerThumbnailSprite, { backgroundColor }]}
@@ -199,9 +201,9 @@ export function MapMarkers({
             ["==", ["get", "eventId"], selectedEventId ?? ""],
           ]}
           style={{
-            circleColor: "rgba(167, 16, 16, 0)",
+            circleColor: "rgba(0, 0, 0, 0)",
             circleRadius: MARKER_SELECTED_RING_RADIUS,
-            circleStrokeColor: "rgb(41, 3, 24)",
+            circleStrokeColor: selectedAccentColor,
             circleStrokeWidth: 5,
             circlePitchAlignment: "map",
             circleEmissiveStrength: 1,

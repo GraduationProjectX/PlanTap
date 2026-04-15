@@ -1,16 +1,19 @@
+import { useRouter } from "expo-router";
 import Mapbox, {
   Camera,
   LocationPuck,
   MapView,
 } from "@rnmapbox/maps";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FlashList } from "@shopify/flash-list";
 import { Button } from "heroui-native";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { EventCard } from "@/components/events/EventCard";
 import { CategoryChips } from "@/components/home/CategoryChips";
 import { SearchBar } from "@/components/ui/SearchBar";
 import {
@@ -20,7 +23,7 @@ import {
 } from "@/features/map/data";
 import { MapMarkers } from "@/features/map/map-markers";
 import { useCategories } from "@/hooks/use-categories";
-import { useEvents } from "@/hooks/use-events";
+import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useDirection } from "@/rtl";
 import { getUserCoordinates, type UserCoordinates } from "@/services/location";
 
@@ -33,14 +36,45 @@ if (mapboxAccessToken) {
 const DEFAULT_CENTER: [number, number] = [45.0792, 23.8859];
 const DEFAULT_ZOOM_LEVEL = 4.2;
 const FOCUSED_ZOOM_LEVEL = 11.8;
-const SELECTED_MARKER_ZOOM_LEVEL = 12.6;
 const HORIZONTAL_PADDING = 16;
+const CARD_GAP = 12;
+const SELECTED_CARD_LIFT = 8;
+const CAROUSEL_VIEW_OFFSET = 0;
+const CAROUSEL_LEFT_PADDING_REDUCTION = 8;
+const CAMERA_ANIMATION_DURATION_MS = 220;
+const CAROUSEL_VIEWABILITY_CONFIG = { itemVisiblePercentThreshold: 60 };
+const SELECTED_EVENT_HIGHLIGHT_COLOR = "#EF4444";
+
+function keyExtractor(item: EventDoc) {
+  return item._id;
+}
 
 export default function MapScreen() {
+  const router = useRouter();
   const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
   const { theme } = useUnistyles();
+  const carouselRef = useRef<{
+    scrollToIndex: (params: {
+      animated?: boolean;
+      index: number;
+      viewOffset?: number;
+      viewPosition?: number;
+    }) => void;
+  } | null>(null);
+  const ignoreNextMapPressRef = useRef(false);
+  const centeredCarouselEventIdRef = useRef<string | undefined>(undefined);
+  const pendingProgrammaticTargetIdRef = useRef<string | undefined>(undefined);
   const { textAlign } = useDirection();
+  const cardWidth = Math.min(248, Math.max(176, screenWidth - HORIZONTAL_PADDING * 2 - 72));
+  const cardHeight = 174;
+  const cardSizeWithGap = cardWidth + CARD_GAP;
+  const carouselEdgePadding = Math.max((screenWidth - cardWidth) / 2, HORIZONTAL_PADDING);
+  const carouselLeftPadding = Math.max(
+    carouselEdgePadding - CAROUSEL_LEFT_PADDING_REDUCTION,
+    8,
+  );
   const cameraRef = useRef<Camera>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchValue, setSearchValue] = useState("");
@@ -85,6 +119,20 @@ export default function MapScreen() {
 
   const selectedEvent = visibleEvents.find((event) => event._id === selectedEventId);
 
+  const focusSelectedCoordinate = (coordinates: [number, number]) => {
+    cameraRef.current?.setCamera({
+      centerCoordinate: coordinates,
+      padding: {
+        paddingTop: 0,
+        paddingRight: 0,
+        paddingBottom: 150,
+        paddingLeft: 0,
+      },
+      animationDuration: CAMERA_ANIMATION_DURATION_MS,
+      animationMode: "easeTo",
+    });
+  };
+
   const focusCoordinate = (
     coordinates: [number, number],
     zoomLevel: number,
@@ -108,7 +156,7 @@ export default function MapScreen() {
       centerCoordinate: coordinates,
       zoomLevel,
       padding,
-      animationDuration: 350,
+      animationDuration: CAMERA_ANIMATION_DURATION_MS,
       animationMode: "easeTo",
     });
   };
@@ -126,16 +174,69 @@ export default function MapScreen() {
   }, [selectedEvent, selectedEventId]);
 
   const handleMarkerPress = (eventId: string) => {
-    const nextEvent = visibleEvents.find((event) => event._id === eventId);
+    const previousCenteredEventId = centeredCarouselEventIdRef.current;
     setSelectedEventId(eventId);
+    centeredCarouselEventIdRef.current = eventId;
 
-    if (nextEvent) {
-      focusCoordinate(
-        [nextEvent.locationLng, nextEvent.locationLat],
-        SELECTED_MARKER_ZOOM_LEVEL,
-        true,
-      );
+    const nextEvent = visibleEvents.find((event) => event._id === eventId);
+    const nextEventIndex = visibleEvents.findIndex((event) => event._id === eventId);
+
+    if (nextEventIndex < 0 || !nextEvent) {
+      return;
     }
+
+    ignoreNextMapPressRef.current = true;
+    const shouldAnimateCarousel = previousCenteredEventId !== eventId;
+    if (shouldAnimateCarousel) {
+      pendingProgrammaticTargetIdRef.current = eventId;
+      requestAnimationFrame(() => {
+        carouselRef.current?.scrollToIndex({
+          animated: true,
+          index: nextEventIndex,
+          viewPosition: 0.5,
+          viewOffset: CAROUSEL_VIEW_OFFSET,
+        });
+      });
+    } else {
+      pendingProgrammaticTargetIdRef.current = undefined;
+    }
+
+    focusSelectedCoordinate([nextEvent.locationLng, nextEvent.locationLat]);
+  };
+
+  const handleEventPress = (eventId: string) => {
+    router.push({ pathname: "/event/[id]", params: { id: eventId } });
+  };
+
+  const handleViewableItemsChanged = (
+    event: { viewableItems: Array<{ item: EventDoc }> },
+  ) => {
+    const nextCenteredItem = event.viewableItems[0]?.item;
+    if (!nextCenteredItem) {
+      return;
+    }
+
+    centeredCarouselEventIdRef.current = nextCenteredItem._id;
+  };
+
+  const handleCarouselMomentumEnd = () => {
+    if (pendingProgrammaticTargetIdRef.current) {
+      pendingProgrammaticTargetIdRef.current = undefined;
+      return;
+    }
+
+    const nextEventId = centeredCarouselEventIdRef.current;
+    if (!nextEventId || nextEventId === selectedEventId) {
+      return;
+    }
+
+    const nextEvent = visibleEvents.find((event) => event._id === nextEventId);
+    if (!nextEvent) {
+      return;
+    }
+
+    setSelectedEventId(nextEventId);
+    focusSelectedCoordinate([nextEvent.locationLng, nextEvent.locationLat]);
   };
 
   const handleMyLocationPress = async () => {
@@ -166,6 +267,11 @@ export default function MapScreen() {
         rotateEnabled={false}
         localizeLabels={{ locale: isArabic ? "ar" : "en" }}
         onPress={() => {
+          if (ignoreNextMapPressRef.current) {
+            ignoreNextMapPressRef.current = false;
+            return;
+          }
+
           setSelectedEventId(undefined);
         }}
       >
@@ -193,6 +299,7 @@ export default function MapScreen() {
           focusCoordinate={focusCoordinate}
           onMarkerPress={handleMarkerPress}
           primaryColor={theme.colors.primary}
+          selectedAccentColor={SELECTED_EVENT_HIGHLIGHT_COLOR}
           selectedEventId={selectedEventId}
           textColor={theme.colors.text}
           visibleEvents={visibleEvents}
@@ -213,7 +320,7 @@ export default function MapScreen() {
         />
       </View>
 
-      <View style={[styles.bottomOverlay, { paddingBottom: 4 }]}>
+      <View style={[styles.bottomOverlay, { paddingBottom: 4 }]}> 
         <View style={styles.myLocationButtonWrap}>
           <Button
             onPress={handleMyLocationPress}
@@ -225,11 +332,61 @@ export default function MapScreen() {
           </Button>
         </View>
 
-        {isLoading || isLocating ? (
-          <View style={styles.statusCard}>
-            <Text style={[styles.statusText, { textAlign }]}>{t("common.loading")}</Text>
-          </View>
-        ) : visibleEvents.length === 0 ? (
+        {visibleEvents.length > 0 && (
+          <>
+            <FlashList
+              ref={(instance) => {
+                carouselRef.current = instance;
+              }}
+              data={visibleEvents}
+              renderItem={({ item }) => {
+                const isSelected = item._id === selectedEventId;
+
+                return (
+                  <View
+                    style={[
+                      styles.carouselItem,
+                      isSelected ? styles.carouselItemSelected : null,
+                    ]}
+                  >
+                    <EventCard
+                      event={item}
+                      variant="medium"
+                      onPress={handleEventPress}
+                      width={cardWidth}
+                      height={cardHeight}
+                      marginBottom={0}
+                      mapActionLabel={t("map.showDetails")}
+                      showDateRangeChip
+                      showMapTypeChip
+                    />
+                    {isSelected ? (
+                      <View pointerEvents="none" style={styles.carouselItemHighlight} />
+                    ) : null}
+                  </View>
+                );
+              }}
+              keyExtractor={keyExtractor}
+              getItemType={() => "map-event-card"}
+              horizontal
+              onMomentumScrollEnd={handleCarouselMomentumEnd}
+              onViewableItemsChanged={handleViewableItemsChanged}
+              viewabilityConfig={CAROUSEL_VIEWABILITY_CONFIG}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={[
+                styles.carouselContent,
+                { paddingLeft: carouselLeftPadding, paddingRight: carouselEdgePadding },
+              ]}
+              ItemSeparatorComponent={CarouselSeparator}
+              snapToInterval={cardSizeWithGap}
+              decelerationRate="fast"
+              drawDistance={cardSizeWithGap * 2}
+            />
+
+          </>
+        )}
+
+        {!isLoading && !isLocating && visibleEvents.length === 0 ? (
           <View style={styles.statusCard}>
             <Text style={[styles.statusText, { textAlign }]}>{t("map.empty")}</Text>
           </View>
@@ -301,6 +458,31 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     gap: theme.spacing.sm,
   },
+  carouselContent: {
+    paddingTop: 10,
+    paddingBottom: 2,
+  },
+  carouselSeparator: {
+    width: CARD_GAP,
+  },
+  carouselItem: {
+    borderRadius: theme.radius.xl,
+    borderCurve: "continuous",
+  },
+  carouselItemSelected: {
+    transform: [{ translateY: -SELECTED_CARD_LIFT }],
+  },
+  carouselItemHighlight: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: theme.radius.xl,
+    borderCurve: "continuous",
+    borderWidth: 3,
+    borderColor: SELECTED_EVENT_HIGHLIGHT_COLOR,
+  },
   statusCard: {
     marginHorizontal: HORIZONTAL_PADDING,
     paddingVertical: 14,
@@ -315,3 +497,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.text,
   },
 }));
+
+function CarouselSeparator() {
+  return <View style={styles.carouselSeparator} />;
+}

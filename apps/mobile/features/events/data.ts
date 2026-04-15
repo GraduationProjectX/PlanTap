@@ -122,6 +122,33 @@ export function formatEventDateTime(timestamp: number | null): string | null {
   return `${month}/${day}/${year} - ${h}:${m} ${ampm}`;
 }
 
+export function formatEventDateRange(
+  startAt: number | null,
+  endAt: number | null,
+  locale = "en-US",
+): string | null {
+  if (startAt == null) {
+    return null;
+  }
+
+  const formatDate = (value: number) => {
+    return new Date(value).toLocaleDateString(locale, { month: "short", day: "numeric" });
+  };
+
+  const startLabel = formatDate(startAt);
+
+  if (endAt == null) {
+    return startLabel;
+  }
+
+  const endLabel = formatDate(endAt);
+  if (startLabel === endLabel) {
+    return startLabel;
+  }
+
+  return `${startLabel} - ${endLabel}`;
+}
+
 export function getTimeRemainingLabel(endAt: number | null): string | null {
   if (endAt == null) return null;
 

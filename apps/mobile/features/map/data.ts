@@ -129,7 +129,7 @@ export function getMarkerFeatures(
           event.images[0] && !failedMarkerImages[event._id]
             ? getMarkerThumbnailName(event._id)
             : fallbackThumbnail,
-        markerLabel: `${getShortMarkerTitle(title)}\n${typeLabel}`,
+        markerLabel: `${getShortMarkerTitle(title)} | ${typeLabel}`,
       },
       geometry: {
         type: "Point",

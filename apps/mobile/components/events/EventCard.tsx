@@ -13,6 +13,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { DateBadge } from "@/components/home/DateBadge";
 import { LiveBadge } from "@/components/home/LiveBadge";
+import { formatEventDateRange } from "@/features/events/data";
 import type { EventDoc } from "@/hooks/use-events";
 import { getEventCardMeta, getEventSharedBoundTag } from "@/features/events/ui";
 import { useDirection } from "@/rtl";
@@ -33,6 +34,9 @@ type EventCardProps = {
   width?: number;
   height?: number;
   marginBottom?: number;
+  mapActionLabel?: string;
+  showDateRangeChip?: boolean;
+  showMapTypeChip?: boolean;
   onPress: (id: EventId) => void;
   onBookmark?: (id: EventId) => void;
   isBookmarked?: boolean;
@@ -46,12 +50,15 @@ function EventCardComponent({
   width,
   height,
   marginBottom,
+  mapActionLabel,
+  showDateRangeChip,
+  showMapTypeChip,
   onPress,
   onBookmark,
   isBookmarked,
   showCountdown = true,
 }: EventCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isRTL, flexDirection, textAlign } = useDirection();
 
   const isPreviewVariant = variant === "preview-list" || variant === "preview-grid";
@@ -71,6 +78,15 @@ function EventCardComponent({
     ? t("bookmarks.remaining", { time: meta.remainingLabel })
     : null;
   const sharedBoundTag = getEventSharedBoundTag(event._id);
+  const dateRangeLabel = showDateRangeChip
+    ? formatEventDateRange(event.startAt, event.endAt, i18n.language === "ar" ? "ar-SA" : "en-US")
+    : null;
+  const mapTypeLabel = showMapTypeChip
+    ? event.type === "activity"
+      ? t("map.markerActivity")
+      : t("map.markerEvent")
+    : null;
+  const shouldShowMapTypeChip = mapTypeLabel != null && !liveBadgeLabel;
 
   const handleCardPress = () => {
     onPress(event._id);
@@ -302,8 +318,25 @@ function EventCardComponent({
             </View>
           )}
 
+          {shouldShowMapTypeChip && (
+            <View style={styles.mapEventCardTypeChipTopLeft}>
+              <Text style={styles.mapEventCardTypeText} numberOfLines={1}>
+                {mapTypeLabel}
+              </Text>
+            </View>
+          )}
+
+          {dateRangeLabel && (
+            <View style={styles.mapEventCardDateChip}>
+              <FontAwesome name="calendar-o" size={10} color="#FFFFFF" />
+              <Text style={styles.mapEventCardDateText} numberOfLines={2}>
+                {dateRangeLabel}
+              </Text>
+            </View>
+          )}
+
           <Card.Body style={styles.mediumContent}>
-            <View style={[styles.mediumLocationRow, { flexDirection }]}>
+            <View style={[styles.mediumLocationRow, { flexDirection }]}> 
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={[styles.mediumLocationText, { textAlign }]} numberOfLines={1}>
                 {meta.locationLabel}
@@ -316,12 +349,25 @@ function EventCardComponent({
               </Text>
 
               <Button
-                isIconOnly
+                isIconOnly={mapActionLabel == null}
                 onPress={handleCardPress}
                 feedbackVariant="scale"
-                style={styles.mediumArrowButton}
+                style={
+                  mapActionLabel
+                    ? styles.mapEventCardActionButton
+                    : styles.mediumArrowButton
+                }
               >
-                <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={12} color="#000000" />
+                {mapActionLabel ? (
+                  <>
+                    <Text style={styles.mapEventCardActionText} numberOfLines={1}>
+                      {mapActionLabel}
+                    </Text>
+                    <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={13} color="#000000" />
+                  </>
+                ) : (
+                  <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={12} color="#000000" />
+                )}
               </Button>
             </View>
 
@@ -577,6 +623,62 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
+  },
+  mapEventCardActionButton: {
+    minWidth: 118,
+    height: 34,
+    borderRadius: theme.radius.full,
+    borderCurve: "continuous",
+    paddingHorizontal: 10,
+    gap: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    backgroundColor: "#FFFFFF",
+  },
+  mapEventCardActionText: {
+    color: "#000000",
+    fontSize: theme.font.size.sm,
+    fontFamily: theme.font.family.semiBold,
+  },
+  mapEventCardDateChip: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: theme.radius.full,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(0, 0, 0, 0.56)",
+    maxWidth: "82%",
+  },
+  mapEventCardDateText: {
+    color: "#FFFFFF",
+    fontSize: theme.font.size.xs,
+    fontFamily: theme.font.family.semiBold,
+    letterSpacing: theme.font.letterSpacing.wide,
+    lineHeight: theme.font.size.xs * 1.2,
+    flexShrink: 1,
+  },
+  mapEventCardTypeChipTopLeft: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.radius.full,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
+  },
+  mapEventCardTypeText: {
+    color: "#FFFFFF",
+    fontSize: theme.font.size.xs,
+    fontFamily: theme.font.family.semiBold,
+    letterSpacing: theme.font.letterSpacing.wider,
   },
   mediumTagsContainer: {
     flexWrap: "wrap",
