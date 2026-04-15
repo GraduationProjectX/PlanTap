@@ -18,7 +18,7 @@ import { ReviewsSection } from "@/components/events/reviews-section";
 import { LiveBadge } from "@/components/home/LiveBadge";
 import { isEventLiveNow } from "@/features/events/data";
 import { getEventSharedBoundTag } from "@/features/events/ui";
-import { useEvent } from "@/hooks/use-event";
+import { useEventById } from "@/hooks/use-event";
 import { useEventReviews } from "@/hooks/use-event-reviews";
 import { useDirection } from "@/rtl";
 
@@ -65,7 +65,7 @@ export default function EventDetailsScreen() {
   const [reviewBody, setReviewBody] = useState("");
   const { id } = useLocalSearchParams<{ id?: Id<"events"> | Id<"events">[] }>();
   const normalizedId = Array.isArray(id) ? id[0] : id;
-  const { event, isLoading, notFound } = useEvent(normalizedId);
+  const { event, isLoading, notFound } = useEventById(normalizedId);
   const {
     averageRating,
     reviewCount,
