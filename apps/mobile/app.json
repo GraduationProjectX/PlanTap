@@ -32,10 +32,11 @@
     "plugins": [
       "expo-router",
       "@sentry/react-native/expo",
+      "@rnmapbox/maps",
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow PlanTap to detect your city and show nearby events."
+          "locationWhenInUsePermission": "Allow PlanTap to show your location and sort nearby events on the map."
         }
       ]
     ],
