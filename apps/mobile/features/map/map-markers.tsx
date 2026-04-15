@@ -7,7 +7,7 @@ import {
 } from "@rnmapbox/maps";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image as ExpoImage } from "expo-image";
-import { type ElementRef, useMemo, useRef, useState } from "react";
+import { type ElementRef, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import {
@@ -66,21 +66,17 @@ export function MapMarkers({
   const markerImageRefs = useRef<Record<string, ElementRef<typeof MapboxImage> | null>>({});
   const shapeSourceRef = useRef<ShapeSource>(null);
   const [failedMarkerImages, setFailedMarkerImages] = useState<Record<string, true>>({});
-  const markerThumbnailEvents = useMemo(() => {
-    return visibleEvents.filter((event) => {
-      return event.images[0] && !failedMarkerImages[event._id];
-    });
-  }, [visibleEvents, failedMarkerImages]);
+  const markerThumbnailEvents = visibleEvents.filter((event) => {
+    return event.images[0] && !failedMarkerImages[event._id];
+  });
 
-  const markerFeatures = useMemo(() => {
-    return getMarkerFeatures(
-      visibleEvents,
-      isArabic,
-      eventTypeLabel,
-      activityTypeLabel,
-      failedMarkerImages,
-    );
-  }, [visibleEvents, isArabic, eventTypeLabel, activityTypeLabel, failedMarkerImages]);
+  const markerFeatures = getMarkerFeatures(
+    visibleEvents,
+    isArabic,
+    eventTypeLabel,
+    activityTypeLabel,
+    failedMarkerImages,
+  );
 
   const handleMarkersPress = async (event: { features: Array<GeoJSON.Feature> }) => {
     const pressedFeature = event.features[0];
@@ -125,13 +121,13 @@ export function MapMarkers({
           </View>
         </MapboxImage>
         {markerThumbnailEvents.map((event) => (
-            <MapboxImage
-              key={event._id}
-              ref={(instance) => {
-                markerImageRefs.current[event._id] = instance;
-              }}
-              name={getMarkerThumbnailName(event._id)}
-            >
+          <MapboxImage
+            key={event._id}
+            ref={(instance) => {
+              markerImageRefs.current[event._id] = instance;
+            }}
+            name={getMarkerThumbnailName(event._id)}
+          >
             <View
               collapsable={false}
               style={[styles.markerThumbnailSprite, { backgroundColor }]}

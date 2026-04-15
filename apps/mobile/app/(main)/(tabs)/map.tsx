@@ -36,6 +36,7 @@ if (mapboxAccessToken) {
 const DEFAULT_CENTER: [number, number] = [45.0792, 23.8859];
 const DEFAULT_ZOOM_LEVEL = 4.2;
 const FOCUSED_ZOOM_LEVEL = 11.8;
+const SELECTED_MARKER_ZOOM_LEVEL = 12.6;
 const HORIZONTAL_PADDING = 16;
 const CARD_GAP = 12;
 const SELECTED_CARD_LIFT = 8;
@@ -66,6 +67,7 @@ export default function MapScreen() {
   const ignoreNextMapPressRef = useRef(false);
   const centeredCarouselEventIdRef = useRef<string | undefined>(undefined);
   const pendingProgrammaticTargetIdRef = useRef<string | undefined>(undefined);
+  const currentZoomLevelRef = useRef(DEFAULT_ZOOM_LEVEL);
   const { textAlign } = useDirection();
   const cardWidth = Math.min(248, Math.max(176, screenWidth - HORIZONTAL_PADDING * 2 - 72));
   const cardHeight = 174;
@@ -120,8 +122,12 @@ export default function MapScreen() {
   const selectedEvent = visibleEvents.find((event) => event._id === selectedEventId);
 
   const focusSelectedCoordinate = (coordinates: [number, number]) => {
+    const nextZoomLevel = Math.max(currentZoomLevelRef.current, SELECTED_MARKER_ZOOM_LEVEL);
+    currentZoomLevelRef.current = nextZoomLevel;
+
     cameraRef.current?.setCamera({
       centerCoordinate: coordinates,
+      zoomLevel: nextZoomLevel,
       padding: {
         paddingTop: 0,
         paddingRight: 0,
@@ -152,6 +158,8 @@ export default function MapScreen() {
           paddingLeft: 24,
         };
 
+    currentZoomLevelRef.current = zoomLevel;
+
     cameraRef.current?.setCamera({
       centerCoordinate: coordinates,
       zoomLevel,
@@ -175,15 +183,15 @@ export default function MapScreen() {
 
   const handleMarkerPress = (eventId: string) => {
     const previousCenteredEventId = centeredCarouselEventIdRef.current;
-    setSelectedEventId(eventId);
-    centeredCarouselEventIdRef.current = eventId;
-
-    const nextEvent = visibleEvents.find((event) => event._id === eventId);
     const nextEventIndex = visibleEvents.findIndex((event) => event._id === eventId);
 
-    if (nextEventIndex < 0 || !nextEvent) {
+    if (nextEventIndex < 0) {
       return;
     }
+
+    const nextEvent = visibleEvents[nextEventIndex];
+    setSelectedEventId(eventId);
+    centeredCarouselEventIdRef.current = eventId;
 
     ignoreNextMapPressRef.current = true;
     const shouldAnimateCarousel = previousCenteredEventId !== eventId;
@@ -266,6 +274,9 @@ export default function MapScreen() {
         compassEnabled
         rotateEnabled={false}
         localizeLabels={{ locale: isArabic ? "ar" : "en" }}
+        onCameraChanged={(state) => {
+          currentZoomLevelRef.current = state.properties.zoom;
+        }}
         onPress={() => {
           if (ignoreNextMapPressRef.current) {
             ignoreNextMapPressRef.current = false;
@@ -320,7 +331,7 @@ export default function MapScreen() {
         />
       </View>
 
-      <View style={[styles.bottomOverlay, { paddingBottom: 4 }]}> 
+      <View style={[styles.bottomOverlay, { paddingBottom: 4 }]}>
         <View style={styles.myLocationButtonWrap}>
           <Button
             onPress={handleMyLocationPress}
@@ -332,59 +343,62 @@ export default function MapScreen() {
           </Button>
         </View>
 
-        {visibleEvents.length > 0 && (
-          <>
-            <FlashList
-              ref={(instance) => {
-                carouselRef.current = instance;
-              }}
-              data={visibleEvents}
-              renderItem={({ item }) => {
-                const isSelected = item._id === selectedEventId;
+        {visibleEvents.length > 0 ? (
+          <FlashList
+            ref={(instance) => {
+              carouselRef.current = instance;
+            }}
+            data={visibleEvents}
+            renderItem={({ item }) => {
+              const isSelected = item._id === selectedEventId;
 
-                return (
-                  <View
-                    style={[
-                      styles.carouselItem,
-                      isSelected ? styles.carouselItemSelected : null,
-                    ]}
-                  >
-                    <EventCard
-                      event={item}
-                      variant="medium"
-                      onPress={handleEventPress}
-                      width={cardWidth}
-                      height={cardHeight}
-                      marginBottom={0}
-                      mapActionLabel={t("map.showDetails")}
-                      showDateRangeChip
-                      showMapTypeChip
-                    />
-                    {isSelected ? (
-                      <View pointerEvents="none" style={styles.carouselItemHighlight} />
-                    ) : null}
-                  </View>
-                );
-              }}
-              keyExtractor={keyExtractor}
-              getItemType={() => "map-event-card"}
-              horizontal
-              onMomentumScrollEnd={handleCarouselMomentumEnd}
-              onViewableItemsChanged={handleViewableItemsChanged}
-              viewabilityConfig={CAROUSEL_VIEWABILITY_CONFIG}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[
-                styles.carouselContent,
-                { paddingLeft: carouselLeftPadding, paddingRight: carouselEdgePadding },
-              ]}
-              ItemSeparatorComponent={CarouselSeparator}
-              snapToInterval={cardSizeWithGap}
-              decelerationRate="fast"
-              drawDistance={cardSizeWithGap * 2}
-            />
+              return (
+                <View
+                  style={[
+                    styles.carouselItem,
+                    isSelected ? styles.carouselItemSelected : null,
+                  ]}
+                >
+                  <EventCard
+                    event={item}
+                    variant="medium"
+                    onPress={handleEventPress}
+                    width={cardWidth}
+                    height={cardHeight}
+                    marginBottom={0}
+                    mapActionLabel={t("map.showDetails")}
+                    showDateRangeChip
+                    showMapTypeChip
+                  />
+                  {isSelected ? (
+                    <View pointerEvents="none" style={styles.carouselItemHighlight} />
+                  ) : null}
+                </View>
+              );
+            }}
+            keyExtractor={keyExtractor}
+            getItemType={() => "map-event-card"}
+            horizontal
+            onMomentumScrollEnd={handleCarouselMomentumEnd}
+            onViewableItemsChanged={handleViewableItemsChanged}
+            viewabilityConfig={CAROUSEL_VIEWABILITY_CONFIG}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.carouselContent,
+              { paddingLeft: carouselLeftPadding, paddingRight: carouselEdgePadding },
+            ]}
+            ItemSeparatorComponent={CarouselSeparator}
+            snapToInterval={cardSizeWithGap}
+            decelerationRate="fast"
+            drawDistance={cardSizeWithGap * 2}
+          />
+        ) : null}
 
-          </>
-        )}
+        {(isLoading || isLocating) && visibleEvents.length === 0 ? (
+          <View style={styles.statusCard}>
+            <Text style={[styles.statusText, { textAlign }]}>{t("common.loading")}</Text>
+          </View>
+        ) : null}
 
         {!isLoading && !isLocating && visibleEvents.length === 0 ? (
           <View style={styles.statusCard}>
