@@ -111,7 +111,7 @@ export function getMarkerFeatures(
   isArabic: boolean,
   eventTypeLabel: string,
   activityTypeLabel: string,
-  readyMarkerImages: Record<string, true>,
+  failedMarkerImages: Record<string, true>,
 ): GeoJSON.FeatureCollection<GeoJSON.Point> {
   const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
 
@@ -126,7 +126,7 @@ export function getMarkerFeatures(
       properties: {
         eventId: event._id,
         markerThumbnail:
-          event.images[0] && readyMarkerImages[event._id]
+          event.images[0] && !failedMarkerImages[event._id]
             ? getMarkerThumbnailName(event._id)
             : fallbackThumbnail,
         markerLabel: `${getShortMarkerTitle(title)}\n${typeLabel}`,

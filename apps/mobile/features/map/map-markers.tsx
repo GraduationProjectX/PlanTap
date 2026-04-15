@@ -6,8 +6,9 @@ import {
   SymbolLayer,
 } from "@rnmapbox/maps";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { type ElementRef, useRef } from "react";
-import { Image as RNImage, StyleSheet, View } from "react-native";
+import { Image as ExpoImage } from "expo-image";
+import { type ElementRef, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 import {
   getMarkerFeatures,
@@ -17,6 +18,10 @@ import type { EventDoc } from "@/hooks/use-events";
 
 const MARKER_LABELS_ZOOM_LEVEL = 11;
 const CLUSTER_MAX_ZOOM_LEVEL = 10;
+const MARKER_SIZE = 50;
+const MARKER_RADIUS = MARKER_SIZE / 2;
+const MARKER_BORDER_WIDTH = 1;
+const MARKER_SELECTED_RING_RADIUS = 25;
 
 type MapMarkersProps = {
   activityTypeLabel: string;
@@ -24,10 +29,8 @@ type MapMarkersProps = {
   eventTypeLabel: string;
   focusCoordinate: (coordinates: [number, number], zoomLevel: number) => void;
   isArabic: boolean;
-  markerThumbnailEvents: EventDoc[];
   onMarkerPress: (eventId: string) => void;
   primaryColor: string;
-  readyMarkerImages: Record<string, true>;
   selectedEventId?: string;
   textColor: string;
   visibleEvents: EventDoc[];
@@ -52,23 +55,25 @@ export function MapMarkers({
   eventTypeLabel,
   focusCoordinate,
   isArabic,
-  markerThumbnailEvents,
   onMarkerPress,
   primaryColor,
-  readyMarkerImages,
   selectedEventId,
   textColor,
   visibleEvents,
 }: MapMarkersProps) {
   const markerImageRefs = useRef<Record<string, ElementRef<typeof MapboxImage> | null>>({});
   const shapeSourceRef = useRef<ShapeSource>(null);
+  const [failedMarkerImages, setFailedMarkerImages] = useState<Record<string, true>>({});
+  const markerThumbnailEvents = visibleEvents.filter((event) => {
+    return event.images[0] && !failedMarkerImages[event._id];
+  });
 
   const markerFeatures = getMarkerFeatures(
     visibleEvents,
     isArabic,
     eventTypeLabel,
     activityTypeLabel,
-    readyMarkerImages,
+    failedMarkerImages,
   );
 
   const handleMarkersPress = async (event: { features: Array<GeoJSON.Feature> }) => {
@@ -118,6 +123,10 @@ export function MapMarkers({
             key={event._id}
             ref={(instance) => {
               markerImageRefs.current[event._id] = instance;
+
+              if (instance) {
+                instance.refresh();
+              }
             }}
             name={getMarkerThumbnailName(event._id)}
           >
@@ -125,11 +134,22 @@ export function MapMarkers({
               collapsable={false}
               style={[styles.markerThumbnailSprite, { backgroundColor }]}
             >
-              <RNImage
+              <ExpoImage
                 source={{ uri: event.images[0] }}
                 style={styles.markerThumbnailImage}
+                contentFit="cover"
+                cachePolicy="memory-disk"
                 onLoadEnd={() => {
                   markerImageRefs.current[event._id]?.refresh();
+                }}
+                onError={() => {
+                  setFailedMarkerImages((current) => {
+                    if (current[event._id]) {
+                      return current;
+                    }
+
+                    return { ...current, [event._id]: true };
+                  });
                 }}
               />
             </View>
@@ -179,10 +199,10 @@ export function MapMarkers({
             ["==", ["get", "eventId"], selectedEventId ?? ""],
           ]}
           style={{
-            circleColor: "rgba(0, 0, 0, 0)",
-            circleRadius: 11,
-            circleStrokeColor: textColor,
-            circleStrokeWidth: 2,
+            circleColor: "rgba(167, 16, 16, 0)",
+            circleRadius: MARKER_SELECTED_RING_RADIUS,
+            circleStrokeColor: "rgb(41, 3, 24)",
+            circleStrokeWidth: 5,
             circlePitchAlignment: "map",
             circleEmissiveStrength: 1,
           }}
@@ -232,7 +252,7 @@ export function MapMarkers({
             textFont: ["Open Sans Semibold"],
             textMaxWidth: 10,
             textLineHeight: 1.1,
-            textOffset: [0, 2.1],
+            textOffset: [0, 2.35],
             textAnchor: "top",
           }}
         />
@@ -253,7 +273,7 @@ export function MapMarkers({
             textFont: ["Open Sans Bold"],
             textMaxWidth: 10,
             textLineHeight: 1.1,
-            textOffset: [0, 2.35],
+            textOffset: [0, 2.6],
             textAnchor: "top",
             textAllowOverlap: true,
           }}
@@ -265,10 +285,10 @@ export function MapMarkers({
 
 const styles = StyleSheet.create({
   markerThumbnailSprite: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1,
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
+    borderRadius: MARKER_RADIUS,
+    borderWidth: MARKER_BORDER_WIDTH,
     borderColor: "rgba(255, 255, 255, 0.95)",
     overflow: "hidden",
   },
@@ -277,10 +297,10 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   markerFallbackSprite: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 1,
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
+    borderRadius: MARKER_RADIUS,
+    borderWidth: MARKER_BORDER_WIDTH,
     borderColor: "rgba(255, 255, 255, 0.95)",
     backgroundColor: "rgba(255, 255, 255, 0.96)",
     alignItems: "center",

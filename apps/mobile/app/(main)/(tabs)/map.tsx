@@ -19,7 +19,6 @@ import {
   getVisibleEvents,
 } from "@/features/map/data";
 import { MapMarkers } from "@/features/map/map-markers";
-import { useMarkerImages } from "@/features/map/use-marker-images";
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents } from "@/hooks/use-events";
 import { useDirection } from "@/rtl";
@@ -83,7 +82,6 @@ export default function MapScreen() {
     query,
     userCoordinates,
   );
-  const { readyMarkerImages, markerThumbnailEvents } = useMarkerImages(visibleEvents);
 
   const selectedEvent = visibleEvents.find((event) => event._id === selectedEventId);
 
@@ -96,7 +94,7 @@ export default function MapScreen() {
       ? {
           paddingTop: 0,
           paddingRight: 0,
-          paddingBottom: 0,
+          paddingBottom: 150,
           paddingLeft: 0,
         }
       : {
@@ -193,10 +191,8 @@ export default function MapScreen() {
           backgroundColor={theme.colors.background}
           eventTypeLabel={eventTypeLabel}
           focusCoordinate={focusCoordinate}
-          markerThumbnailEvents={markerThumbnailEvents}
           onMarkerPress={handleMarkerPress}
           primaryColor={theme.colors.primary}
-          readyMarkerImages={readyMarkerImages}
           selectedEventId={selectedEventId}
           textColor={theme.colors.text}
           visibleEvents={visibleEvents}
