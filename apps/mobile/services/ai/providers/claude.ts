@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
+import { safeParseRecommendation } from "../utils";
 import type {
   AiProvider,
   EventSummary,
@@ -33,9 +34,17 @@ export class ClaudeProvider implements AiProvider {
       ],
     });
 
-    const block = message.content[0];
-    if (block.type !== "text") throw new Error("Unexpected response type from Claude");
+    // Anthropic may return structured blocks; prefer text blocks but tolerate
+    // a plain string payload as well.
+    const first = Array.isArray(message.content) ? message.content[0] : undefined;
+    if (first && (first as any).type === "text" && typeof (first as any).text === "string") {
+      return safeParseRecommendation((first as any).text);
+    }
 
-    return JSON.parse(block.text) as RecommendationResult;
+    if (typeof (message as any).content === "string") {
+      return safeParseRecommendation((message as any).content);
+    }
+
+    throw new Error("Unexpected response type from Claude");
   }
 }

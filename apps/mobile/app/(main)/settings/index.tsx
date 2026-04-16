@@ -3,6 +3,7 @@ import { useClerk } from "@clerk/clerk-expo";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   Text,
@@ -23,12 +24,17 @@ import {
 } from "@/services/ai/secureKeys";
 import {
   AVAILABLE_MODELS,
+  assessDeviceSupport,
+  buildCustomModelEntry,
   downloadModel,
   cancelDownload,
   deleteModel,
   isModelDownloaded,
+  type ModelEntry,
+  type ModelSupportAssessment,
   modelFilePath,
 } from "@/services/ai/modelDownloader";
+import { useRouter } from "expo-router";
 
 const THEME_OPTIONS: AppThemeMode[] = ["system", "light", "dark"];
 
@@ -180,9 +186,13 @@ function LocalModelSection() {
   const setDownloadComplete = useAiStore((s) => s.setDownloadComplete);
 
   const [selectedModelId, setSelectedModelId] = useState(AVAILABLE_MODELS[0].id);
+  const [customModelUrl, setCustomModelUrl] = useState("");
+  const [customModel, setCustomModel] = useState<ModelEntry | null>(null);
+  const [support, setSupport] = useState<ModelSupportAssessment | null>(null);
   const [installed, setInstalled] = useState<Record<string, boolean>>({});
 
-  const selectedModel = AVAILABLE_MODELS.find((m) => m.id === selectedModelId) ?? AVAILABLE_MODELS[0];
+  const modelOptions = customModel ? [customModel, ...AVAILABLE_MODELS] : AVAILABLE_MODELS;
+  const selectedModel = modelOptions.find((m) => m.id === selectedModelId) ?? AVAILABLE_MODELS[0];
 
   const refreshInstalled = useCallback(async () => {
     const entries = await Promise.all(
@@ -195,8 +205,34 @@ function LocalModelSection() {
     refreshInstalled();
   }, [refreshInstalled]);
 
+  useEffect(() => {
+    (async () => {
+      const assessment = await assessDeviceSupport(selectedModel);
+      setSupport(assessment);
+    })();
+  }, [selectedModel]);
+
+  const handleApplyCustomModelUrl = useCallback(() => {
+    try {
+      const entry = buildCustomModelEntry(customModelUrl);
+      setCustomModel(entry);
+      setSelectedModelId(entry.id);
+      Alert.alert("Custom Model", "Custom model URL added. You can now download it.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Invalid model URL";
+      Alert.alert("Invalid URL", msg);
+    }
+  }, [customModelUrl]);
+
   const handleDownload = useCallback(async () => {
     try {
+      const assessment = await assessDeviceSupport(selectedModel);
+      setSupport(assessment);
+      if (!assessment.canDownload) {
+        Alert.alert("Model Not Supported", assessment.reason);
+        return;
+      }
+
       await downloadModel(selectedModel);
       await refreshInstalled();
     } catch (err: unknown) {
@@ -232,13 +268,38 @@ function LocalModelSection() {
   const selectedModelPath = modelFilePath(selectedModel.filename);
   const selectedModelInstalled = Boolean(installed[selectedModel.id]);
   const selectedIsActive = localModelPath === selectedModelPath;
+  const supportBadgeStyle =
+    support?.tier === "good"
+      ? styles.supportGood
+      : support?.tier === "warning"
+        ? styles.supportWarning
+        : styles.supportBlocked;
 
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Local Model</Text>
 
+      <View style={styles.customModelBox}>
+        <Text style={styles.modelRowTitle}>Add Hugging Face GGUF Link</Text>
+        <TextInput
+          style={styles.keyInput}
+          value={customModelUrl}
+          onChangeText={setCustomModelUrl}
+          placeholder="https://huggingface.co/.../resolve/main/model.gguf"
+          placeholderTextColor="#999"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        <Pressable
+          style={styles.smallBtn}
+          onPress={handleApplyCustomModelUrl}
+        >
+          <Text style={styles.smallBtnText}>Use Link Model</Text>
+        </Pressable>
+      </View>
+
       <View style={styles.modelList}>
-        {AVAILABLE_MODELS.map((model) => {
+        {modelOptions.map((model) => {
           const isSelected = model.id === selectedModelId;
           const isInstalled = Boolean(installed[model.id]);
           const isActive = localModelPath === modelFilePath(model.filename);
@@ -251,7 +312,17 @@ function LocalModelSection() {
             >
               <View style={styles.modelRowBody}>
                 <Text style={styles.modelRowTitle}>{model.label}</Text>
-                <Text style={styles.modelInfo}>{model.sizeLabel}</Text>
+                <Text style={styles.modelInfo}>
+                  {model.sizeLabel}
+                  {model.recommendedForMobile ? " · mobile-friendly" : ""}
+                </Text>
+                {model.huggingFacePage ? (
+                  <Pressable
+                    onPress={() => Linking.openURL(model.huggingFacePage as string)}
+                  >
+                    <Text style={styles.modelLink}>View on Hugging Face</Text>
+                  </Pressable>
+                ) : null}
               </View>
               <Text style={styles.modelBadge}>
                 {isActive ? "Active" : isInstalled ? "Downloaded" : "Not installed"}
@@ -260,6 +331,15 @@ function LocalModelSection() {
           );
         })}
       </View>
+
+      {support && (
+        <View style={[styles.supportBox, supportBadgeStyle]}>
+          <Text style={styles.supportTitle}>
+            Device check: {support.tier === "good" ? "Good" : support.tier === "warning" ? "Warning" : "Blocked"}
+          </Text>
+          <Text style={styles.supportText}>{support.reason}</Text>
+        </View>
+      )}
 
       {isDownloading && (
         <View style={styles.progressContainer}>
@@ -279,7 +359,11 @@ function LocalModelSection() {
       )}
 
       {!isDownloading && !selectedModelInstalled && (
-        <Pressable style={styles.actionBtn} onPress={handleDownload}>
+        <Pressable
+          style={[styles.actionBtn, support?.tier === "blocked" && styles.btnDisabled]}
+          onPress={handleDownload}
+          disabled={support?.tier === "blocked"}
+        >
           <Text style={styles.actionBtnText}>Download Selected Model</Text>
         </Pressable>
       )}
@@ -348,6 +432,24 @@ function TestSection() {
   );
 }
 
+function DevBenchLink() {
+  const router = useRouter();
+  return (
+    <View style={{ marginTop: 12 }}>
+      <Text style={{ fontSize: 16, fontWeight: "600" }}>Developer</Text>
+      <Pressable
+        onPress={() => router.push("/dev-ai-bench")}
+        style={{ marginTop: 8, padding: 12, backgroundColor: "#111827", borderRadius: 8 }}
+      >
+        <Text style={{ color: "#fff", fontWeight: "600" }}>Open AI Benchmark</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main Settings Screen
+// ---------------------------------------------------------------------------
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const { signOut } = useClerk();
@@ -430,6 +532,7 @@ export default function SettingsScreen() {
       <ApiKeySection />
       <LocalModelSection />
       <TestSection />
+      <DevBenchLink />
     </ScrollView>
   );
 }
@@ -538,6 +641,9 @@ const styles = StyleSheet.create((theme) => ({
     minHeight: theme.button.md,
     justifyContent: "center",
   },
+  btnDisabled: {
+    opacity: 0.5,
+  },
   actionBtnText: {
     fontSize: theme.font.size.base,
     fontFamily: theme.font.family.semiBold,
@@ -550,6 +656,14 @@ const styles = StyleSheet.create((theme) => ({
   },
   modelList: {
     gap: theme.spacing.xs,
+  },
+  customModelBox: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.sm,
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
   },
   modelRow: {
     borderWidth: 1,
@@ -580,6 +694,36 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.md,
     fontFamily: theme.font.family.medium,
     color: theme.colors.textSecondary,
+  },
+  modelLink: {
+    marginTop: 2,
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.info,
+  },
+  supportBox: {
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.sm,
+    gap: 4,
+  },
+  supportGood: {
+    backgroundColor: theme.colors.success + "18",
+  },
+  supportWarning: {
+    backgroundColor: theme.colors.warning + "18",
+  },
+  supportBlocked: {
+    backgroundColor: theme.colors.error + "18",
+  },
+  supportTitle: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
+    color: theme.colors.text,
+  },
+  supportText: {
+    fontSize: theme.font.size.md,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.text,
   },
   progressContainer: {
     flexDirection: "row",

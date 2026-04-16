@@ -1,5 +1,6 @@
 import { initLlama, type LlamaContext } from "llama.rn";
 import { buildSystemPrompt, buildUserPrompt, EVENT_IDS_GBNF } from "../prompts";
+import { safeParseRecommendation } from "../utils";
 import type {
   AiProvider,
   EventSummary,
@@ -9,6 +10,35 @@ import type {
 
 let _ctx: LlamaContext | null = null;
 let _ctxModelPath: string | null = null;
+let _initPromise: Promise<LlamaContext> | null = null;
+let _initPromiseModelPath: string | null = null;
+
+function getDeviceCores(): number {
+  try {
+    const modules = (global as any).NativeModules as Record<string, any> | undefined;
+    const deviceInfo = modules?.DeviceInfo;
+    const constants = deviceInfo?.getConstants?.();
+    const candidates = [
+      "NumberOfCores",
+      "NumberOfCPUs",
+      "ProcessorCount",
+      "cpuCount",
+      "numCores",
+    ];
+    for (const k of candidates) {
+      const v = constants?.[k];
+      if (typeof v === "number" && v > 0) return v;
+    }
+  } catch {
+    // fallthrough
+  }
+  try {
+    if (typeof (global as any).navigator?.hardwareConcurrency === "number") {
+      return (global as any).navigator.hardwareConcurrency;
+    }
+  } catch {}
+  return 4;
+}
 
 /**
  * Initialise (or re-use) the llama.rn context for the given model file.
@@ -19,20 +49,43 @@ async function getContext(modelPath: string): Promise<LlamaContext> {
     return _ctx;
   }
 
+  // If an initialization for this model is already in progress, wait for it.
+  if (_initPromise && _initPromiseModelPath === modelPath) {
+    return _initPromise;
+  }
+
+  // If a different model is loaded, release it.
   if (_ctx && _ctxModelPath !== modelPath) {
-    await _ctx.release();
+    try {
+      await _ctx.release();
+    } catch {}
     _ctx = null;
     _ctxModelPath = null;
   }
 
-  _ctx = await initLlama({
-    model: modelPath,
-    n_ctx: 2048,
-    n_threads: 4,
-    use_mlock: true,
-  });
-  _ctxModelPath = modelPath;
-  return _ctx;
+  const cores = getDeviceCores();
+  const nThreads = Math.max(1, Math.floor(cores / 2));
+  const nCtx = 2048;
+
+  _initPromiseModelPath = modelPath;
+  _initPromise = (async () => {
+    try {
+      const ctx = await initLlama({
+        model: modelPath,
+        n_ctx: nCtx,
+        n_threads: nThreads,
+        use_mlock: true,
+      });
+      _ctx = ctx;
+      _ctxModelPath = modelPath;
+      return ctx;
+    } finally {
+      _initPromise = null;
+      _initPromiseModelPath = null;
+    }
+  })();
+
+  return _initPromise;
 }
 
 /** Release memory held by the local model. */
@@ -75,6 +128,6 @@ export class LocalProvider implements AiProvider {
       },
     );
 
-    return JSON.parse(result.text) as RecommendationResult;
+    return safeParseRecommendation(result.text);
   }
 }
