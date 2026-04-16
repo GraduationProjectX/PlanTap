@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
+import { safeParseRecommendation } from "../utils";
 import type {
   AiProvider,
   EventSummary,
@@ -45,8 +46,8 @@ export class GeminiProvider implements AiProvider {
           buildUserPrompt(userContext, events, userMessage),
         ]);
 
-        const text = result.response.text();
-        return JSON.parse(text) as RecommendationResult;
+        const text = await result.response.text();
+        return safeParseRecommendation(text);
       } catch (err: unknown) {
         lastError = err;
         const is429 =

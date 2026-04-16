@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
+import { safeParseRecommendation } from "../utils";
 import type {
   AiProvider,
   EventSummary,
@@ -38,6 +39,6 @@ export class OpenAIProvider implements AiProvider {
     const text = completion.choices[0]?.message?.content;
     if (!text) throw new Error("Empty response from OpenAI");
 
-    return JSON.parse(text) as RecommendationResult;
+    return safeParseRecommendation(text);
   }
 }
