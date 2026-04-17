@@ -318,8 +318,12 @@ export const closeFeedback = mutation({
 
 // for scraper to actually add new events or stuff to the db ;D
 export const ingestEventInternal = internalMutation({
-  args: {eventData: v.any()},
+  args: {
+    eventData: v.any(), 
+  },
   handler: async (ctx, args) => {
-    await ctx.runMutation((api as any).admin.createEvent, args.eventData);
+    // Because this is 'internal', it bypasses public Clerk auth checks.
+    // It securely takes the scraper data and saves it directly to the database!
+    return await ctx.db.insert("events", args.eventData);
   },
 });

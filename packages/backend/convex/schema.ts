@@ -37,6 +37,7 @@ export default defineSchema({
     titleAr: v.optional(v.string()),
     descriptionShort: v.optional(v.union(v.string(), v.null())),
     descriptionShortAr: v.optional(v.union(v.string(), v.null())),
+    imageId: v.optional(v.id("_storage")), // for storage.ts ;D should be used as cover or single image
     type: v.union(v.literal("event"), v.literal("activity")),
     cellId: v.string(),
     categories: v.array(v.string()),
@@ -66,7 +67,7 @@ export default defineSchema({
     bookingUrl: v.optional(v.string()),
     providerUrl: v.optional(v.string()),
     familyFriendly: v.optional(v.boolean()),
-    images: v.array(v.id("_storage")), //wip
+    images: v.optional(v.array(v.id("_storage"))), //should be used as a gallery im not great with names
     status: v.union(v.literal("pending"), v.literal("approved"), v.literal("rejected")),
     audit: v.object({
       createdBy: v.optional(v.string()),
