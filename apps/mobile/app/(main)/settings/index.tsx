@@ -195,10 +195,10 @@ function LocalModelSection() {
 
   const refreshInstalled = useCallback(async () => {
     const entries = await Promise.all(
-      AVAILABLE_MODELS.map(async (m) => [m.id, await isModelDownloaded(m.filename)] as const),
+      modelOptions.map(async (m) => [m.id, await isModelDownloaded(m.filename)] as const),
     );
     setInstalled(Object.fromEntries(entries));
-  }, []);
+  }, [modelOptions]);
 
   useEffect(() => {
     refreshInstalled();
@@ -211,11 +211,13 @@ function LocalModelSection() {
     })();
   }, [selectedModel]);
 
-  const handleApplyCustomModelUrl = useCallback(() => {
+  const handleApplyCustomModelUrl = useCallback(async () => {
     try {
       const entry = buildCustomModelEntry(customModelUrl);
+      const alreadyInstalled = await isModelDownloaded(entry.filename);
       setCustomModel(entry);
       setSelectedModelId(entry.id);
+      setInstalled((prev) => ({ ...prev, [entry.id]: alreadyInstalled }));
       Alert.alert("Custom Model", "Custom model URL added. You can now download it.");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Invalid model URL";
@@ -265,7 +267,9 @@ function LocalModelSection() {
   }, [refreshInstalled, selectedModel]);
 
   const selectedModelPath = modelFilePath(selectedModel.filename);
-  const selectedModelInstalled = Boolean(installed[selectedModel.id]);
+  const selectedModelInstalled = Boolean(
+    installed[selectedModel.id] || localModelPath === selectedModelPath,
+  );
   const selectedIsActive = localModelPath === selectedModelPath;
   const supportBadgeStyle =
     support?.tier === "good"
@@ -348,6 +352,9 @@ function LocalModelSection() {
             />
           </View>
           <Text style={styles.progressText}>{downloadProgress}%</Text>
+          {downloadProgress === 0 && (
+            <Text style={styles.modelInfo}>Preparing download. Large files can take a moment to report progress.</Text>
+          )}
           <Pressable style={[styles.smallBtn, styles.dangerBtn]} onPress={cancelDownload}>
             <Text style={styles.smallBtnText}>Cancel</Text>
           </Pressable>

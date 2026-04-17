@@ -12,6 +12,19 @@ pnpm --filter mobile android
 pnpm android
 ```
 
+## Environment Setup
+
+After a fresh clone, create `apps/mobile/.env.local` from `apps/mobile/.env.example`.
+
+```bash
+cp .env.example .env.local
+```
+
+At minimum, set:
+
+- `EXPO_PUBLIC_CONVEX_URL`
+- `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`
+
 ## Development
 
 ### Running on Device
