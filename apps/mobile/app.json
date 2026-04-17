@@ -31,7 +31,14 @@
     },
     "plugins": [
       "expo-router",
-      "@sentry/react-native/expo"
+      "@sentry/react-native/expo",
+      "@rnmapbox/maps",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow PlanTap to show your location and sort nearby events on the map."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

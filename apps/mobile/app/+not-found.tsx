@@ -1,15 +1,18 @@
 import { Link, Stack } from "expo-router";
+import { useAuth } from "@clerk/clerk-expo";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function NotFoundScreen() {
+  const { isSignedIn } = useAuth();
+
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
       <View style={styles.container}>
         <Text style={styles.title}>This screen doesn't exist.</Text>
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
+        <Link href={isSignedIn ? "/" : "/sign-in"} style={styles.link}>
+          <Text style={styles.linkText}>Go to {isSignedIn ? "home" : "sign in"}!</Text>
         </Link>
       </View>
     </>

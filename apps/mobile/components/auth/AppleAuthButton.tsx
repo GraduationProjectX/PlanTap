@@ -1,26 +1,24 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useOAuth } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
+import { useSSO } from "@clerk/clerk-expo";
+import { Button, Spinner } from "heroui-native";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { FadeIn, LinearTransition } from "react-native-reanimated";
 
-const AppleAuthButton = () => {
-  const router = useRouter();
-  const { startOAuthFlow } = useOAuth({ strategy: "oauth_apple" });
+export default function AppleAuthButton() {
+  const { theme } = useUnistyles();
+  const { startSSOFlow } = useSSO();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePress = async () => {
-    if (isLoading) {
-      return;
-    }
+    if (isLoading) return;
 
     try {
       setIsLoading(true);
-      const { createdSessionId, setActive } = await startOAuthFlow();
+      const { createdSessionId, setActive } = await startSSOFlow({ strategy: "oauth_apple" });
 
       if (createdSessionId) {
         await setActive?.({ session: createdSessionId });
-        router.replace("/");
       }
     } catch (error) {
       console.error("Apple sign-in failed", error);
@@ -30,28 +28,38 @@ const AppleAuthButton = () => {
   };
 
   return (
-    <Pressable disabled={isLoading} onPress={handlePress} style={styles.appleButton}>
-      <Ionicons name="logo-apple" size={18} color="#fff" />
-      <Text style={styles.appleButtonText}>{isLoading ? "Signing in..." : "Sign in with Apple"}</Text>
-    </Pressable>
+    <Button
+      size="lg"
+      variant="outline"
+      feedbackVariant="scale"
+      isDisabled={isLoading}
+      onPress={handlePress}
+      layout={LinearTransition.springify()}
+      style={styles.button}
+    >
+      {isLoading ? (
+        <Spinner entering={FadeIn.delay(50)} color={theme.colors.text} size="sm" />
+      ) : (
+        <Ionicons name="logo-apple" size={20} color={theme.colors.text} />
+      )}
+      <Button.Label style={styles.label}>
+        {isLoading ? "Signing in..." : "Sign in with Apple"}
+      </Button.Label>
+    </Button>
   );
-};
+}
 
-const styles = StyleSheet.create({
-  appleButton: {
-    backgroundColor: "#000",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 17,
-    borderRadius: 12,
-    gap: 4,
+const styles = StyleSheet.create((theme) => ({
+  button: {
+    minHeight: theme.button.xl,
+    borderRadius: theme.radius.xl,
+    borderWidth: 1.5,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
   },
-  appleButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
+  label: {
+    color: theme.colors.text,
+    fontSize: theme.font.size.lg,
+    fontFamily: theme.font.family.semiBold,
   },
-});
-
-export default AppleAuthButton;
+}));

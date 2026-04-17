@@ -4,6 +4,29 @@
 > **Legend**: `[ ]` = todo, `[/]` = in progress, `[x]` = done
 
 ---
+## To Generate .APK Application after finishing everything without Deployment to App store or Google Store. 
+# https://x.com/betomoedano/status/2044896666856088013
+# https://codewithbeto.dev/blog/building-expo-apps-locally
+
+Before anything else: if you're on Expo, your Debug builds include expo-dev-client. That's the screen with the "Development Servers" list and the "Enter URL manually" button. Great for development, useless for e2e or distributing a build to someone.
+
+For anything where you want the app to launch straight into your actual UI, you need a Release build. This applies to both platforms.
+Android: the easy one
+
+From the android/ folder, Gradle does all the work:
+
+cd android
+./gradlew assembleRelease
+
+The output lands at:
+
+android/app/build/outputs/apk/release/app-release.apk
+
+Install it on a connected device or emulator with:
+
+adb install -r android/app/build/outputs/apk/release/app-release.apk
+
+That's it. No signing config needed for local testing, Gradle will use the debug keystore by default if you haven't set up release signing.
 
 # 📱 MOBILE APP TASKS
 
@@ -11,7 +34,7 @@
 
 ### 1.1 Monorepo Setup
 
-- [ ] Verify clean branching strategy + CI hooks
+- [x] Verify clean branching strategy + CI hooks
 - [x] Create root `package.json` with workspaces
 - [x] Install Turborepo
 - [x] Create `turbo.json` configuration
@@ -145,7 +168,8 @@
 
 ## Phase 3: Core Screens
 
- 
+- [] Theming need to be fixed and changes only via Settings(Light,Dark, System options).
+- [] Add app Icon in Login and app Logo.
 ### 3.2 Onboarding Flow
 
 - [ ] Check react-native-onboarding
@@ -164,22 +188,15 @@
 
 ### 3.3 Home Tab
 
-- [ ] Create home screen layout
-- [ ] Implement search bar
-- [ ] Create horizontal section component
-- [ ] Create event poster card component
-- [ ] Implement sections:
-  - [ ] Tonight / This Weekend
-  - [ ] Near You (needs location)
-  - [ ] Trending in City
-  - [ ] Family Picks
-  - [ ] Upcoming Events
-- [ ] Integrate FlashList for horizontal scrolling
-- [ ] Add pull-to-refresh
-- [ ] Add loading skeletons
-- [ ] Add empty states per section
-- [ ] Implement filter modal
-- [ ] Connect to Convex queries
+- [x] Create home screen layout
+- [x] Implement search bar
+- [x] Create horizontal section component
+- [x] Create event poster card component
+- [x] Integrate FlashList for horizontal scrolling
+- [x] Add loading skeletons
+- [x] Add empty states per section
+- [x] Implement filter modal
+- [x] Connect to Convex queries
 
 ### 3.4 Event Detail Screen
 
@@ -200,20 +217,19 @@
 
 ### 3.5 Map Tab
 
-- [ ] Install @rnmapbox/maps
-- [ ] Configure Mapbox token
-- [ ] Create map screen layout
-- [ ] Initialize map with user location
-- [ ] Create custom marker component
-- [ ] Fetch events for visible area
-- [ ] Render markers on map
-- [ ] Implement marker clustering
-- [ ] Create filter chip bar
-- [ ] Create bottom sheet preview on marker tap
-- [ ] "Search this area" button
-- [ ] My location button
-- [ ] Navigation to event detail on tap
-- [ ] Test performance with many markers
+- [x] Install @rnmapbox/maps
+- [x] Configure Mapbox token
+- [x] Create map screen layout
+- [x] Initialize map with user location
+- [x] Create custom marker component
+- [x] Fetch events for visible area
+- [x] Render markers on map
+- [x] Implement marker clustering
+- [x] Create filter chip bar
+- [x] Create bottom sheet preview on marker tap
+- [x] My location button
+- [x] Navigation to event detail on tap
+- [x] Test performance with many markers
 
 ### 3.6 Profile Tab
 
@@ -669,6 +685,8 @@
 
 ### Mobile Testing
 
+- [ ] Improve the transition performance between tabs.
+
 - [ ] Check Maestro and https://github.com/bamlab/flashlight
 - [ ] Test auth flow end-to-end
 - [ ] Test onboarding flow
@@ -711,7 +729,7 @@
 
 ### Final Polish
 
-- [ ] Check react-native-screen-transitions
+- [x] Check react-native-screen-transitions
 - [ ] Fix any UI inconsistencies
 - [ ] Add loading states everywhere
 - [ ] Add error handling everywhere
@@ -723,3 +741,5 @@
 ---
 
 _Total : ~350 tasks across all apps_
+
+

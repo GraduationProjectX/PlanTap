@@ -64,6 +64,18 @@ mobile/
 
 See `ROUTING.md` for a detailed explanation of the `(auth)` + `(main)` route architecture.
 
+### Screen Transitions
+
+The app uses [`react-native-screen-transitions`](https://github.com/eds2002/react-native-screen-transitions) only for event card to event details shared transitions.
+
+- Main transition stack wiring: `app/(main)/_layout.tsx` (`event/[id]` only)
+- Shared tag helper: `lib/event-transition.ts`
+- Source event card component: `components/events/EventCard.tsx`
+- Destination event details screen: `app/(main)/event/[id].tsx`
+- Dismiss gesture is disabled on event details to avoid accidental swipe/scroll back behavior.
+
+Do not enable transition presets for tab screens or other stack routes unless explicitly requested.
+
 ### Adding New Screens
 
 Create a new file in the route group that owns it (`(main)` or `(auth)`):

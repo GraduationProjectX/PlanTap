@@ -34,12 +34,12 @@ export const setJSON = <T>(key: string, value: T) => {
   }
 };
 
-export const getJSON = <T>(key: string) => {
+export const getJSON = (key: string): unknown | null => {
   const rawValue = storage.getString(key);
   if (!rawValue) return null;
 
   try {
-    return JSON.parse(rawValue) as T;
+    return JSON.parse(rawValue);
   } catch {
     return null;
   }

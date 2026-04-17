@@ -4,7 +4,7 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "dev": "convex dev",
+    "dev": "pnpm exec convex dev",
     "build": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/.turbo-stamp','');console.log('No build step configured for packages/backend yet')\"",
     "lint": "oxlint --deny-warnings -c ../../.oxlintrc.json --ignore-path ../../.eslintignore .",
     "format": "oxfmt .",
@@ -12,7 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "convex": "^1.32.0",
+    "convex": "^1.33.1",
     "svix": "^1.84.1"
   },
   "devDependencies": {
