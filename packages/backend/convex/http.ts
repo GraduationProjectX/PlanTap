@@ -13,6 +13,7 @@ type ClerkWebhookEvent = {
 
 const http = httpRouter();
 
+//clerk auth
 http.route({
   path: "/clerk-users-webhook",
   method: "POST",
@@ -33,11 +34,9 @@ http.route({
         if (!clerkUserId) {
           return new Response("Missing user id in payload", { status: 400 });
         }
-
         await ctx.runMutation(internal.users.deleteUser, { clerkUserId });
         break;
       }
-
       default:
         console.log("Ignoring Clerk webhook event: ", event.type);
         break;
@@ -47,6 +46,37 @@ http.route({
   }),
 });
 
+// scraper ingest
+http.route({
+  path: "/ingest-event",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // 1. Enforce Auth: Check for our shared secret
+    const authHeader = request.headers.get("Authorization");
+    const expectedSecret = process.env.SCRAPER_SECRET;
+
+    if (!expectedSecret || authHeader !== `Bearer ${expectedSecret}`) {
+      return new Response("Unauthorized: Invalid or missing secret.", {
+        status: 401,
+      });
+    }
+
+    try {
+      // 2. Parse the incoming JSON from the scraper
+      const eventData = await request.json();
+
+      // 3. Save to database using the internal mutation
+      await ctx.runMutation((internal as any).admin.ingestEventInternal, { eventData }); //passed internal as any to make it run for now ;D
+
+      return new Response("Successfully ingested event", { status: 200 });
+    } catch (error) {
+      console.error("Ingestion failed:", error);
+      return new Response("Bad Request: Invalid data format", { status: 400 });
+    }
+  }),
+});
+
+//validator
 async function validateRequest(request: Request): Promise<ClerkWebhookEvent | null> {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
