@@ -4,6 +4,29 @@
 > **Legend**: `[ ]` = todo, `[/]` = in progress, `[x]` = done
 
 ---
+## To Generate .APK Application after finishing everything without Deployment to App store or Google Store. 
+# https://x.com/betomoedano/status/2044896666856088013
+# https://codewithbeto.dev/blog/building-expo-apps-locally
+
+Before anything else: if you're on Expo, your Debug builds include expo-dev-client. That's the screen with the "Development Servers" list and the "Enter URL manually" button. Great for development, useless for e2e or distributing a build to someone.
+
+For anything where you want the app to launch straight into your actual UI, you need a Release build. This applies to both platforms.
+Android: the easy one
+
+From the android/ folder, Gradle does all the work:
+
+cd android
+./gradlew assembleRelease
+
+The output lands at:
+
+android/app/build/outputs/apk/release/app-release.apk
+
+Install it on a connected device or emulator with:
+
+adb install -r android/app/build/outputs/apk/release/app-release.apk
+
+That's it. No signing config needed for local testing, Gradle will use the debug keystore by default if you haven't set up release signing.
 
 # 📱 MOBILE APP TASKS
 
@@ -194,20 +217,19 @@
 
 ### 3.5 Map Tab
 
-- [ ] Install @rnmapbox/maps
-- [ ] Configure Mapbox token
-- [ ] Create map screen layout
-- [ ] Initialize map with user location
-- [ ] Create custom marker component
-- [ ] Fetch events for visible area
-- [ ] Render markers on map
-- [ ] Implement marker clustering
-- [ ] Create filter chip bar
-- [ ] Create bottom sheet preview on marker tap
-- [ ] "Search this area" button
-- [ ] My location button
-- [ ] Navigation to event detail on tap
-- [ ] Test performance with many markers
+- [x] Install @rnmapbox/maps
+- [x] Configure Mapbox token
+- [x] Create map screen layout
+- [x] Initialize map with user location
+- [x] Create custom marker component
+- [x] Fetch events for visible area
+- [x] Render markers on map
+- [x] Implement marker clustering
+- [x] Create filter chip bar
+- [x] Create bottom sheet preview on marker tap
+- [x] My location button
+- [x] Navigation to event detail on tap
+- [x] Test performance with many markers
 
 ### 3.6 Profile Tab
 
@@ -719,3 +741,5 @@
 ---
 
 _Total : ~350 tasks across all apps_
+
+
