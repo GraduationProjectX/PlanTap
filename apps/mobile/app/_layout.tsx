@@ -22,7 +22,7 @@ import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -135,7 +135,9 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}>
+      <ThemeProvider
+        value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}
+      >
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             <HeroUINativeProvider>
@@ -150,26 +152,15 @@ function RootLayout() {
 
 function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
+  const isAuthenticated = isSignedIn === true;
   const navigationRef = useNavigationContainerRef();
-  const currentUser = useQuery(api.users.current, isSignedIn ? {} : "skip");
-  const initialOnboardingCompletedAtRef = useRef<number | null | undefined>(undefined);
+  const currentUser = useQuery(api.users.current, isAuthenticated ? {} : "skip");
 
-  if (!isSignedIn && initialOnboardingCompletedAtRef.current !== undefined) {
-    initialOnboardingCompletedAtRef.current = undefined;
-  }
-
-  if (isSignedIn && currentUser !== undefined && initialOnboardingCompletedAtRef.current === undefined) {
-    initialOnboardingCompletedAtRef.current = currentUser?.onboardingCompletedAt ?? null;
-  }
-
-  const isUserLoading = isSignedIn && currentUser === undefined;
+  const isUserLoading = isAuthenticated && currentUser === undefined;
   const onboardingCompletedAt = currentUser?.onboardingCompletedAt ?? null;
-  const shouldForceOnboardingForDevRetest =
-    __DEV__ &&
-    initialOnboardingCompletedAtRef.current != null &&
-    onboardingCompletedAt === initialOnboardingCompletedAtRef.current;
-  const hasCompletedOnboarding =
-    onboardingCompletedAt != null && !shouldForceOnboardingForDevRetest;
+  const hasCompletedOnboarding = onboardingCompletedAt !== null;
+  const shouldShowOnboarding = isAuthenticated && !hasCompletedOnboarding;
+  const shouldShowAuth = !isAuthenticated;
 
   useEffect(() => {
     if (navigationRef) {
@@ -183,15 +174,15 @@ function RootNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isSignedIn && hasCompletedOnboarding}>
+      <Stack.Protected guard={isAuthenticated && hasCompletedOnboarding}>
         <Stack.Screen name="(main)" />
       </Stack.Protected>
 
-      <Stack.Protected guard={isSignedIn && !hasCompletedOnboarding}>
+      <Stack.Protected guard={shouldShowOnboarding}>
         <Stack.Screen name="onboarding/index" />
       </Stack.Protected>
 
-      <Stack.Protected guard={!isSignedIn}>
+      <Stack.Protected guard={shouldShowAuth}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
 

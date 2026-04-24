@@ -1,5 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -48,7 +49,7 @@ export function InterestsStep({
         <Image
           source={require("@/assets/images/onboarding-likes.png")}
           style={styles.illustration}
-          resizeMode="contain"
+          contentFit="contain"
         />
       </Animated.View>
 

@@ -78,6 +78,7 @@ async function upsertClerkUser(ctx: MutationCtx, data: ClerkUserData) {
 
   await ctx.db.insert("users", {
     ...patch,
+    onboardingCompletedAt: null,
     createdAt: now,
   });
 }
@@ -101,9 +102,7 @@ export const processClerkEvent = internalMutation({
   handler: async (ctx, { eventId, eventType, receivedAt, data }) => {
     const existing = await ctx.db
       .query("webhookEvents")
-      .withIndex("by_provider_and_eventid", (q) =>
-        q.eq("provider", "clerk").eq("eventId", eventId),
-      )
+      .withIndex("by_provider_and_eventid", (q) => q.eq("provider", "clerk").eq("eventId", eventId))
       .first();
 
     if (existing) {

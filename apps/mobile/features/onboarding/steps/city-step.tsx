@@ -1,8 +1,8 @@
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
 import { Button, RadioGroup } from "heroui-native";
 import { useState } from "react";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -95,6 +95,7 @@ export function CityStep({
                   <Image
                     source={{ uri: CITY_IMAGES[city] ?? CITY_IMAGES.Riyadh }}
                     style={styles.cityImage}
+                    contentFit="cover"
                   />
                   <Text style={styles.cityName}>{city}</Text>
                   <View

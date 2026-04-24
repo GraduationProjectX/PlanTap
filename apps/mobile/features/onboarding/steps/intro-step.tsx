@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Image } from "expo-image";
 import { Button } from "heroui-native";
-import { Image, Text, View, useWindowDimensions } from "react-native";
+import { Text, View, useWindowDimensions } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
@@ -32,7 +33,7 @@ export function IntroStep({
         <Image
           source={require("@/assets/images/onboarding-intro.png")}
           style={styles.heroImage}
-          resizeMode="stretch"
+          contentFit="fill"
         />
       </Animated.View>
 

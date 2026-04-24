@@ -160,9 +160,9 @@
   },
   "onboarding": {
     "intro": {
-      "titleLine1": "Find events.",
-      "titleLine2": "Have fun.",
-      "description": "Discover exciting events and activities that match your interests, near you.",
+      "titleLine1": "Discover events.",
+      "titleLine2": "Have fun!",
+      "description": "Find exciting events and activities that match your interests, near you.",
       "cta": "Get Started"
     },
     "city": {
@@ -243,7 +243,14 @@
       "title": "Stay in the loop",
       "description": "Turn on notifications to get reminders for saved and upcoming plans.",
       "switchLabel": "Enable notifications",
-      "switchDescription": "You can change this anytime in settings."
+      "switchDescription": "You can change this anytime in settings.",
+      "benefits": {
+        "reminder": "Event reminders before they start",
+        "interests": "New events matching your interests",
+        "nearby": "Activities happening near you"
+      },
+      "permissionDeniedTitle": "Notifications are off",
+      "permissionDeniedDescription": "We will keep notifications disabled until you allow them in system settings."
     },
     "actions": {
       "finish": "Finish",
@@ -264,6 +271,8 @@
       "wellness": "Wellness",
       "tech": "Tech",
       "family": "Family",
+      "concerts": "Concerts",
+      "entertainment": "Entertainment",
       "nightlife": "Nightlife",
       "culture": "Culture"
     }

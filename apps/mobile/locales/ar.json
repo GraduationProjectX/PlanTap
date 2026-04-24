@@ -243,7 +243,14 @@
       "title": "ابقَ على اطلاع",
       "description": "فعّل الإشعارات لتصلك تذكيرات بالخطط المحفوظة والقادمة.",
       "switchLabel": "تفعيل الإشعارات",
-      "switchDescription": "يمكنك تغيير ذلك لاحقاً من الإعدادات."
+      "switchDescription": "يمكنك تغيير ذلك لاحقاً من الإعدادات.",
+      "benefits": {
+        "reminder": "تذكيرات قبل بدء الفعاليات",
+        "interests": "فعاليات جديدة تناسب اهتماماتك",
+        "nearby": "أنشطة قريبة منك"
+      },
+      "permissionDeniedTitle": "الإشعارات متوقفة",
+      "permissionDeniedDescription": "سنُبقي الإشعارات معطلة حتى تسمح بها من إعدادات النظام."
     },
     "actions": {
       "finish": "إنهاء",
@@ -264,6 +271,8 @@
       "wellness": "عافية",
       "tech": "تقنية",
       "family": "عائلة",
+      "concerts": "حفلات",
+      "entertainment": "ترفيه",
       "nightlife": "سهر",
       "culture": "ثقافة"
     }

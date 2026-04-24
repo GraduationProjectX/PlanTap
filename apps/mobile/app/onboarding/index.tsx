@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
 import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -48,6 +49,12 @@ export default function OnboardingScreen() {
   const currentStep = ONBOARDING_STEPS[stepIndex];
   const isFinalStep = stepIndex === ONBOARDING_STEPS.length - 1;
   const showSkip = stepIndex > 0;
+  const canContinueFromStep =
+    currentStep === "interests"
+      ? draft.preferences.likedTags.length > 0
+      : currentStep === "dislikes"
+        ? draft.preferences.dislikedTags.length > 0
+        : true;
 
   const cityOptions = getCityOptions(events ?? []);
   const isArabic = i18n.language === "ar";
@@ -65,6 +72,10 @@ export default function OnboardingScreen() {
           ...option,
           label: t(`onboarding.tags.${option.id}`, { defaultValue: option.label }),
         }));
+  const likedTagSet = new Set(draft.preferences.likedTags);
+  const dislikedTagSet = new Set(draft.preferences.dislikedTags);
+  const interestOptions = tagOptions.filter((option) => !dislikedTagSet.has(option.id));
+  const dislikeOptions = tagOptions.filter((option) => !likedTagSet.has(option.id));
   const groupTypeOptions = ONBOARDING_GROUP_TYPE_OPTIONS.map((option) => ({
     value: option.value,
     label: t(option.labelKey),
@@ -84,6 +95,16 @@ export default function OnboardingScreen() {
     setStepIndex((current) => Math.max(current - 1, 0));
   };
 
+  const getNotificationPermission = async () => {
+    const currentPermission = await Notifications.getPermissionsAsync();
+    if (currentPermission.granted) {
+      return true;
+    }
+
+    const requestedPermission = await Notifications.requestPermissionsAsync();
+    return requestedPermission.granted;
+  };
+
   const submitOnboarding = async (notificationsEnabled: boolean) => {
     if (isSubmitting) {
       return;
@@ -91,6 +112,16 @@ export default function OnboardingScreen() {
 
     setIsSubmitting(true);
     try {
+      const canEnableNotifications = notificationsEnabled
+        ? await getNotificationPermission()
+        : false;
+      if (notificationsEnabled && !canEnableNotifications) {
+        Alert.alert(
+          t("onboarding.notifications.permissionDeniedTitle"),
+          t("onboarding.notifications.permissionDeniedDescription"),
+        );
+      }
+
       await completeOnboarding({
         city: draft.city,
         preferences: {
@@ -103,7 +134,7 @@ export default function OnboardingScreen() {
           budgetMin: null,
           budgetMax: null,
         },
-        notificationsEnabled,
+        notificationsEnabled: canEnableNotifications,
       });
       router.replace("/");
     } catch (error) {
@@ -212,7 +243,7 @@ export default function OnboardingScreen() {
           counterLabel={t("onboarding.interests.counterLabel")}
           footerNote={t("onboarding.interests.footerNote")}
           selectedTags={draft.preferences.likedTags}
-          options={tagOptions}
+          options={interestOptions}
           onSelectionChange={(likedTags) => {
             setDraft((current) => ({
               ...current,
@@ -237,7 +268,7 @@ export default function OnboardingScreen() {
           counterLabel={t("onboarding.dislikes.counterLabel")}
           footerNote={t("onboarding.dislikes.footerNote")}
           selectedTags={draft.preferences.dislikedTags}
-          options={tagOptions}
+          options={dislikeOptions}
           onSelectionChange={(dislikedTags) => {
             setDraft((current) => ({
               ...current,
@@ -292,6 +323,9 @@ export default function OnboardingScreen() {
         description={t("onboarding.notifications.description")}
         switchLabel={t("onboarding.notifications.switchLabel")}
         switchDescription={t("onboarding.notifications.switchDescription")}
+        benefitReminder={t("onboarding.notifications.benefits.reminder")}
+        benefitInterests={t("onboarding.notifications.benefits.interests")}
+        benefitNearby={t("onboarding.notifications.benefits.nearby")}
         enabled={draft.notificationsEnabled}
         onToggle={(enabled) => {
           setDraft((current) => ({
@@ -378,6 +412,10 @@ export default function OnboardingScreen() {
           <Button
             feedbackVariant="scale"
             onPress={() => {
+              if (!canContinueFromStep) {
+                return;
+              }
+
               if (isFinalStep) {
                 void submitOnboarding(draft.notificationsEnabled);
                 return;
@@ -385,7 +423,7 @@ export default function OnboardingScreen() {
 
               goToNextStep();
             }}
-            isDisabled={isSubmitting}
+            isDisabled={isSubmitting || !canContinueFromStep}
             style={styles.primaryAction}
           >
             <Button.Label style={styles.primaryActionLabel}>

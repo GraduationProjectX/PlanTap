@@ -61,7 +61,7 @@ function normalizeCategories(rawCategories: RawCategoryDoc[]): CategoryDoc[] {
   });
 }
 
-export function useCategories() {
+export function useCategories(enabled = true) {
   const cachedCategoriesRef = useRef<CategoryDoc[] | null>(null);
   if (cachedCategoriesRef.current === null) {
     cachedCategoriesRef.current = readCachedData<CategoryDoc[]>(
@@ -70,7 +70,10 @@ export function useCategories() {
     );
   }
 
-  const rawCategories: RawCategoryDoc[] | undefined = useQuery(api.categories.categoriesList);
+  const rawCategories: RawCategoryDoc[] | undefined = useQuery(
+    api.categories.categoriesList,
+    enabled ? {} : "skip",
+  );
   const normalizedCategories =
     rawCategories === undefined ? undefined : normalizeCategories(rawCategories);
 

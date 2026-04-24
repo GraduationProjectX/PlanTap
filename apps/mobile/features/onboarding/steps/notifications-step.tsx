@@ -1,6 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Switch } from "heroui-native";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { ControlField } from "heroui-native";
+import { Text, View } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -9,6 +10,9 @@ type NotificationsStepProps = {
   description: string;
   switchLabel: string;
   switchDescription: string;
+  benefitReminder: string;
+  benefitInterests: string;
+  benefitNearby: string;
   enabled: boolean;
   onToggle: (enabled: boolean) => void;
 };
@@ -18,6 +22,9 @@ export function NotificationsStep({
   description,
   switchLabel,
   switchDescription,
+  benefitReminder,
+  benefitInterests,
+  benefitNearby,
   enabled,
   onToggle,
 }: NotificationsStepProps) {
@@ -29,7 +36,7 @@ export function NotificationsStep({
         <Image
           source={require("@/assets/images/onboarding-notification.png")}
           style={styles.illustration}
-          resizeMode="cover"
+          contentFit="cover"
         />
       </Animated.View>
 
@@ -39,8 +46,9 @@ export function NotificationsStep({
       </Animated.View>
 
       <Animated.View entering={FadeInUp.duration(400).delay(200)} style={styles.toggleSection}>
-        <Pressable
-          onPress={() => onToggle(!enabled)}
+        <ControlField
+          isSelected={enabled}
+          onSelectedChange={onToggle}
           style={[styles.toggleCard, enabled && styles.toggleCardActive]}
         >
           <View style={[styles.iconWrapper, enabled && styles.iconWrapperActive]}>
@@ -56,8 +64,8 @@ export function NotificationsStep({
             <Text style={styles.toggleDescription}>{switchDescription}</Text>
           </View>
 
-          <Switch isSelected={enabled} onSelectedChange={onToggle} />
-        </Pressable>
+          <ControlField.Indicator variant="switch" />
+        </ControlField>
       </Animated.View>
 
       <Animated.View entering={FadeInUp.duration(400).delay(300)} style={styles.benefitsSection}>
@@ -65,21 +73,21 @@ export function NotificationsStep({
           <View style={styles.benefitIcon}>
             <FontAwesome name="calendar" size={14} color={theme.colors.primary} />
           </View>
-          <Text style={styles.benefitText}>Event reminders before they start</Text>
+          <Text style={styles.benefitText}>{benefitReminder}</Text>
         </View>
 
         <View style={styles.benefitRow}>
           <View style={styles.benefitIcon}>
             <FontAwesome name="star" size={14} color={theme.colors.primary} />
           </View>
-          <Text style={styles.benefitText}>New events matching your interests</Text>
+          <Text style={styles.benefitText}>{benefitInterests}</Text>
         </View>
 
         <View style={styles.benefitRow}>
           <View style={styles.benefitIcon}>
             <FontAwesome name="map-marker" size={14} color={theme.colors.primary} />
           </View>
-          <Text style={styles.benefitText}>Activities happening near you</Text>
+          <Text style={styles.benefitText}>{benefitNearby}</Text>
         </View>
       </Animated.View>
     </View>

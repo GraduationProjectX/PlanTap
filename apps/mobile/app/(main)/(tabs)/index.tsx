@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "backend/convex/_generated/api";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
@@ -27,21 +29,28 @@ export default function HomeScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
+  const currentUser = useQuery(api.users.current, {});
 
   const [searchValue, setSearchValue] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedCity, setSelectedCity] = useState<string | undefined>();
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+  const [selectedCity, setSelectedCity] = useState<string | null | undefined>();
 
-  const {
-    events,
-    collections,
-    isLoading: isEventsLoading,
-  } = useEvents();
+  const { events, collections, isLoading: isEventsLoading } = useEvents();
   const { categories, isLoading: isCategoriesLoading } = useCategories();
   const cityOptions = getCityOptions(events ?? []);
+  const profileCity = currentUser?.city ?? undefined;
+  const activeCity = selectedCity === undefined ? profileCity : (selectedCity ?? undefined);
+  const activeCategory = selectedCategory ?? "all";
 
   useEffect(() => {
-    if (cityOptions.length === 0) return;
+    if (
+      currentUser === undefined ||
+      profileCity ||
+      selectedCity !== undefined ||
+      cityOptions.length === 0
+    ) {
+      return;
+    }
 
     let isMounted = true;
 
@@ -59,7 +68,7 @@ export default function HomeScreen() {
     return () => {
       isMounted = false;
     };
-  }, [cityOptions]);
+  }, [cityOptions, currentUser, profileCity, selectedCity]);
 
   const handleEventPress = (id: string) => {
     router.push({ pathname: "/event/[id]", params: { id } });
@@ -70,12 +79,12 @@ export default function HomeScreen() {
   const handleViewAll = (type: ViewAllEventType) => {
     const params: Record<string, string> = { type };
 
-    if (selectedCity) {
-      params.city = selectedCity;
+    if (activeCity) {
+      params.city = activeCity;
     }
 
-    if (selectedCategory !== "all") {
-      params.homeCategory = selectedCategory;
+    if (activeCategory !== "all") {
+      params.homeCategory = activeCategory;
     }
 
     router.push({ pathname: "/event", params });
@@ -109,15 +118,15 @@ export default function HomeScreen() {
   };
 
   const matchesCategory = (event: EventDoc) => {
-    if (selectedCategory === "all") {
+    if (activeCategory === "all") {
       return true;
     }
 
-    return event.categories.includes(selectedCategory);
+    return event.categories.includes(activeCategory);
   };
 
   const matchesHomeHeaderFilters = (event: EventDoc) => {
-    if (selectedCity && event.city !== selectedCity) {
+    if (activeCity && event.city !== activeCity) {
       return false;
     }
 
@@ -132,31 +141,28 @@ export default function HomeScreen() {
 
   const hasAnyVisibleEvents =
     ongoingEvents.length > 0 || upcomingEvents.length > 0 || activityEvents.length > 0;
-  const hasSearchOrCategoryFilter = query.length > 0 || selectedCategory !== "all";
+  const hasSearchOrCategoryFilter = query.length > 0 || activeCategory !== "all";
 
   const emptyStateMessage =
-    selectedCity && !hasSearchOrCategoryFilter
-      ? t("home.noEventsInCity", { city: selectedCity })
+    activeCity && !hasSearchOrCategoryFilter
+      ? t("home.noEventsInCity", { city: activeCity })
       : t("home.noResultsFound");
-  const showTryAnotherCity = selectedCity && !hasSearchOrCategoryFilter;
+  const showTryAnotherCity = activeCity && !hasSearchOrCategoryFilter;
 
-  const ongoingTitle = selectedCity
-    ? t("home.ongoingEventsInCity", { city: selectedCity })
+  const ongoingTitle = activeCity
+    ? t("home.ongoingEventsInCity", { city: activeCity })
     : t("home.ongoingEvents");
-  const upcomingTitle = selectedCity
-    ? t("home.upcomingInCity", { city: selectedCity })
+  const upcomingTitle = activeCity
+    ? t("home.upcomingInCity", { city: activeCity })
     : t("home.upcoming");
-  const activitiesTitle = selectedCity
-    ? t("home.activitiesInCity", { city: selectedCity })
+  const activitiesTitle = activeCity
+    ? t("home.activitiesInCity", { city: activeCity })
     : t("home.activities");
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       {insets.top > 0 && (
-        <View
-          pointerEvents="none"
-          style={[styles.statusBarBackground, { height: insets.top }]}
-        />
+        <View pointerEvents="none" style={[styles.statusBarBackground, { height: insets.top }]} />
       )}
       <ScrollView
         ref={scrollRef}
@@ -170,15 +176,15 @@ export default function HomeScreen() {
         overScrollMode="never"
       >
         <HomeHeaderTop
-          city={selectedCity}
+          city={activeCity}
           cityOptions={cityOptions}
           onFavoritePress={() => router.push("/bookmarks")}
-          onCitySelect={setSelectedCity}
+          onCitySelect={(city) => setSelectedCity(city ?? null)}
         />
         <HomeHeaderSticky
           searchValue={searchValue}
           onSearchChange={setSearchValue}
-          selectedCategory={selectedCategory}
+          selectedCategory={activeCategory}
           onCategorySelect={handleCategorySelect}
           onFilterPress={handleFilterPress}
           isFilterActive={false}
@@ -197,10 +203,7 @@ export default function HomeScreen() {
                   actionLabel={t("home.viewAll")}
                   onAction={() => handleViewAll("ongoing")}
                 />
-                <OngoingEventsCarousel
-                  events={ongoingEvents}
-                  onEventPress={handleEventPress}
-                />
+                <OngoingEventsCarousel events={ongoingEvents} onEventPress={handleEventPress} />
               </View>
             )}
 
@@ -232,17 +235,16 @@ export default function HomeScreen() {
                   actionLabel={t("home.viewAll")}
                   onAction={() => handleViewAll("upcoming")}
                 />
-                <UpcomingEventsList
-                  events={upcomingEvents}
-                  onEventPress={handleEventPress}
-                />
+                <UpcomingEventsList events={upcomingEvents} onEventPress={handleEventPress} />
               </View>
             )}
 
             {!hasAnyVisibleEvents && (
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyTitle}>{emptyStateMessage}</Text>
-                {showTryAnotherCity && <Text style={styles.emptyHint}>{t("home.tryAnotherCity")}</Text>}
+                {showTryAnotherCity && (
+                  <Text style={styles.emptyHint}>{t("home.tryAnotherCity")}</Text>
+                )}
               </View>
             )}
           </>
