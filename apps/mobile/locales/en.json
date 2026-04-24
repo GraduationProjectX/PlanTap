@@ -157,5 +157,110 @@
         "hint": "Always use the dark theme."
       }
     }
+  },
+  "onboarding": {
+    "intro": {
+      "titleLine1": "Find events.",
+      "titleLine2": "Have fun.",
+      "description": "Discover exciting events and activities that match your interests, near you.",
+      "cta": "Get Started"
+    },
+    "city": {
+      "title": "Where are you?",
+      "description": "Help us show events near you.",
+      "selectLabel": "Select your city",
+      "searchPlaceholder": "Search for your city",
+      "popularCities": "Popular cities",
+      "allCities": "Any city",
+      "enableLocation": "Enable location",
+      "enableLocationDescription": "Allow location access to discover events near you.",
+      "allowLocation": "Allow Location",
+      "notNow": "Not Now",
+      "privacyNote": "Your location is only used to show nearby events.",
+      "locating": "Finding your city...",
+      "permissionDeniedTitle": "Location permission needed",
+      "permissionDeniedDescription": "Enable location access to auto-detect your city.",
+      "locationUnavailableTitle": "City not detected",
+      "locationUnavailableDescription": "We could not match your location to a supported city yet."
+    },
+    "interests": {
+      "title": "What are you into?",
+      "description": "Select as many interests as you want."
+    },
+    "dislikes": {
+      "title": "Anything you want less of?",
+      "description": "Choose what to avoid. You can always edit this later."
+    },
+    "defaults": {
+      "title": "Set your default planning style",
+      "description": "These defaults are only a starting point and can be changed later.",
+      "groupType": {
+        "label": "Group type",
+        "options": {
+          "solo": {
+            "label": "Solo",
+            "description": "Plans tuned for one person."
+          },
+          "group": {
+            "label": "Group",
+            "description": "Great for friends or teams."
+          },
+          "kids": {
+            "label": "Kids",
+            "description": "Family-friendly by default."
+          }
+        }
+      },
+      "indoorOutdoor": {
+        "label": "Indoor or outdoor",
+        "options": {
+          "indoor": {
+            "label": "Indoor",
+            "description": "Prefer indoor venues."
+          },
+          "outdoor": {
+            "label": "Outdoor",
+            "description": "Prefer outdoor experiences."
+          },
+          "any": {
+            "label": "Any",
+            "description": "No indoor/outdoor preference."
+          }
+        }
+      },
+      "budget": {
+        "label": "Budget range",
+        "prefix": "SAR",
+        "clear": "No budget preference"
+      }
+    },
+    "notifications": {
+      "title": "Stay in the loop",
+      "description": "Turn on notifications to get reminders for saved and upcoming plans.",
+      "switchLabel": "Enable notifications",
+      "switchDescription": "You can change this anytime in settings."
+    },
+    "actions": {
+      "finish": "Finish",
+      "submitting": "Saving..."
+    },
+    "errors": {
+      "submitTitle": "Could not finish onboarding",
+      "submitDescription": "Please try again.",
+      "locationTitle": "Could not access location",
+      "locationDescription": "Please try again in a moment."
+    },
+    "tags": {
+      "music": "Music",
+      "food": "Food",
+      "sports": "Sports",
+      "arts": "Arts",
+      "adventure": "Adventure",
+      "wellness": "Wellness",
+      "tech": "Tech",
+      "family": "Family",
+      "nightlife": "Nightlife",
+      "culture": "Culture"
+    }
   }
 }

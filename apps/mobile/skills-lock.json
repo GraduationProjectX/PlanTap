@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "reanimated-skia-performance": {
+      "source": "andreev-danila/skills",
+      "sourceType": "github",
+      "computedHash": "c487dc7ed351bcc5fdfcb4e9a750e8b9c03c18c54f77ef6946c94b9d9c931767"
+    }
+  }
+}

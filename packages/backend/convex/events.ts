@@ -26,8 +26,7 @@ export const list = query({
       const city = args.city;
       return await ctx.db
         .query("events")
-        .withIndex("by_city_and_status", (q) => q.eq("city", city))
-        .filter((q) => q.eq(q.field("status"), "approved"))
+        .withIndex("by_city_and_status", (q) => q.eq("city", city).eq("status", "approved"))
         .take(MAX_EVENTS);
     }
 

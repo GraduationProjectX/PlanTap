@@ -157,5 +157,110 @@
         "hint": "استخدم المظهر الداكن دائماً."
       }
     }
+  },
+  "onboarding": {
+    "intro": {
+      "titleLine1": "اعثر على فعاليات.",
+      "titleLine2": "واستمتع.",
+      "description": "أضف تفضيلاتك بسرعة ليعرض لك PlanTap فعاليات وأنشطة أنسب من البداية.",
+      "cta": "ابدأ"
+    },
+    "city": {
+      "title": "أين أنت؟",
+      "description": "ساعدنا في عرض الفعاليات القريبة منك.",
+      "selectLabel": "اختر مدينتك",
+      "searchPlaceholder": "ابحث عن مدينتك",
+      "popularCities": "المدن الشائعة",
+      "allCities": "أي مدينة",
+      "enableLocation": "تفعيل الموقع",
+      "enableLocationDescription": "اسمح بالوصول إلى موقعك لاكتشاف الفعاليات القريبة.",
+      "allowLocation": "السماح بالموقع",
+      "notNow": "ليس الآن",
+      "privacyNote": "يُستخدم موقعك فقط لعرض الفعاليات القريبة.",
+      "locating": "جارٍ تحديد مدينتك...",
+      "permissionDeniedTitle": "يلزم إذن الموقع",
+      "permissionDeniedDescription": "فعّل إذن الموقع لاكتشاف مدينتك تلقائياً.",
+      "locationUnavailableTitle": "تعذر تحديد المدينة",
+      "locationUnavailableDescription": "لم نتمكن من مطابقة موقعك مع مدينة مدعومة حالياً."
+    },
+    "interests": {
+      "title": "ما الذي يهمك؟",
+      "description": "اختر كل الاهتمامات التي تناسبك."
+    },
+    "dislikes": {
+      "title": "هل هناك ما تفضّل تقليله؟",
+      "description": "اختر ما لا ترغب برؤيته كثيراً. يمكنك تعديل ذلك لاحقاً."
+    },
+    "defaults": {
+      "title": "حدّد نمط التخطيط الافتراضي",
+      "description": "هذه الإعدادات نقطة بداية فقط ويمكن تعديلها لاحقاً.",
+      "groupType": {
+        "label": "نوع المجموعة",
+        "options": {
+          "solo": {
+            "label": "فردي",
+            "description": "خطط مناسبة لشخص واحد."
+          },
+          "group": {
+            "label": "مجموعة",
+            "description": "مناسبة للأصدقاء أو الفرق."
+          },
+          "kids": {
+            "label": "أطفال",
+            "description": "خيارات مناسبة للعائلة افتراضياً."
+          }
+        }
+      },
+      "indoorOutdoor": {
+        "label": "داخلي أو خارجي",
+        "options": {
+          "indoor": {
+            "label": "داخلي",
+            "description": "أفضل الأماكن الداخلية."
+          },
+          "outdoor": {
+            "label": "خارجي",
+            "description": "أفضل التجارب الخارجية."
+          },
+          "any": {
+            "label": "أي خيار",
+            "description": "بدون تفضيل بين الداخلي والخارجي."
+          }
+        }
+      },
+      "budget": {
+        "label": "نطاق الميزانية",
+        "prefix": "ر.س",
+        "clear": "بدون تفضيل للميزانية"
+      }
+    },
+    "notifications": {
+      "title": "ابقَ على اطلاع",
+      "description": "فعّل الإشعارات لتصلك تذكيرات بالخطط المحفوظة والقادمة.",
+      "switchLabel": "تفعيل الإشعارات",
+      "switchDescription": "يمكنك تغيير ذلك لاحقاً من الإعدادات."
+    },
+    "actions": {
+      "finish": "إنهاء",
+      "submitting": "جارٍ الحفظ..."
+    },
+    "errors": {
+      "submitTitle": "تعذر إكمال الإعداد",
+      "submitDescription": "يرجى المحاولة مرة أخرى.",
+      "locationTitle": "تعذر الوصول إلى الموقع",
+      "locationDescription": "يرجى المحاولة بعد قليل."
+    },
+    "tags": {
+      "music": "موسيقى",
+      "food": "طعام",
+      "sports": "رياضة",
+      "arts": "فنون",
+      "adventure": "مغامرة",
+      "wellness": "عافية",
+      "tech": "تقنية",
+      "family": "عائلة",
+      "nightlife": "سهر",
+      "culture": "ثقافة"
+    }
   }
 }

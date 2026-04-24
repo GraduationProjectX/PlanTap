@@ -22,7 +22,7 @@ import { isRunningInExpoGo } from "expo";
 import { useFonts } from "expo-font";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -30,10 +30,13 @@ import { HeroUINativeProvider } from "heroui-native";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { useQuery } from "convex/react";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { AppLoadingSplash } from "@/components/app-loading-splash";
 import { convex } from "@/services/convex";
 import { useUIStore } from "@/stores/ui-store";
 import { darkTheme, lightTheme } from "@/theme/unistyles";
+import { api } from "backend/convex/_generated/api";
 import * as Sentry from "@sentry/react-native";
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -122,7 +125,7 @@ function RootLayout() {
   }, [resolvedThemeName]);
 
   if (!loaded) {
-    return null;
+    return <AppLoadingSplash />;
   }
 
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -148,6 +151,25 @@ function RootLayout() {
 function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
   const navigationRef = useNavigationContainerRef();
+  const currentUser = useQuery(api.users.current, isSignedIn ? {} : "skip");
+  const initialOnboardingCompletedAtRef = useRef<number | null | undefined>(undefined);
+
+  if (!isSignedIn && initialOnboardingCompletedAtRef.current !== undefined) {
+    initialOnboardingCompletedAtRef.current = undefined;
+  }
+
+  if (isSignedIn && currentUser !== undefined && initialOnboardingCompletedAtRef.current === undefined) {
+    initialOnboardingCompletedAtRef.current = currentUser?.onboardingCompletedAt ?? null;
+  }
+
+  const isUserLoading = isSignedIn && currentUser === undefined;
+  const onboardingCompletedAt = currentUser?.onboardingCompletedAt ?? null;
+  const shouldForceOnboardingForDevRetest =
+    __DEV__ &&
+    initialOnboardingCompletedAtRef.current != null &&
+    onboardingCompletedAt === initialOnboardingCompletedAtRef.current;
+  const hasCompletedOnboarding =
+    onboardingCompletedAt != null && !shouldForceOnboardingForDevRetest;
 
   useEffect(() => {
     if (navigationRef) {
@@ -155,20 +177,18 @@ function RootNavigator() {
     }
   }, [navigationRef]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [isLoaded]);
-
-  if (!isLoaded) {
-    return null;
+  if (!isLoaded || isUserLoading) {
+    return <AppLoadingSplash />;
   }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isSignedIn}>
+      <Stack.Protected guard={isSignedIn && hasCompletedOnboarding}>
         <Stack.Screen name="(main)" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isSignedIn && !hasCompletedOnboarding}>
+        <Stack.Screen name="onboarding/index" />
       </Stack.Protected>
 
       <Stack.Protected guard={!isSignedIn}>

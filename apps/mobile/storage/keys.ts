@@ -1,7 +1,6 @@
 export const STORAGE_KEYS = {
   UI_STATE: "plantap.ui-state",
   AUTH_STATE: "plantap.auth-state",
-  ONBOARDING_COMPLETED: "plantap.onboarding-completed",
   EVENTS_CACHE: "plantap.cache.events",
   CATEGORIES_CACHE: "plantap.cache.categories",
 } as const;

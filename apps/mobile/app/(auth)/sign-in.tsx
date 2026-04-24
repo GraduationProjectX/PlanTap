@@ -7,7 +7,10 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function SignInScreen() {
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.container}>
         <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.branding}>
           <View style={styles.logoContainer}>
@@ -34,10 +37,8 @@ export default function SignInScreen() {
 
         <Animated.View entering={FadeInUp.delay(500).duration(500)}>
           <Text style={styles.terms}>
-            By continuing, you agree to our{" "}
-            <Text style={styles.termsLink}>Terms of Service</Text>
-            {" "}and{" "}
-            <Text style={styles.termsLink}>Privacy Policy</Text>
+            By continuing, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{" "}
+            and <Text style={styles.termsLink}>Privacy Policy</Text>
           </Text>
         </Animated.View>
       </View>
@@ -109,6 +110,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   termsLink: {
     fontFamily: theme.font.family.medium,
-    color: theme.colors.text
+    color: theme.colors.text,
   },
 }));
