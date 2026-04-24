@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Button } from "heroui-native";
 import { Image, Text, View, useWindowDimensions } from "react-native";
-import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -23,38 +23,34 @@ export function IntroStep({
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const heroHeight = height * 0.58;
-
   return (
     <View style={styles.container}>
-      <View style={styles.middleSection}>
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          style={[styles.heroWrapper, { height: heroHeight }]}
-        >
-          <Image
-            source={require("@/assets/images/onboarding-intro.png")}
-            style={styles.heroImage}
-            resizeMode="stretch"
-          />
-        </Animated.View>
+      <Animated.View
+        entering={FadeIn.duration(500)}
+        style={[styles.heroWrapper, { flex: 1, minHeight: height * 0.42 }]}
+      >
+        <Image
+          source={require("@/assets/images/onboarding-intro.png")}
+          style={styles.heroImage}
+          resizeMode="stretch"
+        />
+      </Animated.View>
 
-        <Animated.View entering={FadeInUp.duration(400)} style={styles.contentCard}>
-          <View style={styles.textBlock}>
-            <View style={styles.titleGroup}>
-              <Text style={styles.titleLine}>{titleLine1}</Text>
-              <Text style={styles.titleLine}>{titleLine2}</Text>
-            </View>
-            <Text style={styles.description}>{description}</Text>
+      <View style={[styles.contentCard, { paddingBottom: insets.bottom + 16 }]}>
+        <Animated.View entering={FadeIn.duration(400).delay(150)} style={styles.textBlock}>
+          <View style={styles.titleGroup}>
+            <Text style={styles.titleLine}>{titleLine1}</Text>
+            <Text style={styles.titleLine}>{titleLine2}</Text>
           </View>
+          <Text style={styles.description}>{description}</Text>
         </Animated.View>
-      </View>
 
-      <View style={[styles.bottomCta, { paddingBottom: insets.bottom + 16 }]}>
-        <Button feedbackVariant="scale" onPress={onContinue} style={styles.ctaButton}>
-          <Button.Label style={styles.ctaLabel}>{ctaLabel}</Button.Label>
-          <FontAwesome name="arrow-right" size={18} color="white" />
-        </Button>
+        <Animated.View entering={FadeIn.duration(400).delay(300)}>
+          <Button feedbackVariant="scale" onPress={onContinue} style={styles.ctaButton}>
+            <Button.Label style={styles.ctaLabel}>{ctaLabel}</Button.Label>
+            <FontAwesome name="arrow-right" size={18} color="white" />
+          </Button>
+        </Animated.View>
       </View>
     </View>
   );
@@ -65,28 +61,22 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     backgroundColor: theme.colors.surface,
   },
-  middleSection: {
-    flex: 1,
-  },
   heroWrapper: {
     width: "100%",
-    overflow: "hidden",
   },
   heroImage: {
     width: "100%",
     height: "100%",
   },
   contentCard: {
-    flex: 1,
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: theme.radius.xxl,
     borderTopRightRadius: theme.radius.xxl,
     borderCurve: "continuous",
     marginTop: -theme.radius.xxl,
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl,
-    paddingBottom: theme.spacing.lg,
-    gap: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
+    gap: theme.spacing.md,
     ...theme.shadow.lg,
   },
   textBlock: {
@@ -106,12 +96,6 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.regular,
     lineHeight: 24,
-  },
-  bottomCta: {
-    width: "100%",
-    backgroundColor: theme.colors.surface,
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
   },
   ctaButton: {
     minHeight: theme.button.xl,

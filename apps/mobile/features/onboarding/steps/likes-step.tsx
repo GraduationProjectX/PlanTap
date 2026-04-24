@@ -7,7 +7,8 @@ import { getCategoryIconName } from "@/features/categories/meta";
 
 import type { OnboardingTagOption } from "../types";
 
-type DislikesStepProps = {
+
+type InterestsStepProps = {
   title: string;
   description: string;
   selectedTags: string[];
@@ -18,16 +19,16 @@ type DislikesStepProps = {
   footerNote?: string;
 };
 
-export function DislikesStep({
+export function InterestsStep({
   title,
   description,
   selectedTags,
   options,
   onSelectionChange,
-  sectionLabel = "Select what to avoid",
+  sectionLabel = "Select your interests",
   counterLabel = "selected",
   footerNote = "You can update these anytime",
-}: DislikesStepProps) {
+}: InterestsStepProps) {
   const { theme } = useUnistyles();
 
   const handleTagPress = (tagId: string) => {
@@ -36,13 +37,16 @@ export function DislikesStep({
     } else {
       onSelectionChange([...selectedTags, tagId]);
     }
+    // else if (selectedTags.length < MAX_SELECTIONS) {
+    //   onSelectionChange([...selectedTags, tagId]);
+    // }
   };
 
   return (
     <View style={styles.container}>
       <Animated.View entering={FadeIn.duration(400)} style={styles.illustrationWrapper}>
         <Image
-          source={require("@/assets/images/onboarding-dislikes.png")}
+          source={require("@/assets/images/onboarding-likes.png")}
           style={styles.illustration}
           resizeMode="contain"
         />
@@ -110,7 +114,6 @@ const styles = StyleSheet.create((theme) => ({
   illustration: {
     height: 180,
     width: "100%",
-    left: -10,
   },
   textBlock: {
     gap: theme.spacing.sm,

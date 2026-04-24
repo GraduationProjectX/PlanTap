@@ -3,8 +3,9 @@ import type {
   OnboardingGroupType,
   OnboardingIndoorOutdoor,
   OnboardingStepId,
-  OnboardingTagOption,
 } from "./types";
+
+export { ONBOARDING_FALLBACK_TAG_OPTIONS } from "@/features/categories/meta";
 
 export const ONBOARDING_STEPS: OnboardingStepId[] = [
   "intro",
@@ -24,24 +25,9 @@ export const ONBOARDING_DEFAULT_DRAFT: OnboardingDraft = {
   defaults: {
     groupType: "group",
     indoorOutdoor: "any",
-    budgetMin: null,
-    budgetMax: null,
   },
   notificationsEnabled: false,
 };
-
-export const ONBOARDING_FALLBACK_TAG_OPTIONS: OnboardingTagOption[] = [
-  { id: "music", label: "Music" },
-  { id: "food", label: "Food" },
-  { id: "sports", label: "Sports" },
-  { id: "arts", label: "Arts" },
-  { id: "adventure", label: "Adventure" },
-  { id: "wellness", label: "Wellness" },
-  { id: "tech", label: "Tech" },
-  { id: "family", label: "Family" },
-  { id: "nightlife", label: "Nightlife" },
-  { id: "culture", label: "Culture" },
-];
 
 export const ONBOARDING_GROUP_TYPE_OPTIONS: Array<{
   value: OnboardingGroupType;
@@ -62,6 +48,11 @@ export const ONBOARDING_GROUP_TYPE_OPTIONS: Array<{
     value: "kids",
     labelKey: "onboarding.defaults.groupType.options.kids.label",
     descriptionKey: "onboarding.defaults.groupType.options.kids.description",
+  },
+  {
+    value: "any",
+    labelKey: "onboarding.defaults.groupType.options.any.label",
+    descriptionKey: "onboarding.defaults.groupType.options.any.description",
   },
 ];
 
@@ -86,8 +77,3 @@ export const ONBOARDING_INDOOR_OUTDOOR_OPTIONS: Array<{
     descriptionKey: "onboarding.defaults.indoorOutdoor.options.any.description",
   },
 ];
-
-export const ONBOARDING_BUDGET_MIN = 0;
-export const ONBOARDING_BUDGET_MAX = 500;
-export const ONBOARDING_BUDGET_STEP = 5;
-export const ONBOARDING_BUDGET_DEFAULT_RANGE: [number, number] = [80, 220];

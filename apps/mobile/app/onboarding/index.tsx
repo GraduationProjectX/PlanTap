@@ -21,7 +21,7 @@ import {
 import { CityStep } from "@/features/onboarding/steps/city-step";
 import { DefaultsStep } from "@/features/onboarding/steps/defaults-step";
 import { DislikesStep } from "@/features/onboarding/steps/dislikes-step";
-import { InterestsStep } from "@/features/onboarding/steps/interests-step";
+import { InterestsStep } from "@/features/onboarding/steps/likes-step";
 import { IntroStep } from "@/features/onboarding/steps/intro-step";
 import { NotificationsStep } from "@/features/onboarding/steps/notifications-step";
 import { getCityOptions } from "@/features/filters/utils";
@@ -56,6 +56,7 @@ export default function OnboardingScreen() {
     .map((category) => ({
       id: category.key,
       label: isArabic ? category.labelAr : category.label,
+      icon: category.icon,
     }));
   const tagOptions =
     categoryTagOptions.length > 0
@@ -99,8 +100,8 @@ export default function OnboardingScreen() {
         defaults: {
           groupType: draft.defaults.groupType,
           indoorOutdoor: draft.defaults.indoorOutdoor,
-          budgetMin: draft.defaults.budgetMin,
-          budgetMax: draft.defaults.budgetMax,
+          budgetMin: null,
+          budgetMax: null,
         },
         notificationsEnabled,
       });
@@ -207,6 +208,9 @@ export default function OnboardingScreen() {
         <InterestsStep
           title={t("onboarding.interests.title")}
           description={t("onboarding.interests.description")}
+          sectionLabel={t("onboarding.interests.sectionLabel")}
+          counterLabel={t("onboarding.interests.counterLabel")}
+          footerNote={t("onboarding.interests.footerNote")}
           selectedTags={draft.preferences.likedTags}
           options={tagOptions}
           onSelectionChange={(likedTags) => {
@@ -229,6 +233,9 @@ export default function OnboardingScreen() {
         <DislikesStep
           title={t("onboarding.dislikes.title")}
           description={t("onboarding.dislikes.description")}
+          sectionLabel={t("onboarding.dislikes.sectionLabel")}
+          counterLabel={t("onboarding.dislikes.counterLabel")}
+          footerNote={t("onboarding.dislikes.footerNote")}
           selectedTags={draft.preferences.dislikedTags}
           options={tagOptions}
           onSelectionChange={(dislikedTags) => {
@@ -253,15 +260,10 @@ export default function OnboardingScreen() {
           description={t("onboarding.defaults.description")}
           groupTypeLabel={t("onboarding.defaults.groupType.label")}
           indoorOutdoorLabel={t("onboarding.defaults.indoorOutdoor.label")}
-          budgetLabel={t("onboarding.defaults.budget.label")}
-          clearBudgetLabel={t("onboarding.defaults.budget.clear")}
-          budgetRangePrefix={t("onboarding.defaults.budget.prefix")}
           groupTypeOptions={groupTypeOptions}
           indoorOutdoorOptions={indoorOutdoorOptions}
           groupType={draft.defaults.groupType}
           indoorOutdoor={draft.defaults.indoorOutdoor}
-          budgetMin={draft.defaults.budgetMin}
-          budgetMax={draft.defaults.budgetMax}
           onGroupTypeChange={(groupType) => {
             setDraft((current) => ({
               ...current,
@@ -277,16 +279,6 @@ export default function OnboardingScreen() {
               defaults: {
                 ...current.defaults,
                 indoorOutdoor,
-              },
-            }));
-          }}
-          onBudgetRangeChange={(budgetMin, budgetMax) => {
-            setDraft((current) => ({
-              ...current,
-              defaults: {
-                ...current.defaults,
-                budgetMin,
-                budgetMax,
               },
             }));
           }}
@@ -336,7 +328,9 @@ export default function OnboardingScreen() {
               onPress={handleSkip}
               style={styles.skipAction}
             >
-              <Button.Label style={styles.secondaryActionLabel}>{t("common.skip")}</Button.Label>
+              <Button.Label className="text-foreground" style={styles.secondaryActionLabel}>
+                {t("common.skip")}
+              </Button.Label>
             </Button>
           )}
         </View>
@@ -426,8 +420,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.md,
     paddingBottom: theme.spacing.md,
     backgroundColor: theme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
   headerRow: {
     flexDirection: "row",
@@ -442,10 +434,12 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.md,
   },
   skipAction: {
-    minHeight: theme.button.xl,
+    minHeight: theme.button.md,
     borderRadius: theme.radius.xl,
     borderCurve: "continuous",
     paddingHorizontal: theme.spacing.md,
+    borderWidth: 0,
+    borderColor: "transparent",
   },
   bottomActions: {
     width: "100%",
@@ -466,6 +460,7 @@ const styles = StyleSheet.create((theme) => ({
   secondaryActionLabel: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.semiBold,
+    color: theme.colors.text,
   },
   primaryAction: {
     flex: 1,

@@ -14,7 +14,7 @@ export default function SignInScreen() {
       <View style={styles.container}>
         <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.branding}>
           <View style={styles.logoContainer}>
-            <Image source={require("@/assets/images/icon.png")} style={styles.logo} />
+            <Image source={require("@/assets/images/planTap-icon.png")} style={styles.logo} />
           </View>
           <Text style={styles.title}>PlanTap</Text>
           <Text style={styles.subtitle}>Discover nearby events and activities.</Text>
@@ -63,15 +63,15 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xxxl,
   },
   logoContainer: {
-    width: 88,
-    height: 88,
+    width: 150,
+    height: 150,
     borderRadius: 22,
     borderCurve: "continuous",
     overflow: "hidden",
   },
   logo: {
-    width: 88,
-    height: 88,
+    width: "100%",
+    height: "100%",
   },
   title: {
     marginTop: theme.spacing.lg,

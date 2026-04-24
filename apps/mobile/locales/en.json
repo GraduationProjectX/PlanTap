@@ -184,12 +184,18 @@
       "locationUnavailableDescription": "We could not match your location to a supported city yet."
     },
     "interests": {
-      "title": "What are you into?",
-      "description": "Select as many interests as you want."
+      "title": "What are you interested in?",
+      "description": "Pick a few topics you love. We'll show events and activities you'll enjoy.",
+      "sectionLabel": "Select your interests",
+      "counterLabel": "selected",
+      "footerNote": "You can update these anytime"
     },
     "dislikes": {
       "title": "Anything you want less of?",
-      "description": "Choose what to avoid. You can always edit this later."
+      "description": "Choose what to avoid. You can always edit this later.",
+      "sectionLabel": "Select what to avoid",
+      "counterLabel": "selected",
+      "footerNote": "You can update these anytime"
     },
     "defaults": {
       "title": "Set your default planning style",
@@ -208,6 +214,10 @@
           "kids": {
             "label": "Kids",
             "description": "Family-friendly by default."
+          },
+          "any": {
+            "label": "Any",
+            "description": "No preference for group size."
           }
         }
       },
@@ -227,11 +237,6 @@
             "description": "No indoor/outdoor preference."
           }
         }
-      },
-      "budget": {
-        "label": "Budget range",
-        "prefix": "SAR",
-        "clear": "No budget preference"
       }
     },
     "notifications": {

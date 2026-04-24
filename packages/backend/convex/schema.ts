@@ -21,6 +21,7 @@ export const userGroupTypeValidator = v.union(
   v.literal("solo"),
   v.literal("group"),
   v.literal("kids"),
+  v.literal("any"),
 );
 export const userIndoorOutdoorPreferenceValidator = v.union(
   v.literal("indoor"),

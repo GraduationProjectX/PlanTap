@@ -1,13 +1,10 @@
-import { Button, RadioGroup, Slider } from "heroui-native";
-import { Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import type { ComponentProps } from "react";
 
-import {
-  ONBOARDING_BUDGET_DEFAULT_RANGE,
-  ONBOARDING_BUDGET_MAX,
-  ONBOARDING_BUDGET_MIN,
-  ONBOARDING_BUDGET_STEP,
-} from "../defaults";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Image, Pressable, Text, View } from "react-native";
+import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import type { OnboardingGroupType, OnboardingIndoorOutdoor } from "../types";
 
 type DefaultsStepProps = {
@@ -15,9 +12,6 @@ type DefaultsStepProps = {
   description: string;
   groupTypeLabel: string;
   indoorOutdoorLabel: string;
-  budgetLabel: string;
-  clearBudgetLabel: string;
-  budgetRangePrefix: string;
   groupTypeOptions: Array<{
     value: OnboardingGroupType;
     label: string;
@@ -30,139 +24,105 @@ type DefaultsStepProps = {
   }>;
   groupType: OnboardingGroupType;
   indoorOutdoor: OnboardingIndoorOutdoor;
-  budgetMin: number | null;
-  budgetMax: number | null;
   onGroupTypeChange: (value: OnboardingGroupType) => void;
   onIndoorOutdoorChange: (value: OnboardingIndoorOutdoor) => void;
-  onBudgetRangeChange: (budgetMin: number | null, budgetMax: number | null) => void;
 };
 
-function formatBudgetRange(prefix: string, budgetMin: number, budgetMax: number) {
-  return `${prefix} ${budgetMin} - ${budgetMax}`;
-}
+type IconName = ComponentProps<typeof FontAwesome>["name"];
+
+const GROUP_TYPE_ICONS: Record<OnboardingGroupType, IconName> = {
+  solo: "user",
+  group: "users",
+  kids: "child",
+  any: "globe",
+};
+
+const INDOOR_OUTDOOR_ICONS: Record<OnboardingIndoorOutdoor, IconName> = {
+  indoor: "home",
+  outdoor: "tree",
+  any: "globe",
+};
 
 export function DefaultsStep({
   title,
   description,
   groupTypeLabel,
   indoorOutdoorLabel,
-  budgetLabel,
-  clearBudgetLabel,
-  budgetRangePrefix,
   groupTypeOptions,
   indoorOutdoorOptions,
   groupType,
   indoorOutdoor,
-  budgetMin,
-  budgetMax,
   onGroupTypeChange,
   onIndoorOutdoorChange,
-  onBudgetRangeChange,
 }: DefaultsStepProps) {
-  const sliderValue =
-    budgetMin != null && budgetMax != null
-      ? [budgetMin, budgetMax]
-      : [ONBOARDING_BUDGET_DEFAULT_RANGE[0], ONBOARDING_BUDGET_DEFAULT_RANGE[1]];
+  const { theme } = useUnistyles();
 
   return (
     <View style={styles.container}>
-      <View style={styles.textBlock}>
+      <Animated.View entering={FadeInUp.duration(400).delay(100)} style={styles.textBlock}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
-      </View>
+      </Animated.View>
 
-      <View style={styles.card}>
+      <Animated.View entering={FadeInUp.duration(400).delay(200)} style={styles.sectionsWrapper}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{groupTypeLabel}</Text>
-          <RadioGroup
-            value={groupType}
-            onValueChange={(value) => {
-              if (value === "solo" || value === "group" || value === "kids") {
-                onGroupTypeChange(value);
-              }
-            }}
-          >
-            {groupTypeOptions.map((option) => (
-              <RadioGroup.Item key={option.value} value={option.value}>
-                <View style={styles.radioTextBlock}>
-                  <Text style={styles.radioTitle}>{option.label}</Text>
-                  <Text style={styles.radioDescription}>{option.description}</Text>
-                </View>
-              </RadioGroup.Item>
-            ))}
-          </RadioGroup>
+          <Text style={styles.sectionLabel}>{groupTypeLabel}</Text>
+          <View style={styles.optionsRow}>
+            {groupTypeOptions.map((option) => {
+              const isSelected = groupType === option.value;
+              const iconName = GROUP_TYPE_ICONS[option.value];
+
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => onGroupTypeChange(option.value)}
+                  style={[styles.optionCard, isSelected && styles.optionCardSelected]}
+                >
+                  <View style={[styles.optionIconWrapper, isSelected && styles.optionIconWrapperSelected]}>
+                    <FontAwesome
+                      name={iconName}
+                      size={20}
+                      color={isSelected ? theme.colors.primaryForeground : theme.colors.text}
+                    />
+                  </View>
+                  <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{indoorOutdoorLabel}</Text>
-          <RadioGroup
-            value={indoorOutdoor}
-            onValueChange={(value) => {
-              if (value === "indoor" || value === "outdoor" || value === "any") {
-                onIndoorOutdoorChange(value);
-              }
-            }}
-          >
-            {indoorOutdoorOptions.map((option) => (
-              <RadioGroup.Item key={option.value} value={option.value}>
-                <View style={styles.radioTextBlock}>
-                  <Text style={styles.radioTitle}>{option.label}</Text>
-                  <Text style={styles.radioDescription}>{option.description}</Text>
-                </View>
-              </RadioGroup.Item>
-            ))}
-          </RadioGroup>
-        </View>
+          <Text style={styles.sectionLabel}>{indoorOutdoorLabel}</Text>
+          <View style={styles.optionsRow}>
+            {indoorOutdoorOptions.map((option) => {
+              const isSelected = indoorOutdoor === option.value;
+              const iconName = INDOOR_OUTDOOR_ICONS[option.value];
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{budgetLabel}</Text>
-          <Slider
-            value={sliderValue}
-            minValue={ONBOARDING_BUDGET_MIN}
-            maxValue={ONBOARDING_BUDGET_MAX}
-            step={ONBOARDING_BUDGET_STEP}
-            onChange={(value) => {
-              if (!Array.isArray(value) || value.length !== 2) {
-                return;
-              }
-
-              const first = value[0];
-              const second = value[1];
-              onBudgetRangeChange(Math.min(first, second), Math.max(first, second));
-            }}
-          >
-            <Slider.Output>
-              {({ state }) => (
-                <Text style={styles.sliderOutput}>
-                  {formatBudgetRange(budgetRangePrefix, state.values[0], state.values[1])}
-                </Text>
-              )}
-            </Slider.Output>
-            <Slider.Track>
-              {({ state }) => (
-                <>
-                  <Slider.Fill />
-                  {state.values.map((value, index) => (
-                    <Slider.Thumb key={`${value}-${index}`} index={index} />
-                  ))}
-                </>
-              )}
-            </Slider.Track>
-          </Slider>
-          {(budgetMin != null || budgetMax != null) && (
-            <Button
-              variant="outline"
-              feedbackVariant="scale"
-              style={styles.clearBudgetButton}
-              onPress={() => {
-                onBudgetRangeChange(null, null);
-              }}
-            >
-              <Button.Label style={styles.clearBudgetButtonLabel}>{clearBudgetLabel}</Button.Label>
-            </Button>
-          )}
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => onIndoorOutdoorChange(option.value)}
+                  style={[styles.optionCard, isSelected && styles.optionCardSelected]}
+                >
+                  <View style={[styles.optionIconWrapper, isSelected && styles.optionIconWrapperSelected]}>
+                    <FontAwesome
+                      name={iconName}
+                      size={20}
+                      color={isSelected ? theme.colors.primaryForeground : theme.colors.text}
+                    />
+                  </View>
+                  <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -171,65 +131,82 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     gap: theme.spacing.lg,
   },
+  illustrationWrapper: {
+    alignItems: "center",
+    paddingVertical: theme.spacing.sm,
+  },
+  illustration: {
+    height: 160,
+    width: "100%",
+  },
   textBlock: {
-    gap: theme.spacing.xs,
+    gap: theme.spacing.sm,
+    alignItems: "center",
   },
   title: {
     color: theme.colors.text,
-    fontSize: theme.font.size.xxl,
+    fontSize: theme.font.size.xxxl,
     fontFamily: theme.font.family.bold,
+    letterSpacing: theme.font.letterSpacing.tight,
+    textAlign: "center",
   },
   description: {
     color: theme.colors.textSecondary,
     fontSize: theme.font.size.base,
     fontFamily: theme.font.family.regular,
-    lineHeight: 20,
+    lineHeight: 22,
+    textAlign: "center",
+    paddingHorizontal: theme.spacing.md,
   },
-  card: {
-    borderRadius: theme.radius.xl,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.md,
+  sectionsWrapper: {
     gap: theme.spacing.lg,
   },
   section: {
     gap: theme.spacing.sm,
   },
-  sectionTitle: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.font.size.md,
-    fontFamily: theme.font.family.medium,
-    letterSpacing: theme.font.letterSpacing.wide,
-    textTransform: "uppercase",
+  sectionLabel: {
+    color: theme.colors.text,
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.semiBold,
   },
-  radioTextBlock: {
+  optionsRow: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  optionCard: {
     flex: 1,
-    gap: 2,
-  },
-  radioTitle: {
-    color: theme.colors.text,
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.medium,
-  },
-  radioDescription: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.font.size.md,
-    fontFamily: theme.font.family.regular,
-  },
-  sliderOutput: {
-    color: theme.colors.text,
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.medium,
-  },
-  clearBudgetButton: {
-    minHeight: theme.button.xl,
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.radius.xl,
     borderCurve: "continuous",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
   },
-  clearBudgetButtonLabel: {
-    fontSize: theme.font.size.lg,
+  optionCardSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.background,
+  },
+  optionIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.background,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  optionIconWrapperSelected: {
+    backgroundColor: theme.colors.primary,
+  },
+  optionLabel: {
+    color: theme.colors.text,
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.medium,
+    textAlign: "center",
+  },
+  optionLabelSelected: {
     fontFamily: theme.font.family.semiBold,
   },
 }));

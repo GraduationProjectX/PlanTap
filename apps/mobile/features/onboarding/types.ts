@@ -1,4 +1,4 @@
-export type OnboardingGroupType = "solo" | "group" | "kids";
+export type OnboardingGroupType = "solo" | "group" | "kids" | "any";
 
 export type OnboardingIndoorOutdoor = "indoor" | "outdoor" | "any";
 
@@ -19,8 +19,6 @@ export type OnboardingDraft = {
   defaults: {
     groupType: OnboardingGroupType;
     indoorOutdoor: OnboardingIndoorOutdoor;
-    budgetMin: number | null;
-    budgetMax: number | null;
   };
   notificationsEnabled: boolean;
 };
@@ -28,4 +26,5 @@ export type OnboardingDraft = {
 export type OnboardingTagOption = {
   id: string;
   label: string;
+  icon?: string;
 };
