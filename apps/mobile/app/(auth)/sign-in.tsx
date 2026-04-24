@@ -54,7 +54,7 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.xxl,
   },
@@ -89,6 +89,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   buttons: {
     width: "100%",
+    marginTop: theme.spacing.xxxl,
     gap: theme.spacing.sm,
   },
   dividerRow: {
