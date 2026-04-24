@@ -89,7 +89,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   buttons: {
     width: "100%",
-    marginTop: theme.spacing.xxxl,
+    marginTop: theme.spacing.xxl,
     gap: theme.spacing.sm,
   },
   dividerRow: {
