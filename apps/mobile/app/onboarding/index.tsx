@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, View } from "react-native";
 import Animated, { FadeInRight, FadeOutLeft } from "react-native-reanimated";
-import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -29,7 +28,6 @@ import { getCityOptions } from "@/features/filters/utils";
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents } from "@/hooks/use-events";
 import { useDirection } from "@/rtl";
-import { detectCityFromUserLocation } from "@/services/location";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -44,7 +42,6 @@ export default function OnboardingScreen() {
   const [stepIndex, setStepIndex] = useState(0);
   const [draft, setDraft] = useState(ONBOARDING_DEFAULT_DRAFT);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
 
   const currentStep = ONBOARDING_STEPS[stepIndex];
   const isFinalStep = stepIndex === ONBOARDING_STEPS.length - 1;
@@ -145,43 +142,6 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleUseMyLocation = async () => {
-    if (isLocating) {
-      return;
-    }
-
-    setIsLocating(true);
-    try {
-      const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
-        Alert.alert(
-          t("onboarding.city.permissionDeniedTitle"),
-          t("onboarding.city.permissionDeniedDescription"),
-        );
-        return;
-      }
-
-      const detectedCity = await detectCityFromUserLocation(cityOptions);
-      if (!detectedCity) {
-        Alert.alert(
-          t("onboarding.city.locationUnavailableTitle"),
-          t("onboarding.city.locationUnavailableDescription"),
-        );
-        return;
-      }
-
-      setDraft((current) => ({
-        ...current,
-        city: detectedCity,
-      }));
-    } catch (error) {
-      console.error("Failed to detect city from location", error);
-      Alert.alert(t("onboarding.errors.locationTitle"), t("onboarding.errors.locationDescription"));
-    } finally {
-      setIsLocating(false);
-    }
-  };
-
   const handleSkip = () => {
     if (isFinalStep) {
       void submitOnboarding(false);
@@ -213,23 +173,12 @@ export default function OnboardingScreen() {
           searchPlaceholder={t("onboarding.city.searchPlaceholder")}
           selectedCity={draft.city}
           cityOptions={cityOptions}
-          enableLocationTitle={t("onboarding.city.enableLocation")}
-          enableLocationDescription={t("onboarding.city.enableLocationDescription")}
-          allowLocationLabel={t("onboarding.city.allowLocation")}
-          notNowLabel={t("onboarding.city.notNow")}
-          privacyNote={t("onboarding.city.privacyNote")}
-          locatingLabel={t("onboarding.city.locating")}
-          isLocating={isLocating}
           onSelectCity={(city) => {
             setDraft((current) => ({
               ...current,
               city,
             }));
           }}
-          onAllowLocation={() => {
-            void handleUseMyLocation();
-          }}
-          onNotNow={goToNextStep}
         />
       );
     }
