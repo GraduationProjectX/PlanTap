@@ -29,15 +29,10 @@ const eventReviewsValidator = v.object({
 function getAuthorName(user: {
   firstName: string | null;
   lastName: string | null;
-  email: string | null;
 }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
   if (fullName.length > 0) {
     return fullName;
-  }
-
-  if (user.email) {
-    return user.email;
   }
 
   return "PlanTap User";
@@ -50,6 +45,8 @@ function roundAverageRating(total: number, count: number) {
 
   return Math.round((total / count) * 10) / 10;
 }
+
+const MAX_REVIEW_BODY_LENGTH = 2000;
 
 export const getForEvent = query({
   args: { eventId: v.id("events") },
@@ -129,11 +126,19 @@ export const upsertForEvent = mutation({
     const now = Date.now();
     const existingReview = await ctx.db
       .query("reviews")
-      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("eventId"), args.eventId))
+      .withIndex("by_userid_and_eventid", (q) =>
+        q.eq("userId", user._id).eq("eventId", args.eventId),
+      )
       .first();
 
     const body = args.body.trim();
+    if (body.length === 0) {
+      throw new ConvexError("Review body is required");
+    }
+    if (body.length > MAX_REVIEW_BODY_LENGTH) {
+      throw new ConvexError("Review body is too long");
+    }
+
     const reviewId = existingReview
       ? existingReview._id
       : await ctx.db.insert("reviews", {

@@ -126,6 +126,7 @@ export function HomeHeaderSticky({
   const categories = categoryItems.map((category) => ({
     id: category.key,
     label: isAr ? category.labelAr : category.label,
+    icon: category.icon,
   }));
 
   return (

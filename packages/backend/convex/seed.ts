@@ -1,4 +1,4 @@
-import { internalMutation, mutation, type MutationCtx } from "./_generated/server";
+import { internalMutation, type MutationCtx } from "./_generated/server";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -707,8 +707,7 @@ async function seedAllData(ctx: MutationCtx) {
 
     const existingReview = await ctx.db
       .query("reviews")
-      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", userId))
-      .filter((q) => q.eq(q.field("eventId"), eventId))
+      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", userId).eq("eventId", eventId))
       .first();
 
     if (!existingReview) {
@@ -768,7 +767,7 @@ export const seedEvents = internalMutation({
   handler: async (ctx) => await seedAllData(ctx),
 });
 
-export const run = mutation({
+export const run = internalMutation({
   args: {},
   handler: async (ctx) => await seedAllData(ctx),
 });

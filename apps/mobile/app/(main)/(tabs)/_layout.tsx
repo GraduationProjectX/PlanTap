@@ -28,7 +28,7 @@ export default function TabsLayout() {
     { name: "index", label: t("tabs.home"), icon: "home" },
     { name: "map", label: t("tabs.map"), icon: "map" },
     { name: "suggest", label: t("tabs.suggest"), icon: "lightbulb-o" },
-    { name: "profile", label: t("tabs.profile"), icon: "user" },
+    { name: "profile", label: t("settings.title"), icon: "cog" },
   ];
 
   const orderedTabs = isRTL ? [...tabs].reverse() : tabs;

@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "@/storage/keys";
+import { removeValue, setString } from "@/storage/helpers";
 import { zustandMMKVStorage } from "@/storage/mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -7,16 +8,12 @@ type AppLanguage = "ar" | "en";
 export type AppThemeMode = "system" | "light" | "dark";
 
 type UIState = {
-  hasCompletedOnboarding: boolean;
   languageOverride: AppLanguage | null;
   themeMode: AppThemeMode;
-  notificationsEnabled: boolean;
   homeSearch: string;
   selectedCategories: string[];
-  setHasCompletedOnboarding: (value: boolean) => void;
   setLanguageOverride: (value: AppLanguage | null) => void;
   setThemeMode: (value: AppThemeMode) => void;
-  setNotificationsEnabled: (value: boolean) => void;
   setHomeSearch: (value: string) => void;
   setSelectedCategories: (value: string[]) => void;
   toggleCategory: (category: string) => void;
@@ -24,10 +21,8 @@ type UIState = {
 };
 
 type PersistedUIState = Partial<{
-  hasCompletedOnboarding: boolean;
   languageOverride: AppLanguage | null;
   themeMode: AppThemeMode;
-  notificationsEnabled: boolean;
   homeSearch: string;
   selectedCategories: string[];
 }>;
@@ -37,17 +32,13 @@ function isPersistedUIState(value: unknown): value is PersistedUIState {
 }
 
 const initialState: {
-  hasCompletedOnboarding: boolean;
   languageOverride: AppLanguage | null;
   themeMode: AppThemeMode;
-  notificationsEnabled: boolean;
   homeSearch: string;
   selectedCategories: string[];
 } = {
-  hasCompletedOnboarding: false,
   languageOverride: null,
   themeMode: "system",
-  notificationsEnabled: true,
   homeSearch: "",
   selectedCategories: [],
 };
@@ -56,18 +47,25 @@ export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
       ...initialState,
-      setHasCompletedOnboarding: (value) => set({ hasCompletedOnboarding: value }),
-      setLanguageOverride: (value) => set({ languageOverride: value }),
+      setLanguageOverride: (value) =>
+        set(() => {
+          if (value === null) {
+            removeValue(STORAGE_KEYS.LANGUAGE_OVERRIDE);
+          } else {
+            setString(STORAGE_KEYS.LANGUAGE_OVERRIDE, value);
+          }
+
+          return { languageOverride: value };
+        }),
       setThemeMode: (value) => set({ themeMode: value }),
-      setNotificationsEnabled: (value) => set({ notificationsEnabled: value }),
       setHomeSearch: (value) => set({ homeSearch: value }),
       setSelectedCategories: (value) => set({ selectedCategories: value }),
-      toggleCategory: (category) => 
+      toggleCategory: (category) =>
         set((state) => ({
           selectedCategories: state.selectedCategories.includes(category)
-          ? state.selectedCategories.filter((item) => item !== category)
-          : [...state.selectedCategories, category],
-      })),
+            ? state.selectedCategories.filter((item) => item !== category)
+            : [...state.selectedCategories, category],
+        })),
       resetHomeFilters: () =>
         set({
           homeSearch: initialState.homeSearch,
@@ -77,7 +75,13 @@ export const useUIStore = create<UIState>()(
     {
       name: STORAGE_KEYS.UI_STATE,
       storage: createJSONStorage(() => zustandMMKVStorage),
-      version: 2,
+      version: 3,
+      partialize: (state) => ({
+        languageOverride: state.languageOverride,
+        themeMode: state.themeMode,
+        homeSearch: state.homeSearch,
+        selectedCategories: state.selectedCategories,
+      }),
       migrate: (persistedState, version) => {
         if (!isPersistedUIState(persistedState)) {
           return {
@@ -91,12 +95,19 @@ export const useUIStore = create<UIState>()(
 
         if (version < 2 || !hasValidThemeMode) {
           return {
-            ...state,
+            languageOverride: state.languageOverride ?? initialState.languageOverride,
             themeMode: "system",
+            homeSearch: state.homeSearch ?? initialState.homeSearch,
+            selectedCategories: state.selectedCategories ?? initialState.selectedCategories,
           };
         }
 
-        return state;
+        return {
+          languageOverride: state.languageOverride ?? initialState.languageOverride,
+          themeMode: state.themeMode ?? initialState.themeMode,
+          homeSearch: state.homeSearch ?? initialState.homeSearch,
+          selectedCategories: state.selectedCategories ?? initialState.selectedCategories,
+        };
       },
     },
   ),

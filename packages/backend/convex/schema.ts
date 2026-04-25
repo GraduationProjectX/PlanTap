@@ -17,6 +17,17 @@ export const indoorOutdoorValidator = v.union(
   v.literal("mixed"),
   v.literal("unknown"),
 );
+export const userGroupTypeValidator = v.union(
+  v.literal("solo"),
+  v.literal("group"),
+  v.literal("kids"),
+  v.literal("any"),
+);
+export const userIndoorOutdoorPreferenceValidator = v.union(
+  v.literal("indoor"),
+  v.literal("outdoor"),
+  v.literal("any"),
+);
 export const reviewRatingValidator = v.union(
   v.literal(1),
   v.literal(2),
@@ -32,6 +43,23 @@ export const userFields = {
   lastName: nullableString,
   imageUrl: nullableString,
   locale: nullableString,
+  city: v.optional(nullableString),
+  preferences: v.optional(
+    v.object({
+      likedTags: v.array(v.string()),
+      dislikedTags: v.array(v.string()),
+    }),
+  ),
+  defaults: v.optional(
+    v.object({
+      groupType: userGroupTypeValidator,
+      indoorOutdoor: userIndoorOutdoorPreferenceValidator,
+      budgetMin: nullableNumber,
+      budgetMax: nullableNumber,
+    }),
+  ),
+  notificationsEnabled: v.optional(v.boolean()),
+  onboardingCompletedAt: v.optional(nullableNumber),
   createdAt: v.number(),
   updatedAt: v.number(),
 };

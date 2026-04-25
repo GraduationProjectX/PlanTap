@@ -45,7 +45,7 @@ export const listForUser = query({
     const bookmarkedEvents = [];
     for (const bookmark of bookmarks) {
       const event = await ctx.db.get(bookmark.eventId);
-      if (event) {
+      if (event?.status === "approved") {
         bookmarkedEvents.push({
           ...event,
           bookmarkId: bookmark._id,
@@ -66,8 +66,9 @@ export const toggle = mutation({
 
     const existing = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("eventId"), args.eventId))
+      .withIndex("by_userid_and_eventid", (q) =>
+        q.eq("userId", user._id).eq("eventId", args.eventId),
+      )
       .first();
 
     const event = await ctx.db.get(args.eventId);
@@ -111,8 +112,9 @@ export const isBookmarked = query({
 
     const bookmark = await ctx.db
       .query("bookmarks")
-      .withIndex("by_userid_and_eventid", (q) => q.eq("userId", user._id))
-      .filter((q) => q.eq(q.field("eventId"), args.eventId))
+      .withIndex("by_userid_and_eventid", (q) =>
+        q.eq("userId", user._id).eq("eventId", args.eventId),
+      )
       .first();
 
     return bookmark !== null;

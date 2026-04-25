@@ -3,27 +3,18 @@ import { Pressable, ScrollView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
+import { getCategoryIconName } from "@/features/categories/meta";
+
 type Category = {
   id: string;
   label: string;
+  icon?: string;
 };
 
 type CategoryChipsProps = {
   categories: Category[];
   selected: string;
   onSelect: (id: string) => void;
-};
-
-const CATEGORY_ICONS: Record<string, React.ComponentProps<typeof FontAwesome>["name"]> = {
-  all: "th-large",
-  concerts: "music",
-  sports: "futbol-o",
-  adventure: "compass",
-  food: "cutlery",
-  arts: "paint-brush",
-  tech: "laptop",
-  wellness: "heart",
-  entertainment: "film",
 };
 
 export function CategoryChips({
@@ -41,7 +32,7 @@ export function CategoryChips({
     >
       {categories.map((cat) => {
         const isActive = cat.id === selected;
-        const iconName = CATEGORY_ICONS[cat.id] ?? "circle";
+        const iconName = getCategoryIconName(cat.id, cat.icon);
         return (
           <Pressable
             key={cat.id}
