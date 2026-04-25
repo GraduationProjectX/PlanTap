@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "backend/convex/_generated/api";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
@@ -16,7 +16,6 @@ import { EventCard } from "@/components/events/EventCard";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useCategories } from "@/hooks/use-categories";
 import { getCityOptions } from "@/features/filters/utils";
-import { detectCityFromUserLocation } from "@/services/location";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
@@ -41,34 +40,6 @@ export default function HomeScreen() {
   const profileCity = currentUser?.city ?? undefined;
   const activeCity = selectedCity === undefined ? profileCity : (selectedCity ?? undefined);
   const activeCategory = selectedCategory ?? "all";
-
-  useEffect(() => {
-    if (
-      currentUser === undefined ||
-      profileCity ||
-      selectedCity !== undefined ||
-      cityOptions.length === 0
-    ) {
-      return;
-    }
-
-    let isMounted = true;
-
-    // const detectCity = async () => {
-    //   const detectedCity = await detectCityFromUserLocation(cityOptions);
-    //   if (!isMounted || !detectedCity) {
-    //     return;
-    //   }
-
-    //   setSelectedCity(detectedCity);
-    // };
-
-    // void detectCity();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [cityOptions, currentUser, profileCity, selectedCity]);
 
   const handleEventPress = (id: string) => {
     router.push({ pathname: "/event/[id]", params: { id } });

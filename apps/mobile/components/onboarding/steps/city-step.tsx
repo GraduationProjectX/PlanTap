@@ -1,8 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { Button, RadioGroup } from "heroui-native";
+import { RadioGroup } from "heroui-native";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -21,16 +21,7 @@ type CityStepProps = {
   searchPlaceholder: string;
   selectedCity: string | null;
   cityOptions: string[];
-  enableLocationTitle: string;
-  enableLocationDescription: string;
-  allowLocationLabel: string;
-  notNowLabel: string;
-  privacyNote: string;
-  locatingLabel: string;
-  isLocating: boolean;
   onSelectCity: (city: string | null) => void;
-  onAllowLocation: () => void;
-  onNotNow: () => void;
 };
 
 export default function CityStep({
@@ -40,25 +31,15 @@ export default function CityStep({
   searchPlaceholder,
   selectedCity,
   cityOptions,
-  enableLocationTitle,
-  enableLocationDescription,
-  allowLocationLabel,
-  notNowLabel,
-  privacyNote,
-  locatingLabel,
-  isLocating,
   onSelectCity,
-  onAllowLocation,
-  onNotNow,
 }: CityStepProps) {
   const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
+  const query = searchQuery.toLowerCase();
 
-  const filteredCities = cityOptions.filter((city) =>
-    city.toLowerCase().includes(searchQuery.toLowerCase()),
+  const displayedCities = cityOptions.filter((city) =>
+    query.length === 0 ? true : city.toLowerCase().includes(query),
   );
-
-  const displayedCities = searchQuery.length > 0 ? filteredCities : cityOptions;
 
   return (
     <View style={styles.container}>
@@ -193,72 +174,5 @@ const styles = StyleSheet.create((theme) => ({
   },
   radioIndicatorSelected: {
     borderColor: "transparent",
-  },
-  locationCard: {
-    borderRadius: theme.radius.xl,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-    alignItems: "center",
-  },
-  locationHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: theme.spacing.md,
-    width: "100%",
-  },
-  locationIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  locationTextBlock: {
-    flex: 1,
-    gap: 2,
-  },
-  locationTitle: {
-    color: theme.colors.text,
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.semiBold,
-  },
-  locationDescription: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.font.size.sm,
-    fontFamily: theme.font.family.regular,
-    lineHeight: 18,
-  },
-  allowButton: {
-    width: "100%",
-    minHeight: 52,
-    borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.overlayDark,
-  },
-  allowButtonLabel: {
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.semiBold,
-    color: theme.colors.headerForeground,
-  },
-  notNowText: {
-    color: theme.colors.text,
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.medium,
-    paddingVertical: theme.spacing.sm,
-  },
-  privacyContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.xs,
-  },
-  privacyText: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.font.size.sm,
-    fontFamily: theme.font.family.regular,
   },
 }));
