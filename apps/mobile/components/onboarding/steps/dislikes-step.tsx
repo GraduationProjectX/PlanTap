@@ -6,10 +6,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getCategoryIconName } from "@/features/categories/meta";
 
-import type { OnboardingTagOption } from "../types";
+import type { OnboardingTagOption } from "../../../features/onboarding/types";
 
-
-type InterestsStepProps = {
+type DislikesStepProps = {
   title: string;
   description: string;
   selectedTags: string[];
@@ -20,16 +19,16 @@ type InterestsStepProps = {
   footerNote?: string;
 };
 
-export function InterestsStep({
+export default function DislikesStep({
   title,
   description,
   selectedTags,
   options,
   onSelectionChange,
-  sectionLabel = "Select your interests",
+  sectionLabel = "Select what to avoid",
   counterLabel = "selected",
   footerNote = "You can update these anytime",
-}: InterestsStepProps) {
+}: DislikesStepProps) {
   const { theme } = useUnistyles();
 
   const handleTagPress = (tagId: string) => {
@@ -38,16 +37,13 @@ export function InterestsStep({
     } else {
       onSelectionChange([...selectedTags, tagId]);
     }
-    // else if (selectedTags.length < MAX_SELECTIONS) {
-    //   onSelectionChange([...selectedTags, tagId]);
-    // }
   };
 
   return (
     <View style={styles.container}>
       <Animated.View entering={FadeIn.duration(400)} style={styles.illustrationWrapper}>
         <Image
-          source={require("@/assets/images/onboarding-likes.png")}
+          source={require("@/assets/images/onboarding-dislikes.png")}
           style={styles.illustration}
           contentFit="contain"
         />
@@ -115,6 +111,7 @@ const styles = StyleSheet.create((theme) => ({
   illustration: {
     height: 180,
     width: "100%",
+    left: -10,
   },
   textBlock: {
     gap: theme.spacing.sm,

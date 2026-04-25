@@ -5,7 +5,10 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import type { OnboardingGroupType, OnboardingIndoorOutdoor } from "../types";
+import type {
+  OnboardingGroupType,
+  OnboardingIndoorOutdoor,
+} from "../../../features/onboarding/types";
 
 type DefaultsStepProps = {
   title: string;
@@ -43,7 +46,7 @@ const INDOOR_OUTDOOR_ICONS: Record<OnboardingIndoorOutdoor, IconName> = {
   any: "globe",
 };
 
-export function DefaultsStep({
+export default function DefaultsStep({
   title,
   description,
   groupTypeLabel,
@@ -78,7 +81,12 @@ export function DefaultsStep({
                   onPress={() => onGroupTypeChange(option.value)}
                   style={[styles.optionCard, isSelected && styles.optionCardSelected]}
                 >
-                  <View style={[styles.optionIconWrapper, isSelected && styles.optionIconWrapperSelected]}>
+                  <View
+                    style={[
+                      styles.optionIconWrapper,
+                      isSelected && styles.optionIconWrapperSelected,
+                    ]}
+                  >
                     <FontAwesome
                       name={iconName}
                       size={20}
@@ -107,7 +115,12 @@ export function DefaultsStep({
                   onPress={() => onIndoorOutdoorChange(option.value)}
                   style={[styles.optionCard, isSelected && styles.optionCardSelected]}
                 >
-                  <View style={[styles.optionIconWrapper, isSelected && styles.optionIconWrapperSelected]}>
+                  <View
+                    style={[
+                      styles.optionIconWrapper,
+                      isSelected && styles.optionIconWrapperSelected,
+                    ]}
+                  >
                     <FontAwesome
                       name={iconName}
                       size={20}

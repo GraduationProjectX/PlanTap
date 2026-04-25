@@ -1,10 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
-import { Button } from "heroui-native";
+import { Button, Select } from "heroui-native";
 import { Text, View, useWindowDimensions } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useTranslation } from "react-i18next";
 
 type IntroStepProps = {
   titleLine1: string;
@@ -14,7 +15,7 @@ type IntroStepProps = {
   onContinue: () => void;
 };
 
-export function IntroStep({
+export default function IntroStep({
   titleLine1,
   titleLine2,
   description,
@@ -23,6 +24,10 @@ export function IntroStep({
 }: IntroStepProps) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+
+  const { i18n } = useTranslation();
+  const isArabic = i18n.language.startsWith("ar");
+  const languageValue = isArabic ? { value: "ar", label: "العربية" } : { value: "en", label: "EN" };
 
   return (
     <View style={styles.container}>
@@ -53,6 +58,36 @@ export function IntroStep({
           </Button>
         </Animated.View>
       </View>
+
+      <Select
+        value={languageValue}
+        onValueChange={(language) => {
+          const nextLanguage = language?.value === "ar" ? "ar" : "en";
+          if (nextLanguage !== languageValue.value) {
+            void i18n.changeLanguage(nextLanguage);
+          }
+        }}
+        style={[styles.languageSelect, { top: insets.top + 10 }]}
+      >
+        <Select.Trigger style={styles.languageTrigger}>
+          <FontAwesome name="globe" size={16} color="white" />
+          <Text style={styles.languageValue}>{languageValue.label}</Text>
+        </Select.Trigger>
+
+        <Select.Portal>
+          <Select.Overlay style={styles.languageOverlay} />
+          <Select.Content
+            presentation="popover"
+            placement="bottom"
+            align="end"
+            offset={8}
+            width={120}
+          >
+            <Select.Item value="en" label="EN" />
+            <Select.Item value="ar" label="العربية" />
+          </Select.Content>
+        </Select.Portal>
+      </Select>
     </View>
   );
 }
@@ -68,6 +103,31 @@ const styles = StyleSheet.create((theme) => ({
   heroImage: {
     width: "100%",
     height: "100%",
+  },
+  languageSelect: {
+    position: "absolute",
+    right: 14,
+    zIndex: theme.zIndex.popover,
+    elevation: 12,
+  },
+  languageTrigger: {
+    minHeight: 30,
+    borderRadius: theme.radius.full,
+    borderCurve: "continuous",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.35)",
+    backgroundColor: "rgba(0, 0, 0, 0.38)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  languageValue: {
+    display: "flex",
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontFamily: theme.font.family.semiBold,
+  },
+  languageOverlay: {
+    backgroundColor: "transparent",
   },
   contentCard: {
     backgroundColor: theme.colors.surface,

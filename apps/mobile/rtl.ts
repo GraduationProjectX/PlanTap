@@ -1,5 +1,4 @@
 import { I18nManager } from "react-native";
-import * as Localization from "expo-localization";
 import { useTranslation } from "react-i18next";
 import i18n from "./i18n";
 
@@ -44,9 +43,7 @@ export const configureRTL = (language: "ar" | "en") => {
  * Should be called before rendering
  */
 export const initializeRTL = () => {
-  const locales = Localization.getLocales();
-  const deviceLang = locales[0]?.languageCode ?? "ar";
-  const isArabic = deviceLang === "ar";
+  const isArabic = getCurrentLanguage() === "ar";
 
   I18nManager.allowRTL(isArabic);
   I18nManager.forceRTL(isArabic);

@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from "@/storage/keys";
+import { removeValue, setString } from "@/storage/helpers";
 import { zustandMMKVStorage } from "@/storage/mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -46,7 +47,16 @@ export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
       ...initialState,
-      setLanguageOverride: (value) => set({ languageOverride: value }),
+      setLanguageOverride: (value) =>
+        set(() => {
+          if (value === null) {
+            removeValue(STORAGE_KEYS.LANGUAGE_OVERRIDE);
+          } else {
+            setString(STORAGE_KEYS.LANGUAGE_OVERRIDE, value);
+          }
+
+          return { languageOverride: value };
+        }),
       setThemeMode: (value) => set({ themeMode: value }),
       setHomeSearch: (value) => set({ homeSearch: value }),
       setSelectedCategories: (value) => set({ selectedCategories: value }),

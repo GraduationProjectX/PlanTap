@@ -17,7 +17,7 @@ type NotificationsStepProps = {
   onToggle: (enabled: boolean) => void;
 };
 
-export function NotificationsStep({
+export default function NotificationsStep({
   title,
   description,
   switchLabel,

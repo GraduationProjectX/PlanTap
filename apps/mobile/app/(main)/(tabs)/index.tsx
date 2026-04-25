@@ -54,16 +54,16 @@ export default function HomeScreen() {
 
     let isMounted = true;
 
-    const detectCity = async () => {
-      const detectedCity = await detectCityFromUserLocation(cityOptions);
-      if (!isMounted || !detectedCity) {
-        return;
-      }
+    // const detectCity = async () => {
+    //   const detectedCity = await detectCityFromUserLocation(cityOptions);
+    //   if (!isMounted || !detectedCity) {
+    //     return;
+    //   }
 
-      setSelectedCity(detectedCity);
-    };
+    //   setSelectedCity(detectedCity);
+    // };
 
-    void detectCity();
+    // void detectCity();
 
     return () => {
       isMounted = false;

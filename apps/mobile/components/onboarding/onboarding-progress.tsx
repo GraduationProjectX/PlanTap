@@ -7,7 +7,7 @@ type OnboardingProgressProps = {
   totalSteps: number;
 };
 
-export function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgressProps) {
+export default function OnboardingProgress({ currentStep, totalSteps }: OnboardingProgressProps) {
   const safeTotal = totalSteps > 0 ? totalSteps : 1;
   const clampedStep = Math.min(Math.max(currentStep, 0), safeTotal - 1);
   const progress = (clampedStep + 1) / safeTotal;

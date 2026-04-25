@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import { getUserByClerkId, requireIdentity } from "./lib/auth";
+import { getUserByClerkId, requireCurrentUser, requireIdentity } from "./lib/auth";
 import {
   nullableNumber,
   nullableString,
@@ -33,6 +33,17 @@ const completeOnboardingArgsValidator = v.object({
     }),
   ),
   notificationsEnabled: v.optional(v.boolean()),
+});
+
+const updateSettingsArgsValidator = v.object({
+  locale: v.optional(v.union(v.literal("ar"), v.literal("en"), v.null())),
+  notificationsEnabled: v.optional(v.boolean()),
+  preferences: v.optional(
+    v.object({
+      likedTags: v.optional(v.array(v.string())),
+      dislikedTags: v.optional(v.array(v.string())),
+    }),
+  ),
 });
 
 function normalizeCity(city: string | null | undefined): string | null {
@@ -75,6 +86,14 @@ function normalizeBudgetRange(min: number | null, max: number | null) {
   }
 
   return { budgetMin: max, budgetMax: min };
+}
+
+function normalizeLocale(locale: "ar" | "en" | null | undefined) {
+  if (locale === "ar" || locale === "en") {
+    return locale;
+  }
+
+  return null;
 }
 
 export const current = query({
@@ -151,5 +170,55 @@ export const completeOnboarding = mutation({
     }
 
     return insertedUser;
+  },
+});
+
+export const updateSettings = mutation({
+  args: updateSettingsArgsValidator,
+  returns: userValidator,
+  handler: async (ctx, args) => {
+    const user = await requireCurrentUser(ctx);
+    const now = Date.now();
+
+    const patch: {
+      updatedAt: number;
+      locale?: "ar" | "en" | null;
+      notificationsEnabled?: boolean;
+      preferences?: {
+        likedTags: string[];
+        dislikedTags: string[];
+      };
+    } = {
+      updatedAt: now,
+    };
+
+    if (args.locale !== undefined) {
+      patch.locale = normalizeLocale(args.locale);
+    }
+
+    if (args.notificationsEnabled !== undefined) {
+      patch.notificationsEnabled = args.notificationsEnabled;
+    }
+
+    if (args.preferences) {
+      const likedTags = normalizeTags(args.preferences.likedTags);
+      const likedTagSet = new Set(likedTags);
+      const dislikedTags = normalizeTags(args.preferences.dislikedTags).filter(
+        (tag) => !likedTagSet.has(tag),
+      );
+
+      patch.preferences = {
+        likedTags,
+        dislikedTags,
+      };
+    }
+
+    await ctx.db.patch(user._id, patch);
+    const updatedUser = await ctx.db.get(user._id);
+    if (!updatedUser) {
+      throw new ConvexError("User not found");
+    }
+
+    return updatedUser;
   },
 });

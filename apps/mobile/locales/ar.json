@@ -136,26 +136,75 @@
   },
   "settings": {
     "title": "الإعدادات",
-    "appearanceDescription": "اختر شكل تطبيق PlanTap في جميع الشاشات.",
-    "temporaryLogout": {
-      "label": "تسجيل خروج مؤقت",
-      "hint": "استخدمه للعودة سريعاً إلى شاشة تسجيل الدخول أثناء الاختبار.",
-      "action": "تسجيل الخروج",
-      "loading": "جارٍ تسجيل الخروج..."
+    "subtitle": "عدّل طريقة عمل PlanTap بما يناسبك.",
+    "sections": {
+      "preferences": "التفضيلات",
+      "privacy": "الخصوصية",
+      "account": "الحساب"
     },
-    "themeMode": {
-      "system": {
-        "label": "اتباع إعدادات الجهاز",
-        "hint": "اتبع مظهر الهاتف وتحدَّث مباشرة عند تغييره."
-      },
-      "light": {
-        "label": "فاتح",
-        "hint": "استخدم المظهر الفاتح دائماً."
-      },
-      "dark": {
-        "label": "داكن",
-        "hint": "استخدم المظهر الداكن دائماً."
+    "theme": {
+      "label": "وضع المظهر",
+      "description": "اختر مظهر التطبيق",
+      "placeholder": "اختر مظهراً",
+      "options": {
+        "system": "النظام",
+        "light": "فاتح",
+        "dark": "داكن"
       }
+    },
+    "language": {
+      "label": "اللغة",
+      "description": "اختر لغتك المفضلة",
+      "placeholder": "اختر لغة",
+      "options": {
+        "en": "الإنجليزية",
+        "ar": "العربية"
+      }
+    },
+    "notifications": {
+      "label": "الإشعارات",
+      "description": "احصل على تحديثات حول الفعاليات والمطابقات والأنشطة والعروض",
+      "permissionDeniedTitle": "الإشعارات معطلة",
+      "permissionDeniedDescription": "فعّل الإشعارات من إعدادات النظام لتشغيل هذا الخيار."
+    },
+    "location": {
+      "label": "الموقع",
+      "description": "اسمح بالوصول إلى موقعك لعرض الفعاليات والأنشطة القريبة",
+      "permissionDeniedTitle": "الموقع معطل",
+      "permissionDeniedDescription": "فعّل إذن الموقع من إعدادات النظام لتشغيل هذا الخيار.",
+      "disableHintTitle": "أوقف الموقع من إعدادات النظام",
+      "disableHintDescription": "يمكن تعطيل إذن الموقع فقط من إعدادات جهازك."
+    },
+    "contentFilters": {
+      "label": "فلاتر المحتوى",
+      "description": "خصص ما تراه",
+      "preferences": "تفضيلات الوسوم",
+      "cycleHint": "اضغط مرة للإعجاب، ومرة ثانية لعدم الإعجاب، ومرة ثالثة للإزالة.",
+      "likes": "أرني المزيد من",
+      "dislikes": "أرني أقل من",
+      "selected": "مختار",
+      "note": "الفئات التي تضيفها هنا لن تظهر في \"أرني المزيد من\". يمكنك تحديث هذه في أي وقت."
+    },
+    "signOut": {
+      "label": "تسجيل الخروج",
+      "description": "الخروج من حسابك"
+    },
+    "actions": {
+      "save": "حفظ التغييرات",
+      "saving": "جارٍ الحفظ...",
+      "signOut": "تسجيل الخروج",
+      "signingOut": "جارٍ تسجيل الخروج...",
+      "openSettings": "فتح الإعدادات"
+    },
+    "alerts": {
+      "saveErrorTitle": "تعذر حفظ الإعدادات",
+      "saveErrorDescription": "يرجى المحاولة مرة أخرى.",
+      "restartTitle": "إعادة تشغيل مطلوبة",
+      "restartDescription": "يرجى إعادة تشغيل التطبيق لتطبيق اتجاه اللغة بالكامل."
+    },
+    "tos": {
+      "prefix": "باستخدامك PlanTap فأنت توافق على",
+      "link": "شروط الخدمة"
     }
   },
   "onboarding": {

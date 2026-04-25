@@ -11,7 +11,7 @@ import * as Notifications from "expo-notifications";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { OnboardingProgress } from "@/features/onboarding/components/onboarding-progress";
+import OnboardingProgress from "@/components/onboarding/onboarding-progress";
 import {
   ONBOARDING_DEFAULT_DRAFT,
   ONBOARDING_FALLBACK_TAG_OPTIONS,
@@ -19,12 +19,12 @@ import {
   ONBOARDING_INDOOR_OUTDOOR_OPTIONS,
   ONBOARDING_STEPS,
 } from "@/features/onboarding/defaults";
-import { CityStep } from "@/features/onboarding/steps/city-step";
-import { DefaultsStep } from "@/features/onboarding/steps/defaults-step";
-import { DislikesStep } from "@/features/onboarding/steps/dislikes-step";
-import { InterestsStep } from "@/features/onboarding/steps/likes-step";
-import { IntroStep } from "@/features/onboarding/steps/intro-step";
-import { NotificationsStep } from "@/features/onboarding/steps/notifications-step";
+import CityStep from "@/components/onboarding/steps/city-step";
+import DefaultsStep from "@/components/onboarding/steps/defaults-step";
+import DislikesStep from "@/components/onboarding/steps/dislikes-step";
+import InterestsStep from "@/components/onboarding/steps/likes-step";
+import IntroStep from "@/components/onboarding/steps/intro-step";
+import NotificationsStep from "@/components/onboarding/steps/notifications-step";
 import { getCityOptions } from "@/features/filters/utils";
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents } from "@/hooks/use-events";

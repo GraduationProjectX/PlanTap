@@ -33,7 +33,7 @@ type CityStepProps = {
   onNotNow: () => void;
 };
 
-export function CityStep({
+export default function CityStep({
   title,
   description,
   selectLabel,
