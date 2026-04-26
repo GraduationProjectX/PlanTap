@@ -304,7 +304,6 @@ StyleSheet.configure({
   },
   breakpoints,
   settings: {
-    initialTheme: "light",
     adaptiveThemes: true, // Follows system theme
   },
 });
