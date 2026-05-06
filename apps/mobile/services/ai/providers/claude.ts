@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
-import { safeParseRecommendation } from "../utils";
+import { validateResponse } from "../responseValidator";
 import type {
   AiProvider,
   EventSummary,
@@ -36,15 +36,21 @@ export class ClaudeProvider implements AiProvider {
 
     // Anthropic may return structured blocks; prefer text blocks but tolerate
     // a plain string payload as well.
+    let text: string | undefined;
     const first = Array.isArray(message.content) ? message.content[0] : undefined;
     if (first && (first as any).type === "text" && typeof (first as any).text === "string") {
-      return safeParseRecommendation((first as any).text);
+      text = (first as any).text;
+    } else if (typeof (message as any).content === "string") {
+      text = (message as any).content;
     }
 
-    if (typeof (message as any).content === "string") {
-      return safeParseRecommendation((message as any).content);
-    }
+    if (!text) throw new Error("Unexpected response type from Claude");
 
-    throw new Error("Unexpected response type from Claude");
+    const candidateIds = new Set(events.map((e) => e.id));
+    const validation = validateResponse(text, candidateIds);
+    if (!validation.valid) {
+      throw new Error(validation.error || "Response validation failed");
+    }
+    return validation.result!;
   }
 }

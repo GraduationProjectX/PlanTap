@@ -1,32 +1,66 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
+import { Select } from "heroui-native";
+import { useRouter } from "expo-router";
 import { useDirection } from "@/rtl";
 import { useAiStore } from "@/stores";
 import { useEventRecommendations } from "@/hooks/useEventRecommendations";
 import { useAiContext } from "@/hooks/useAiContext";
 import { getTestPromptData } from "@/services/ai/prompts";
+import { AiModelSelector } from "@/components/ui/AiModelSelector";
+import { SUPPORTED_CITIES } from "@/features/filters/utils";
+
+function eventMatchesCity(location: string | undefined, city: string | undefined): boolean {
+  if (!city) return true;
+  const normalizedCity = city.trim().toLowerCase();
+  if (!normalizedCity) return true;
+
+  const normalizedLocation = (location ?? "").toLowerCase();
+  if (!normalizedLocation) return false;
+
+  return normalizedLocation === normalizedCity || normalizedLocation.includes(normalizedCity);
+}
 
 export default function SuggestScreen() {
   const { t } = useTranslation();
-  const { textAlign } = useDirection();
+  const { textAlign, flexDirection } = useDirection();
   const provider = useAiStore((s) => s.provider);
   const localModelDownloaded = useAiStore((s) => s.localModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
-  const { eventIds, isLoading, error, recommend, recommendTest } =
+  const { eventIds, isLoading, error, recommend } =
     useEventRecommendations();
   const [userNote, setUserNote] = useState("");
   const [useRealData, setUseRealData] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
   // Real Convex data (may be null while loading)
-  const convexData = useAiContext();
+  const convexData = useAiContext(selectedCity);
   const testData = getTestPromptData();
+
+  const cityOptions = SUPPORTED_CITIES;
+  const defaultCity = useRealData
+    ? convexData.userContext?.city
+    : testData.userContext.city;
+  const fallbackCity = cityOptions[0];
+  const resolvedCity = selectedCity ?? defaultCity ?? fallbackCity;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!selectedCity && resolvedCity) {
+      setSelectedCity(resolvedCity);
+    }
+  }, [resolvedCity, selectedCity]);
 
   // Choose which data source to display below
   const displayEvents = useRealData && !convexData.isLoading
     ? convexData.events ?? []
     : testData.events;
+
+  const cityFilteredEvents = resolvedCity
+    ? displayEvents.filter((event) => eventMatchesCity(event.location, resolvedCity))
+    : displayEvents;
 
   const handleRun = () => {
     if (provider === "local" && (!localModelDownloaded || !localModelPath)) {
@@ -34,9 +68,17 @@ export default function SuggestScreen() {
     }
 
     if (useRealData && !convexData.isLoading && convexData.userContext && convexData.events) {
-      recommend(convexData.userContext, convexData.events, userNote || undefined);
+      const context = { ...convexData.userContext, city: resolvedCity };
+      const events = resolvedCity
+        ? convexData.events.filter((event) => eventMatchesCity(event.location, resolvedCity))
+        : convexData.events;
+      recommend(context, events, userNote || undefined);
     } else {
-      recommendTest(userNote || undefined);
+      const context = { ...testData.userContext, city: resolvedCity };
+      const events = resolvedCity
+        ? testData.events.filter((event) => eventMatchesCity(event.location, resolvedCity))
+        : testData.events;
+      recommend(context, events, userNote || undefined);
     }
   };
 
@@ -49,6 +91,9 @@ export default function SuggestScreen() {
       <Text style={[styles.subtitle, { textAlign }]}>
         AI test — provider: {provider}
       </Text>
+
+      {/* AI Model Selector (collapsible) */}
+      <AiModelSelector />
 
       {provider === "local" && (!localModelDownloaded || !localModelPath) && (
         <View style={styles.errorBox}>
@@ -106,6 +151,48 @@ export default function SuggestScreen() {
         </View>
       )}
 
+      {/* ---------- Benchmark Link ---------- */}
+      <Pressable
+        onPress={() => router.push("/dev-ai-bench")}
+        style={styles.benchLink}
+      >
+        <Text style={styles.benchLinkText}>Open AI Benchmark</Text>
+      </Pressable>
+
+      {/* ---------- City selection ---------- */}
+      <View style={styles.inputSection}>
+        <Text style={styles.inputLabel}>Your city</Text>
+        <Select
+          presentation="bottom-sheet"
+          value={resolvedCity ? { value: resolvedCity, label: resolvedCity } : undefined}
+          onValueChange={(option) => setSelectedCity(option?.value)}
+        >
+          <Select.Trigger style={styles.selectTrigger}>
+            <View style={[styles.selectInner, { flexDirection }]}>
+              <Select.Value placeholder="Choose a city" />
+            </View>
+            <Select.TriggerIndicator>
+              <Text style={styles.selectIndicator}>▼</Text>
+            </Select.TriggerIndicator>
+          </Select.Trigger>
+
+          <Select.Portal>
+            <Select.Overlay style={styles.selectOverlay} />
+            <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+              <Select.ListLabel>City</Select.ListLabel>
+              {cityOptions.map((city) => (
+                <Select.Item key={city} value={city} label={city}>
+                  <View style={styles.selectItemInner}>
+                    <Select.ItemLabel />
+                  </View>
+                  <Select.ItemIndicator />
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Portal>
+        </Select>
+      </View>
+
       {/* ---------- User note ---------- */}
       <View style={styles.inputSection}>
         <Text style={styles.inputLabel}>What are you in the mood for?</Text>
@@ -159,12 +246,12 @@ export default function SuggestScreen() {
       {/* ---------- Events fed to the model ---------- */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
-          {useRealData ? `Events from Convex (${displayEvents.length})` : "Test Events (input)"}
+          {useRealData ? `Events from Convex (${cityFilteredEvents.length})` : "Test Events (input)"}
         </Text>
-        {displayEvents.length === 0 && (
+        {cityFilteredEvents.length === 0 && (
           <Text style={styles.eventDesc}>No events found. Add some via the admin or scraper.</Text>
         )}
-        {displayEvents.map((evt) => (
+        {cityFilteredEvents.map((evt) => (
           <View key={evt.id} style={styles.eventCard}>
             <Text style={styles.eventTitle}>{evt.title}</Text>
             <Text style={styles.eventMeta}>
@@ -191,7 +278,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.md,
   },
   title: {
-    fontSize: theme.font.size["2xl"],
+    fontSize: theme.font.size.xxl,
     fontFamily: theme.font.family.bold,
     color: theme.colors.text,
   },
@@ -199,6 +286,19 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.base,
     fontFamily: theme.font.family.regular,
     color: theme.colors.textSecondary,
+  },
+  benchLink: {
+    backgroundColor: theme.colors.surface,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  benchLinkText: {
+    color: theme.colors.primary,
+    fontFamily: theme.font.family.semiBold,
   },
 
   // Button
@@ -341,6 +441,34 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.sm,
     color: theme.colors.textMuted,
     textAlign: "right" as const,
+  },
+
+  // City select
+  selectTrigger: {
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+  },
+  selectInner: {
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    flex: 1,
+  },
+  selectIndicator: {
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.textMuted,
+  },
+  selectOverlay: {
+    backgroundColor: theme.colors.overlayDark,
+  },
+  selectItemInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    flex: 1,
   },
 
   // Event cards

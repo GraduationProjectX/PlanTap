@@ -33,7 +33,7 @@ type PersistedUIState = Partial<{
 }>;
 
 function isPersistedUIState(value: unknown): value is PersistedUIState {
-  return !!value && typeof value === "object";
+  return value !== null && value !== undefined && typeof value === "object" && !Array.isArray(value);
 }
 
 const initialState: {

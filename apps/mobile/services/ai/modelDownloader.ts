@@ -5,11 +5,10 @@
  * directory. Supports progress tracking and deletion.
  */
 
-import RNFS from "react-native-fs";
 import { NativeModules } from "react-native";
 import { useAiStore } from "@/stores/ai-store";
 import { fetchWithTimeout, retry } from "./utils";
-import NetInfo from "@react-native-community/netinfo";
+import { getRNFS, requireRNFS } from "../nativeFileSystem";
 
 /** Pre-configured model entries the user can choose from. */
 export type ModelEntry = {
@@ -71,7 +70,6 @@ export const AVAILABLE_MODELS: ModelEntry[] = [
   },
 ];
 
-const MODEL_DIR = `${RNFS.DocumentDirectoryPath}/models`;
 const STORAGE_SAFETY_FACTOR = 1.25;
 const TMP_SUFFIX = ".download";
 
@@ -122,9 +120,8 @@ async function getStorageInfo(): Promise<{
   totalSpaceBytes: number | null;
 }> {
   try {
-    const info = await (RNFS as unknown as {
-      getFSInfo?: () => Promise<{ freeSpace: number; totalSpace: number }>;
-    }).getFSInfo?.();
+    const RNFS = getRNFS();
+    const info = await RNFS?.getFSInfo?.();
 
     if (!info) {
       return { freeSpaceBytes: null, totalSpaceBytes: null };
@@ -238,19 +235,28 @@ export async function assessDeviceSupport(
 
 /** Ensure the models directory exists. */
 async function ensureModelDir(): Promise<void> {
-  const exists = await RNFS.exists(MODEL_DIR);
+  const RNFS = requireRNFS();
+  const modelDir = `${RNFS.DocumentDirectoryPath}/models`;
+  const exists = await RNFS.exists(modelDir);
   if (!exists) {
-    await RNFS.mkdir(MODEL_DIR);
+    await RNFS.mkdir(modelDir);
   }
 }
 
 /** Full path where a model file will be stored. */
 export function modelFilePath(filename: string): string {
-  return `${MODEL_DIR}/${filename}`;
+  const RNFS = getRNFS();
+  const modelDir = RNFS ? `${RNFS.DocumentDirectoryPath}/models` : "/models";
+  return `${modelDir}/${filename}`;
 }
 
 /** Check if a model file exists on disk. */
 export async function isModelDownloaded(filename: string): Promise<boolean> {
+  const RNFS = getRNFS();
+  if (!RNFS) {
+    return false;
+  }
+
   return RNFS.exists(modelFilePath(filename));
 }
 
@@ -259,12 +265,22 @@ let _currentTempPath: string | null = null;
 let _cancelRequested = false;
 let _isConnectedCache: boolean | null = null;
 
+function getNetInfo(): { fetch: () => Promise<{ isConnected: boolean | null }> } | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require("@react-native-community/netinfo");
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Download a model and track progress via the AI store.
  * Returns the absolute path of the downloaded file.
  */
 export async function downloadModel(model: ModelEntry): Promise<string> {
   const store = useAiStore.getState();
+  const RNFS = requireRNFS();
   await ensureModelDir();
 
   const support = await assessDeviceSupport(model);
@@ -329,13 +345,10 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
     }
 
     return new Promise<string>((resolve, reject) => {
-      NetInfo.fetch().then((state) => {
-        _isConnectedCache = state.isConnected ?? false;
-        if (!_isConnectedCache) {
-          reject(new Error("No internet connection"));
-          return;
-        }
+      const NetInfo = getNetInfo();
+      const netInfoPromise = NetInfo ? NetInfo.fetch() : Promise.resolve({ isConnected: null });
 
+      const startDownload = () => {
         const { jobId, promise } = RNFS.downloadFile({
           fromUrl: model.url,
           toFile: tempPath,
@@ -412,9 +425,11 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
             _currentJobId = null;
             _currentTempPath = null;
             useAiStore.getState().cancelDownload();
-            const net = await NetInfo.fetch();
-            _isConnectedCache = net.isConnected ?? false;
-            if (!_isConnectedCache) {
+            const netInfo = getNetInfo();
+            const net = netInfo ? await netInfo.fetch() : { isConnected: null };
+            const isConnected = net.isConnected;
+            _isConnectedCache = isConnected ?? null;
+            if (isConnected === false) {
               // leave temp file for resume
               reject(new Error("Network disconnected during download; resume available"));
             } else {
@@ -428,7 +443,22 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
               reject(err);
             }
           });
-      }).catch(() => reject(new Error("Failed to check network state")));
+      };
+
+      netInfoPromise
+        .then((state) => {
+          const isConnected = state.isConnected;
+          _isConnectedCache = isConnected ?? null;
+          if (isConnected === false) {
+            reject(new Error("No internet connection"));
+            return;
+          }
+          startDownload();
+        })
+        .catch(() => {
+          _isConnectedCache = null;
+          startDownload();
+        });
     });
   };
 
@@ -452,16 +482,18 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
 
 /** Cancel an in-progress download. */
 export function cancelDownload(): void {
+  const RNFS = getRNFS();
   if (_currentJobId != null) {
-    RNFS.stopDownload(_currentJobId);
+    RNFS?.stopDownload(_currentJobId);
     _cancelRequested = true;
   }
   useAiStore.getState().cancelDownload();
   // Attempt to remove any temp file
   if (_currentTempPath) {
-    RNFS.exists(_currentTempPath)
+    const tempPath = _currentTempPath;
+    RNFS?.exists(tempPath)
       .then((exists) => {
-        if (exists) RNFS.unlink(_currentTempPath as string).catch(() => {});
+        if (exists) RNFS.unlink(tempPath).catch(() => {});
       })
       .catch(() => {});
     _currentTempPath = null;
@@ -471,6 +503,11 @@ export function cancelDownload(): void {
 
 /** Delete a downloaded model from disk and reset store state. */
 export async function deleteModel(filename: string): Promise<void> {
+  const RNFS = getRNFS();
+  if (!RNFS) {
+    return;
+  }
+
   const path = modelFilePath(filename);
   if (await RNFS.exists(path)) {
     await RNFS.unlink(path);

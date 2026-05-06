@@ -22,6 +22,8 @@ type AiState = {
 
   // --- Actions ---
   setProvider: (provider: AiProvider) => void;
+  setLocalModelPath: (path: string | null) => void;
+  setLocalModelDownloaded: (downloaded: boolean) => void;
   startDownload: () => void;
   setDownloadProgress: (progress: number) => void;
   setDownloadComplete: (modelPath: string) => void;
@@ -45,6 +47,10 @@ export const useAiStore = create<AiState>()(
       ...initialState,
 
       setProvider: (provider) => set({ provider }),
+
+      setLocalModelPath: (path) => set({ localModelPath: path }),
+
+      setLocalModelDownloaded: (downloaded) => set({ localModelDownloaded: downloaded }),
 
       startDownload: () =>
         set({ isDownloading: true, downloadProgress: 0 }),

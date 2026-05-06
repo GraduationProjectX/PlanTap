@@ -15,8 +15,12 @@ export function useBookmarks() {
   const bookmarkedEvents: BookmarkedEvent[] = data ?? [];
   const bookmarkedIds = new Set(bookmarkedEvents.map((event) => event._id));
 
-  const toggleBookmark = (eventId: Id<"events">) => {
-    void toggleMutation({ eventId });
+  const toggleBookmark = async (eventId: Id<"events">) => {
+    try {
+      await toggleMutation({ eventId });
+    } catch (err) {
+      console.error("Failed to toggle bookmark:", err instanceof Error ? err.message : String(err));
+    }
   };
 
   return { bookmarkedEvents, bookmarkedIds, toggleBookmark, isLoading };

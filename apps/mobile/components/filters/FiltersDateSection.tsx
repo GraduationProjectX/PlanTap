@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import type { DateData } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import {
@@ -49,7 +50,6 @@ export function FiltersDateSection({
     activeDate === "specificDates" && startDate
       ? formatRange(startDate, endDate, i18n.language === "ar" ? "ar-SA" : "en-US")
       : null;
-  const CalendarComponent = calendarOpen ? require("react-native-calendars").Calendar : null;
   const quickDateOptions = QUICK_DATE_OPTIONS;
 
   const handleOpenChange = (open: boolean) => {
@@ -139,17 +139,15 @@ export function FiltersDateSection({
                 {t("filters.chooseDatesDesc")}
               </BottomSheet.Description>
 
-              {CalendarComponent ? (
-                <CalendarComponent
-                  markingType="period"
-                  markedDates={markedDates}
-                  onDayPress={handleDayPress}
-                  minDate={TODAY_STR}
-                  enableSwipeMonths
-                  theme={CALENDAR_THEME}
-                  style={styles.calendar}
-                />
-              ) : null}
+              <Calendar
+                markingType="period"
+                markedDates={markedDates}
+                onDayPress={handleDayPress}
+                minDate={TODAY_STR}
+                enableSwipeMonths
+                theme={CALENDAR_THEME as any}
+                style={styles.calendar}
+              />
 
               <View style={styles.sheetActions}>
                 <Button

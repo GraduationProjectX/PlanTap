@@ -32,7 +32,7 @@ export const userFields = {
   lastName: nullableString,
   imageUrl: nullableString,
   locale: nullableString,
-  city: v.optional(v.string()),
+  city: v.optional(nullableString),
   preferences: v.optional(
     v.object({
       likedTags: v.array(v.string()),
@@ -41,9 +41,9 @@ export const userFields = {
   ),
   defaults: v.optional(
     v.object({
-      budgetMin: v.optional(v.number()),
-      budgetMax: v.optional(v.number()),
-      radiusKm: v.optional(v.number()),
+      budgetMin: v.optional(nullableNumber),
+      budgetMax: v.optional(nullableNumber),
+      radiusKm: v.optional(nullableNumber),
       groupType: v.optional(
         v.union(
           v.literal("solo"),
@@ -61,6 +61,8 @@ export const userFields = {
       ),
     }),
   ),
+  notificationsEnabled: v.optional(v.boolean()),
+  onboardingCompletedAt: v.optional(v.number()),
   createdAt: v.number(),
   updatedAt: v.number(),
 };

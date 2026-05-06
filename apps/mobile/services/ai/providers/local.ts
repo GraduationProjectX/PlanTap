@@ -1,6 +1,6 @@
 import { initLlama, type LlamaContext } from "llama.rn";
 import { buildSystemPrompt, buildUserPrompt, EVENT_IDS_GBNF } from "../prompts";
-import { safeParseRecommendation } from "../utils";
+import { validateResponse } from "../responseValidator";
 import type {
   AiProvider,
   EventSummary,
@@ -128,6 +128,11 @@ export class LocalProvider implements AiProvider {
       },
     );
 
-    return safeParseRecommendation(result.text);
+    const candidateIds = new Set(events.map((e) => e.id));
+    const validation = validateResponse(result.text, candidateIds);
+    if (!validation.valid) {
+      throw new Error(validation.error || "Response validation failed");
+    }
+    return validation.result!;
   }
 }

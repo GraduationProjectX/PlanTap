@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
-import { safeParseRecommendation } from "../utils";
+import { validateResponse } from "../responseValidator";
 import type {
   AiProvider,
   EventSummary,
@@ -47,7 +47,12 @@ export class GeminiProvider implements AiProvider {
         ]);
 
         const text = await result.response.text();
-        return safeParseRecommendation(text);
+        const candidateIds = new Set(events.map((e) => e.id));
+        const validation = validateResponse(text, candidateIds);
+        if (!validation.valid) {
+          throw new Error(validation.error || "Response validation failed");
+        }
+        return validation.result!;
       } catch (err: unknown) {
         lastError = err;
         const is429 =

@@ -4,7 +4,7 @@
  *
  * NOTE: The `backend` workspace package is not yet linked as a dependency of
  * mobile — see use-events.ts for the same issue. Once it is wired up, swap
- * the `any` casts below for proper `Doc<"events">` / `Doc<"users">` types.
+ * the fallback logic below for proper type-safe API calls.
  */
 
 import { useQuery } from "convex/react";
@@ -12,6 +12,7 @@ import type { EventSummary, UserContext } from "@/services/ai/types";
 
 let api: any;
 try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   api = require("backend/convex/_generated/api").api;
 } catch {
   api = null;
@@ -30,7 +31,7 @@ const UNAVAILABLE_RESULT = {
  */
 function useAiContextInner(city?: string) {
   const user = useQuery(api.users.current, {});
-  const events = useQuery(api.events.listApproved, { city, limit: 50 });
+  const events = useQuery(api.events.listApproved, { city, limit: 100 });
 
   const isLoading = user === undefined || events === undefined;
 
@@ -42,7 +43,7 @@ function useAiContextInner(city?: string) {
     locale: user?.locale ?? "en",
     interests: user?.preferences?.likedTags ?? [],
     dislikedTags: user?.preferences?.dislikedTags ?? [],
-    city: user?.city ?? city,
+    city: city ?? user?.city,
     groupType: user?.defaults?.groupType,
     indoorOutdoor: user?.defaults?.indoorOutdoor,
     budgetMin: user?.defaults?.budgetMin,
@@ -74,6 +75,5 @@ function useAiContextInner(city?: string) {
  */
 export function useAiContext(city?: string) {
   if (!api) return UNAVAILABLE_RESULT;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useAiContextInner(city);
 }
