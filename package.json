@@ -7,10 +7,12 @@
     "packages/*"
   ],
   "scripts": {
+    "predev": "node scripts/sync-convex-env.mjs",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "sync:convex-env": "node scripts/sync-convex-env.mjs",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "android": "pnpm --filter mobile android",

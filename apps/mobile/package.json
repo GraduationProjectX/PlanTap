@@ -4,9 +4,13 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
+    "predev": "node ../../scripts/sync-convex-env.mjs",
     "dev": "expo start --dev-client",
+    "prestart": "node ../../scripts/sync-convex-env.mjs",
     "start": "expo start",
+    "preandroid": "node ../../scripts/sync-convex-env.mjs",
     "android": "expo run:android",
+    "preios": "node ../../scripts/sync-convex-env.mjs",
     "ios": "expo run:ios",
     "expo:prebuild": "expo prebuild",
     "web": "expo start --web",

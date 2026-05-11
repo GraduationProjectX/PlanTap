@@ -36,7 +36,7 @@ export default function SuggestScreen() {
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
   // Real Convex data (may be null while loading)
-  const convexData = useAiContext(selectedCity);
+  const convexData = useAiContext(selectedCity, useRealData);
   const testData = getTestPromptData();
 
   const cityOptions = SUPPORTED_CITIES;

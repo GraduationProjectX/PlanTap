@@ -29,9 +29,16 @@ const UNAVAILABLE_RESULT = {
  * Inner hook — only called when `api` is available so the useQuery calls
  * always receive a valid function reference.
  */
-function useAiContextInner(city?: string) {
-  const user = useQuery(api.users.current, {});
-  const events = useQuery(api.events.listApproved, { city, limit: 100 });
+function useAiContextInner(city: string | undefined, enabled: boolean) {
+  const user = useQuery(api.users.current, enabled ? {} : "skip");
+  const events = useQuery(
+    api.events.listApproved,
+    enabled ? { city, limit: 100 } : "skip",
+  );
+
+  if (!enabled) {
+    return { isLoading: false, userContext: null, events: null, unavailable: false };
+  }
 
   const isLoading = user === undefined || events === undefined;
 
@@ -73,7 +80,7 @@ function useAiContextInner(city?: string) {
  * Public hook. When the backend package isn't linked, returns an
  * `unavailable` result without calling any Convex hooks.
  */
-export function useAiContext(city?: string) {
+export function useAiContext(city?: string, enabled: boolean = true) {
   if (!api) return UNAVAILABLE_RESULT;
-  return useAiContextInner(city);
+  return useAiContextInner(city, enabled);
 }
