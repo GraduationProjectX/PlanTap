@@ -30,10 +30,13 @@ import { HeroUINativeProvider } from "heroui-native";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { useQuery } from "convex/react";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { AppLoadingSplash } from "@/components/app-loading-splash";
 import { convex } from "@/services/convex";
 import { useUIStore } from "@/stores/ui-store";
 import { darkTheme, lightTheme } from "@/theme/unistyles";
+import { api } from "backend/convex/_generated/api";
 import * as Sentry from "@sentry/react-native";
 
 const navigationIntegration = Sentry.reactNavigationIntegration({
@@ -122,7 +125,7 @@ function RootLayout() {
   }, [resolvedThemeName]);
 
   if (!loaded) {
-    return null;
+    return <AppLoadingSplash />;
   }
 
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -132,7 +135,9 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}>
+      <ThemeProvider
+        value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}
+      >
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             <HeroUINativeProvider>
@@ -147,7 +152,15 @@ function RootLayout() {
 
 function RootNavigator() {
   const { isLoaded, isSignedIn } = useAuth();
+  const isAuthenticated = isSignedIn === true;
   const navigationRef = useNavigationContainerRef();
+  const currentUser = useQuery(api.users.current, isAuthenticated ? {} : "skip");
+
+  const isUserLoading = isAuthenticated && currentUser === undefined;
+  const onboardingCompletedAt = currentUser?.onboardingCompletedAt ?? null;
+  const hasCompletedOnboarding = onboardingCompletedAt !== null;
+  const shouldShowOnboarding = isAuthenticated && !hasCompletedOnboarding;
+  const shouldShowAuth = !isAuthenticated;
 
   useEffect(() => {
     if (navigationRef) {
@@ -155,23 +168,21 @@ function RootNavigator() {
     }
   }, [navigationRef]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [isLoaded]);
-
-  if (!isLoaded) {
-    return null;
+  if (!isLoaded || isUserLoading) {
+    return <AppLoadingSplash />;
   }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isSignedIn}>
+      <Stack.Protected guard={isAuthenticated && hasCompletedOnboarding}>
         <Stack.Screen name="(main)" />
       </Stack.Protected>
 
-      <Stack.Protected guard={!isSignedIn}>
+      <Stack.Protected guard={shouldShowOnboarding}>
+        <Stack.Screen name="onboarding/index" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={shouldShowAuth}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
 

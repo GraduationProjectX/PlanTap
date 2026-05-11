@@ -71,6 +71,7 @@ export const addOrUpdateUser = internalMutation({
 
     return await ctx.db.insert("users", {
       ...patch,
+      onboardingCompletedAt: null,
       createdAt: now,
     });
   },

@@ -44,7 +44,7 @@ function buildCollections(events: EventDoc[]): EventCollections {
   return { all: events, ongoing, upcoming, activity };
 }
 
-export function useEvents(city?: string) {
+export function useEvents(city?: string, enabled = true) {
   const cacheKey = city ? `${STORAGE_KEYS.EVENTS_CACHE}:${city}` : STORAGE_KEYS.EVENTS_CACHE;
   const cacheKeyRef = useRef<string | null>(null);
   const cachedEventsRef = useRef<EventDoc[] | null>(null);
@@ -54,7 +54,7 @@ export function useEvents(city?: string) {
     cachedEventsRef.current = readCachedData<EventDoc[]>(cacheKey, EVENTS_CACHE_TTL_MS);
   }
 
-  const liveEvents = useQuery(api.events.list, city ? { city } : {});
+  const liveEvents = useQuery(api.events.list, enabled ? (city ? { city } : {}) : "skip");
 
   useEffect(() => {
     if (liveEvents === undefined) {

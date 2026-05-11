@@ -136,26 +136,194 @@
   },
   "settings": {
     "title": "الإعدادات",
-    "appearanceDescription": "اختر شكل تطبيق PlanTap في جميع الشاشات.",
-    "temporaryLogout": {
-      "label": "تسجيل خروج مؤقت",
-      "hint": "استخدمه للعودة سريعاً إلى شاشة تسجيل الدخول أثناء الاختبار.",
-      "action": "تسجيل الخروج",
-      "loading": "جارٍ تسجيل الخروج..."
+    "subtitle": "عدّل طريقة عمل PlanTap بما يناسبك.",
+    "sections": {
+      "preferences": "التفضيلات",
+      "privacy": "الخصوصية",
+      "account": "الحساب"
     },
-    "themeMode": {
-      "system": {
-        "label": "اتباع إعدادات الجهاز",
-        "hint": "اتبع مظهر الهاتف وتحدَّث مباشرة عند تغييره."
-      },
-      "light": {
-        "label": "فاتح",
-        "hint": "استخدم المظهر الفاتح دائماً."
-      },
-      "dark": {
-        "label": "داكن",
-        "hint": "استخدم المظهر الداكن دائماً."
+    "theme": {
+      "label": "وضع المظهر",
+      "description": "اختر مظهر التطبيق",
+      "placeholder": "اختر مظهراً",
+      "options": {
+        "system": "النظام",
+        "light": "فاتح",
+        "dark": "داكن"
       }
+    },
+    "language": {
+      "label": "اللغة",
+      "description": "اختر لغتك المفضلة",
+      "placeholder": "اختر لغة",
+      "options": {
+        "en": "الإنجليزية",
+        "ar": "العربية"
+      }
+    },
+    "notifications": {
+      "label": "الإشعارات",
+      "description": "احصل على تحديثات حول الفعاليات والمطابقات والأنشطة والعروض",
+      "permissionDeniedTitle": "الإشعارات معطلة",
+      "permissionDeniedDescription": "فعّل الإشعارات من إعدادات النظام لتشغيل هذا الخيار."
+    },
+    "location": {
+      "label": "الموقع",
+      "description": "اسمح بالوصول إلى موقعك لعرض الفعاليات والأنشطة القريبة",
+      "permissionDeniedTitle": "الموقع معطل",
+      "permissionDeniedDescription": "فعّل إذن الموقع من إعدادات النظام لتشغيل هذا الخيار.",
+      "disableHintTitle": "أوقف الموقع من إعدادات النظام",
+      "disableHintDescription": "يمكن تعطيل إذن الموقع فقط من إعدادات جهازك."
+    },
+    "contentFilters": {
+      "label": "فلاتر المحتوى",
+      "description": "خصص ما تراه",
+      "preferences": "تفضيلات الوسوم",
+      "cycleHint": "اضغط مرة للإعجاب، ومرة ثانية لعدم الإعجاب، ومرة ثالثة للإزالة.",
+      "likes": "أرني المزيد من",
+      "dislikes": "أرني أقل من",
+      "selected": "مختار",
+      "note": "الفئات التي تضيفها هنا لن تظهر في \"أرني المزيد من\". يمكنك تحديث هذه في أي وقت."
+    },
+    "signOut": {
+      "label": "تسجيل الخروج",
+      "description": "الخروج من حسابك"
+    },
+    "actions": {
+      "save": "حفظ التغييرات",
+      "saving": "جارٍ الحفظ...",
+      "signOut": "تسجيل الخروج",
+      "signingOut": "جارٍ تسجيل الخروج...",
+      "openSettings": "فتح الإعدادات"
+    },
+    "alerts": {
+      "saveErrorTitle": "تعذر حفظ الإعدادات",
+      "saveErrorDescription": "يرجى المحاولة مرة أخرى.",
+      "restartTitle": "إعادة تشغيل مطلوبة",
+      "restartDescription": "يرجى إعادة تشغيل التطبيق لتطبيق اتجاه اللغة بالكامل."
+    },
+    "tos": {
+      "prefix": "باستخدامك PlanTap فأنت توافق على",
+      "link": "شروط الخدمة"
+    }
+  },
+  "onboarding": {
+    "intro": {
+      "titleLine1": "اعثر على فعاليات.",
+      "titleLine2": "واستمتع.",
+      "description": "أضف تفضيلاتك بسرعة ليعرض لك PlanTap فعاليات وأنشطة أنسب من البداية.",
+      "cta": "ابدأ"
+    },
+    "city": {
+      "title": "أين أنت؟",
+      "description": "ساعدنا في عرض الفعاليات القريبة منك.",
+      "selectLabel": "اختر مدينتك",
+      "searchPlaceholder": "ابحث عن مدينتك",
+      "popularCities": "المدن الشائعة",
+      "allCities": "أي مدينة",
+      "enableLocation": "تفعيل الموقع",
+      "enableLocationDescription": "اسمح بالوصول إلى موقعك لاكتشاف الفعاليات القريبة.",
+      "allowLocation": "السماح بالموقع",
+      "notNow": "ليس الآن",
+      "privacyNote": "يُستخدم موقعك فقط لعرض الفعاليات القريبة.",
+      "locating": "جارٍ تحديد مدينتك...",
+      "permissionDeniedTitle": "يلزم إذن الموقع",
+      "permissionDeniedDescription": "فعّل إذن الموقع لاكتشاف مدينتك تلقائياً.",
+      "locationUnavailableTitle": "تعذر تحديد المدينة",
+      "locationUnavailableDescription": "لم نتمكن من مطابقة موقعك مع مدينة مدعومة حالياً."
+    },
+    "interests": {
+      "title": "ما الذي يثير اهتمامك؟",
+      "description": "اختر بعض المواضيع التي تحبها. سنعرض لك فعاليات وأنشطة ستستمتع بها.",
+      "sectionLabel": "اختر اهتماماتك",
+      "counterLabel": "مختار",
+      "footerNote": "يمكنك تحديث هذه في أي وقت"
+    },
+    "dislikes": {
+      "title": "هل هناك ما تفضّل تقليله؟",
+      "description": "اختر ما لا ترغب برؤيته كثيراً. يمكنك تعديل ذلك لاحقاً.",
+      "sectionLabel": "اختر ما تريد تجنبه",
+      "counterLabel": "مختار",
+      "footerNote": "يمكنك تحديث هذه في أي وقت"
+    },
+    "defaults": {
+      "title": "حدّد نمط التخطيط الافتراضي",
+      "description": "هذه الإعدادات نقطة بداية فقط ويمكن تعديلها لاحقاً.",
+      "groupType": {
+        "label": "نوع المجموعة",
+        "options": {
+          "solo": {
+            "label": "فردي",
+            "description": "خطط مناسبة لشخص واحد."
+          },
+          "group": {
+            "label": "مجموعة",
+            "description": "مناسبة للأصدقاء أو الفرق."
+          },
+          "kids": {
+            "label": "أطفال",
+            "description": "خيارات مناسبة للعائلة افتراضياً."
+          },
+          "any": {
+            "label": "أي خيار",
+            "description": "بدون تفضيل لحجم المجموعة."
+          }
+        }
+      },
+      "indoorOutdoor": {
+        "label": "داخلي أو خارجي",
+        "options": {
+          "indoor": {
+            "label": "داخلي",
+            "description": "أفضل الأماكن الداخلية."
+          },
+          "outdoor": {
+            "label": "خارجي",
+            "description": "أفضل التجارب الخارجية."
+          },
+          "any": {
+            "label": "أي خيار",
+            "description": "بدون تفضيل بين الداخلي والخارجي."
+          }
+        }
+      }
+    },
+    "notifications": {
+      "title": "ابقَ على اطلاع",
+      "description": "فعّل الإشعارات لتصلك تذكيرات بالخطط المحفوظة والقادمة.",
+      "switchLabel": "تفعيل الإشعارات",
+      "switchDescription": "يمكنك تغيير ذلك لاحقاً من الإعدادات.",
+      "benefits": {
+        "reminder": "تذكيرات قبل بدء الفعاليات",
+        "interests": "فعاليات جديدة تناسب اهتماماتك",
+        "nearby": "أنشطة قريبة منك"
+      },
+      "permissionDeniedTitle": "الإشعارات متوقفة",
+      "permissionDeniedDescription": "سنُبقي الإشعارات معطلة حتى تسمح بها من إعدادات النظام."
+    },
+    "actions": {
+      "finish": "إنهاء",
+      "submitting": "جارٍ الحفظ..."
+    },
+    "errors": {
+      "submitTitle": "تعذر إكمال الإعداد",
+      "submitDescription": "يرجى المحاولة مرة أخرى.",
+      "locationTitle": "تعذر الوصول إلى الموقع",
+      "locationDescription": "يرجى المحاولة بعد قليل."
+    },
+    "tags": {
+      "music": "موسيقى",
+      "food": "طعام",
+      "sports": "رياضة",
+      "arts": "فنون",
+      "adventure": "مغامرة",
+      "wellness": "عافية",
+      "tech": "تقنية",
+      "family": "عائلة",
+      "concerts": "حفلات",
+      "entertainment": "ترفيه",
+      "nightlife": "سهر",
+      "culture": "ثقافة"
     }
   }
 }

@@ -7,11 +7,14 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function SignInScreen() {
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.container}>
         <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.branding}>
           <View style={styles.logoContainer}>
-            <Image source={require("@/assets/images/icon.png")} style={styles.logo} />
+            <Image source={require("@/assets/images/planTap-icon.png")} style={styles.logo} />
           </View>
           <Text style={styles.title}>PlanTap</Text>
           <Text style={styles.subtitle}>Discover nearby events and activities.</Text>
@@ -34,10 +37,8 @@ export default function SignInScreen() {
 
         <Animated.View entering={FadeInUp.delay(500).duration(500)}>
           <Text style={styles.terms}>
-            By continuing, you agree to our{" "}
-            <Text style={styles.termsLink}>Terms of Service</Text>
-            {" "}and{" "}
-            <Text style={styles.termsLink}>Privacy Policy</Text>
+            By continuing, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{" "}
+            and <Text style={styles.termsLink}>Privacy Policy</Text>
           </Text>
         </Animated.View>
       </View>
@@ -53,7 +54,7 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.xxl,
   },
@@ -62,15 +63,15 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xxxl,
   },
   logoContainer: {
-    width: 88,
-    height: 88,
+    width: 150,
+    height: 150,
     borderRadius: 22,
     borderCurve: "continuous",
     overflow: "hidden",
   },
   logo: {
-    width: 88,
-    height: 88,
+    width: "100%",
+    height: "100%",
   },
   title: {
     marginTop: theme.spacing.lg,
@@ -88,6 +89,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   buttons: {
     width: "100%",
+    marginTop: theme.spacing.xxl,
     gap: theme.spacing.sm,
   },
   dividerRow: {
@@ -109,6 +111,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   termsLink: {
     fontFamily: theme.font.family.medium,
-    color: theme.colors.text
+    color: theme.colors.text,
   },
 }));

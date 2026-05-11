@@ -136,26 +136,194 @@
   },
   "settings": {
     "title": "Settings",
-    "appearanceDescription": "Choose how PlanTap looks across the app.",
-    "temporaryLogout": {
-      "label": "Temporary logout",
-      "hint": "Use this to quickly return to sign in while testing.",
-      "action": "Log out",
-      "loading": "Signing out..."
+    "subtitle": "Adjust how PlanTap works for you.",
+    "sections": {
+      "preferences": "Preferences",
+      "privacy": "Privacy",
+      "account": "Account"
     },
-    "themeMode": {
-      "system": {
-        "label": "Use device theme",
-        "hint": "Follow your phone appearance and update live."
-      },
-      "light": {
-        "label": "Light",
-        "hint": "Always use the light theme."
-      },
-      "dark": {
-        "label": "Dark",
-        "hint": "Always use the dark theme."
+    "theme": {
+      "label": "Theme mode",
+      "description": "Choose how the app looks",
+      "placeholder": "Select a theme",
+      "options": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
       }
+    },
+    "language": {
+      "label": "Language",
+      "description": "Choose your preferred language",
+      "placeholder": "Select a language",
+      "options": {
+        "en": "English",
+        "ar": "Arabic"
+      }
+    },
+    "notifications": {
+      "label": "Notifications",
+      "description": "Get updates about events, matches, activities and offers",
+      "permissionDeniedTitle": "Notifications disabled",
+      "permissionDeniedDescription": "Allow notifications in system settings to turn this on."
+    },
+    "location": {
+      "label": "Location",
+      "description": "Allow access to your location to show nearby events and activities",
+      "permissionDeniedTitle": "Location disabled",
+      "permissionDeniedDescription": "Allow location access in system settings to turn this on.",
+      "disableHintTitle": "Disable location in system settings",
+      "disableHintDescription": "Location permission can only be disabled from your device settings."
+    },
+    "contentFilters": {
+      "label": "Content filters",
+      "description": "Customize what you see",
+      "preferences": "Tag preferences",
+      "cycleHint": "Tap once to like, again to dislike, and one more time to clear.",
+      "likes": "Show me more of",
+      "dislikes": "Show me less of",
+      "selected": "selected",
+      "note": "Categories you add here won't appear in \"Show me more of\". You can update these anytime."
+    },
+    "signOut": {
+      "label": "Sign out",
+      "description": "Sign out of your account"
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving...",
+      "signOut": "Sign out",
+      "signingOut": "Signing out...",
+      "openSettings": "Open settings"
+    },
+    "alerts": {
+      "saveErrorTitle": "Could not save settings",
+      "saveErrorDescription": "Please try again.",
+      "restartTitle": "Restart required",
+      "restartDescription": "Please restart the app to fully apply the language direction change."
+    },
+    "tos": {
+      "prefix": "By using PlanTap, you agree to",
+      "link": "Terms of Service"
+    }
+  },
+  "onboarding": {
+    "intro": {
+      "titleLine1": "Discover events.",
+      "titleLine2": "Have fun!",
+      "description": "Find exciting events and activities that match your interests, near you.",
+      "cta": "Get Started"
+    },
+    "city": {
+      "title": "Where are you?",
+      "description": "Help us show events near you.",
+      "selectLabel": "Select your city",
+      "searchPlaceholder": "Search for your city",
+      "popularCities": "Popular cities",
+      "allCities": "Any city",
+      "enableLocation": "Enable location",
+      "enableLocationDescription": "Allow location access to discover events near you.",
+      "allowLocation": "Allow Location",
+      "notNow": "Not Now",
+      "privacyNote": "Your location is only used to show nearby events.",
+      "locating": "Finding your city...",
+      "permissionDeniedTitle": "Location permission needed",
+      "permissionDeniedDescription": "Enable location access to auto-detect your city.",
+      "locationUnavailableTitle": "City not detected",
+      "locationUnavailableDescription": "We could not match your location to a supported city yet."
+    },
+    "interests": {
+      "title": "What are you interested in?",
+      "description": "Pick a few topics you love. We'll show events and activities you'll enjoy.",
+      "sectionLabel": "Select your interests",
+      "counterLabel": "selected",
+      "footerNote": "You can update these anytime"
+    },
+    "dislikes": {
+      "title": "Anything you want less of?",
+      "description": "Choose what to avoid. You can always edit this later.",
+      "sectionLabel": "Select what to avoid",
+      "counterLabel": "selected",
+      "footerNote": "You can update these anytime"
+    },
+    "defaults": {
+      "title": "Set your default planning style",
+      "description": "These defaults are only a starting point and can be changed later.",
+      "groupType": {
+        "label": "Group type",
+        "options": {
+          "solo": {
+            "label": "Solo",
+            "description": "Plans tuned for one person."
+          },
+          "group": {
+            "label": "Group",
+            "description": "Great for friends or teams."
+          },
+          "kids": {
+            "label": "Kids",
+            "description": "Family-friendly by default."
+          },
+          "any": {
+            "label": "Any",
+            "description": "No preference for group size."
+          }
+        }
+      },
+      "indoorOutdoor": {
+        "label": "Indoor or outdoor",
+        "options": {
+          "indoor": {
+            "label": "Indoor",
+            "description": "Prefer indoor venues."
+          },
+          "outdoor": {
+            "label": "Outdoor",
+            "description": "Prefer outdoor experiences."
+          },
+          "any": {
+            "label": "Any",
+            "description": "No indoor/outdoor preference."
+          }
+        }
+      }
+    },
+    "notifications": {
+      "title": "Stay in the loop",
+      "description": "Turn on notifications to get reminders for saved and upcoming plans.",
+      "switchLabel": "Enable notifications",
+      "switchDescription": "You can change this anytime in settings.",
+      "benefits": {
+        "reminder": "Event reminders before they start",
+        "interests": "New events matching your interests",
+        "nearby": "Activities happening near you"
+      },
+      "permissionDeniedTitle": "Notifications are off",
+      "permissionDeniedDescription": "We will keep notifications disabled until you allow them in system settings."
+    },
+    "actions": {
+      "finish": "Finish",
+      "submitting": "Saving..."
+    },
+    "errors": {
+      "submitTitle": "Could not finish onboarding",
+      "submitDescription": "Please try again.",
+      "locationTitle": "Could not access location",
+      "locationDescription": "Please try again in a moment."
+    },
+    "tags": {
+      "music": "Music",
+      "food": "Food",
+      "sports": "Sports",
+      "arts": "Arts",
+      "adventure": "Adventure",
+      "wellness": "Wellness",
+      "tech": "Tech",
+      "family": "Family",
+      "concerts": "Concerts",
+      "entertainment": "Entertainment",
+      "nightlife": "Nightlife",
+      "culture": "Culture"
     }
   }
 }
