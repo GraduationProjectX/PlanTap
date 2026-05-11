@@ -4,12 +4,18 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-// Schedule the Harvester to run exactly twice a day (e.g., 12:00 AM and 12:00 PM)
+
 crons.cron(
   "Harvest Google Places automatically",
-  "0 0,12 * * *", // This cron syntax means "Minute 0 of Hour 0 and Hour 12"
+  "0 0,12 * * *", // twice at 12
   internal.googleplaces.fetchAndSync,
   {}
 );
 
+crons.cron(
+  "Harvest Visit Saudi automatically",
+  "0 1,13 * * *", 
+  internal.visitsaudi.fetchVisitSaudi,
+  {} 
+);
 export default crons;
