@@ -83,6 +83,18 @@ export type ModelSupportAssessment = {
   estimatedRamBytes: number | null;
 };
 
+function isNumber(value: unknown): value is number {
+  return Object.prototype.toString.call(value) === "[object Number]";
+}
+
+function isString(value: unknown): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
+}
+
+function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+  return Object.prototype.toString.call(value) === "[object Function]";
+}
+
 function parseFilenameFromUrl(url: string): string {
   const clean = url.split("?")[0].trim();
   const parts = clean.split("/");
@@ -99,14 +111,12 @@ function formatBytes(bytes: number): string {
 
 function getEstimatedRamBytes(): number | null {
   try {
-    const modules = NativeModules as Record<string, unknown>;
-    const deviceInfo = modules.DeviceInfo as {
-      getConstants?: () => Record<string, unknown>;
-    } | undefined;
-
-    const constants = deviceInfo?.getConstants?.();
+    const deviceInfo = NativeModules.DeviceInfo;
+    const constants = isFunction(deviceInfo?.getConstants)
+      ? deviceInfo.getConstants()
+      : null;
     const totalMemory = constants?.TotalMemory;
-    if (typeof totalMemory === "number" && Number.isFinite(totalMemory)) {
+    if (isNumber(totalMemory) && Number.isFinite(totalMemory)) {
       return totalMemory;
     }
   } catch {
@@ -129,9 +139,9 @@ async function getStorageInfo(): Promise<{
 
     return {
       freeSpaceBytes:
-        typeof info.freeSpace === "number" ? info.freeSpace : null,
+        isNumber(info.freeSpace) ? info.freeSpace : null,
       totalSpaceBytes:
-        typeof info.totalSpace === "number" ? info.totalSpace : null,
+        isNumber(info.totalSpace) ? info.totalSpace : null,
     };
   } catch {
     return { freeSpaceBytes: null, totalSpaceBytes: null };
@@ -263,6 +273,7 @@ export async function isModelDownloaded(filename: string): Promise<boolean> {
 let _currentJobId: number | null = null;
 let _currentTempPath: string | null = null;
 let _cancelRequested = false;
+let _pauseRequested = false;
 let _isConnectedCache: boolean | null = null;
 
 function getNetInfo(): { fetch: () => Promise<{ isConnected: boolean | null }> } | null {
@@ -293,9 +304,13 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
   // Perform an optional HEAD request to obtain content-length / etag
   let serverContentLength: number | null = null;
   let serverEtag: string | null = null;
+  let resolvedUrl: string = model.url;
   try {
     const head = await fetchWithTimeout(model.url, { method: "HEAD", redirect: "follow" }, 10_000);
     if (head.ok) {
+      if (head.url) {
+        resolvedUrl = head.url;
+      }
       const cl = head.headers.get("content-length");
       if (cl) serverContentLength = Number(cl);
       serverEtag = head.headers.get("etag");
@@ -316,7 +331,7 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
   if (await RNFS.exists(destPath)) {
     try {
       const st = await RNFS.stat(destPath);
-      const actualSize = Number((st as any).size);
+      const actualSize = Number(st.size);
       if (expectedSize === 0 || (expectedSize > 0 && actualSize === expectedSize)) {
         store.setDownloadComplete(destPath);
         // persist metadata if available
@@ -329,8 +344,6 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
       // ignore and continue with download
     }
   }
-
-  store.startDownload();
 
   const tempPath = destPath + TMP_SUFFIX;
 
@@ -350,12 +363,19 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
 
       const startDownload = () => {
         const { jobId, promise } = RNFS.downloadFile({
-          fromUrl: model.url,
+          fromUrl: resolvedUrl,
           toFile: tempPath,
           background: true,
           discretionary: false,
           cacheable: false,
           progressInterval: 500,
+          headers: {
+            "User-Agent": "PlanTap",
+            Accept: "application/octet-stream",
+          },
+          resumable: () => {
+            useAiStore.getState().setDownloadCanResume(true);
+          },
           progress: (res) => {
             const total = (res.contentLength && res.contentLength > 0) ? res.contentLength : serverContentLength;
             let progress = 0;
@@ -369,6 +389,8 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
         _currentJobId = jobId;
         _currentTempPath = tempPath;
         _cancelRequested = false;
+        _pauseRequested = false;
+        useAiStore.getState().startDownload(model.id, jobId);
 
         promise
           .then(async (result) => {
@@ -377,7 +399,7 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
             if (result.statusCode === 200 || result.statusCode === 201) {
               try {
                 const st = await RNFS.stat(tempPath);
-                const size = Number((st as any).size);
+                const size = Number(st.size);
                 if (serverContentLength && serverContentLength > 0 && size !== serverContentLength) {
                   // corrupted/incomplete
                   await RNFS.unlink(tempPath).catch(() => {});
@@ -424,21 +446,30 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
           .catch(async (err) => {
             _currentJobId = null;
             _currentTempPath = null;
-            useAiStore.getState().cancelDownload();
             const netInfo = getNetInfo();
             const net = netInfo ? await netInfo.fetch() : { isConnected: null };
             const isConnected = net.isConnected;
             _isConnectedCache = isConnected ?? null;
             if (isConnected === false) {
+              useAiStore.getState().setDownloadCanResume(true);
+              useAiStore.getState().setDownloadPaused();
               // leave temp file for resume
               reject(new Error("Network disconnected during download; resume available"));
             } else {
+              if (_pauseRequested) {
+                useAiStore.getState().setDownloadPaused();
+                reject(new Error("Download paused"));
+                return;
+              }
               if (_cancelRequested) {
+                useAiStore.getState().cancelDownload();
                 try {
                   if (await RNFS.exists(tempPath)) {
                     await RNFS.unlink(tempPath).catch(() => {});
                   }
                 } catch {}
+              } else {
+                useAiStore.getState().setDownloadError();
               }
               reject(err);
             }
@@ -466,18 +497,51 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
     const resultPath = await retry(() => downloadAttempt(), 2, 4000);
     return resultPath;
   } catch (err) {
-    // cleanup
-    try {
-      if (await RNFS.exists(tempPath)) {
-        await RNFS.unlink(tempPath).catch(() => {});
-      }
-    } catch {}
+    const shouldKeepTemp =
+      err instanceof Error &&
+      (err.message === "Download paused" || err.message === "Network disconnected during download; resume available");
+    if (!shouldKeepTemp) {
+      try {
+        if (await RNFS.exists(tempPath)) {
+          await RNFS.unlink(tempPath).catch(() => {});
+        }
+      } catch {}
+      useAiStore.getState().setDownloadError();
+    }
     throw err;
   } finally {
     _currentJobId = null;
     _currentTempPath = null;
     _cancelRequested = false;
+    _pauseRequested = false;
   }
+}
+
+/** Pause an in-progress download, keeping temp file for resume. */
+export async function pauseDownload(): Promise<void> {
+  const RNFS = getRNFS();
+  if (_currentJobId != null) {
+    _pauseRequested = true;
+    RNFS?.stopDownload(_currentJobId);
+  }
+}
+
+/** Resume a paused download if RNFS supports it. */
+export async function resumeDownload(): Promise<void> {
+  const RNFS = getRNFS();
+  if (_currentJobId != null && RNFS) {
+    const resumable = await RNFS.isResumable(_currentJobId).catch(() => false);
+    if (resumable) {
+      _pauseRequested = false;
+      RNFS.resumeDownload(_currentJobId);
+      useAiStore.getState().setDownloadJobId(_currentJobId);
+      useAiStore.getState().setDownloadCanResume(true);
+      useAiStore.getState().setDownloadResumed();
+      useAiStore.getState().setDownloadProgress(useAiStore.getState().downloadProgress);
+      return;
+    }
+  }
+  throw new Error("Download is not resumable");
 }
 
 /** Cancel an in-progress download. */

@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
 import { Select } from "heroui-native";
 import { useRouter } from "expo-router";
+import { useAuth } from "@clerk/clerk-expo";
 import { useDirection } from "@/rtl";
 import { useAiStore } from "@/stores";
 import { useEventRecommendations } from "@/hooks/useEventRecommendations";
 import { useAiContext } from "@/hooks/useAiContext";
-import { getTestPromptData } from "@/services/ai/prompts";
 import { AiModelSelector } from "@/components/ui/AiModelSelector";
 import { SUPPORTED_CITIES } from "@/features/filters/utils";
 
@@ -26,23 +26,20 @@ function eventMatchesCity(location: string | undefined, city: string | undefined
 export default function SuggestScreen() {
   const { t } = useTranslation();
   const { textAlign, flexDirection } = useDirection();
+  const { isLoaded, isSignedIn } = useAuth();
+  const isAuthenticated = isLoaded && isSignedIn;
   const provider = useAiStore((s) => s.provider);
   const localModelDownloaded = useAiStore((s) => s.localModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
   const { eventIds, isLoading, error, recommend } =
     useEventRecommendations();
   const [userNote, setUserNote] = useState("");
-  const [useRealData, setUseRealData] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
-  // Real Convex data (may be null while loading)
-  const convexData = useAiContext(selectedCity, useRealData);
-  const testData = getTestPromptData();
+  const convexData = useAiContext(selectedCity, isAuthenticated);
 
   const cityOptions = SUPPORTED_CITIES;
-  const defaultCity = useRealData
-    ? convexData.userContext?.city
-    : testData.userContext.city;
+  const defaultCity = convexData.userContext?.city;
   const fallbackCity = cityOptions[0];
   const resolvedCity = selectedCity ?? defaultCity ?? fallbackCity;
   const router = useRouter();
@@ -53,32 +50,26 @@ export default function SuggestScreen() {
     }
   }, [resolvedCity, selectedCity]);
 
-  // Choose which data source to display below
-  const displayEvents = useRealData && !convexData.isLoading
-    ? convexData.events ?? []
-    : testData.events;
-
+  const events = convexData.isLoading ? [] : convexData.events ?? [];
   const cityFilteredEvents = resolvedCity
-    ? displayEvents.filter((event) => eventMatchesCity(event.location, resolvedCity))
-    : displayEvents;
+    ? events.filter((event) => eventMatchesCity(event.location, resolvedCity))
+    : events;
 
   const handleRun = () => {
     if (provider === "local" && (!localModelDownloaded || !localModelPath)) {
       return;
     }
 
-    if (useRealData && !convexData.isLoading && convexData.userContext && convexData.events) {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    if (!convexData.isLoading && convexData.userContext && convexData.events) {
       const context = { ...convexData.userContext, city: resolvedCity };
-      const events = resolvedCity
+      const contextEvents = resolvedCity
         ? convexData.events.filter((event) => eventMatchesCity(event.location, resolvedCity))
         : convexData.events;
-      recommend(context, events, userNote || undefined);
-    } else {
-      const context = { ...testData.userContext, city: resolvedCity };
-      const events = resolvedCity
-        ? testData.events.filter((event) => eventMatchesCity(event.location, resolvedCity))
-        : testData.events;
-      recommend(context, events, userNote || undefined);
+      recommend(context, contextEvents, userNote || undefined);
     }
   };
 
@@ -103,42 +94,28 @@ export default function SuggestScreen() {
         </View>
       )}
 
-      {/* ---------- Data source toggle ---------- */}
-      <View style={styles.toggleRow}>
-        <Pressable
-          style={[styles.toggleBtn, !useRealData && styles.toggleBtnActive]}
-          onPress={() => setUseRealData(false)}
-        >
-          <Text style={[styles.toggleText, !useRealData && styles.toggleTextActive]}>
-            Test Data
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.toggleBtn, useRealData && styles.toggleBtnActive]}
-          onPress={() => setUseRealData(true)}
-        >
-          <Text style={[styles.toggleText, useRealData && styles.toggleTextActive]}>
-            Live (Convex)
-          </Text>
-        </Pressable>
-      </View>
+      {isLoaded && !isSignedIn && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>Sign in to personalize recommendations. Public events are shown below.</Text>
+        </View>
+      )}
 
-      {useRealData && convexData.isLoading && (
+      {isAuthenticated && convexData.isLoading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
           <Text style={styles.loadingText}>Loading Convex data…</Text>
         </View>
       )}
 
-      {useRealData && convexData.unavailable && (
+      {convexData.unavailable && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>
-            Convex backend not linked yet — using test data as fallback.
+            Convex backend not linked yet.
           </Text>
         </View>
       )}
 
-      {useRealData && !convexData.isLoading && convexData.userContext && (
+      {isAuthenticated && !convexData.isLoading && convexData.userContext && (
         <View style={styles.contextBox}>
           <Text style={styles.contextTitle}>Your Profile (from Convex)</Text>
           <Text style={styles.contextItem}>City: {convexData.userContext.city ?? "—"}</Text>
@@ -211,15 +188,20 @@ export default function SuggestScreen() {
 
       {/* ---------- Run ---------- */}
       <Pressable
-        style={[styles.btn, isLoading && styles.btnDisabled]}
+        style={[styles.btn, (isLoading || !isAuthenticated || convexData.isLoading) && styles.btnDisabled]}
         onPress={handleRun}
-        disabled={isLoading || (provider === "local" && (!localModelDownloaded || !localModelPath))}
+        disabled={
+          isLoading ||
+          !isAuthenticated ||
+          convexData.isLoading ||
+          (provider === "local" && (!localModelDownloaded || !localModelPath))
+        }
       >
         {isLoading ? (
           <ActivityIndicator color="#fff" size="small" />
         ) : (
           <Text style={styles.btnText}>
-            {useRealData ? "Get Suggestions" : "Run Test Prompt"}
+            Get Suggestions
           </Text>
         )}
       </Pressable>
@@ -245,9 +227,7 @@ export default function SuggestScreen() {
 
       {/* ---------- Events fed to the model ---------- */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          {useRealData ? `Events from Convex (${cityFilteredEvents.length})` : "Test Events (input)"}
-        </Text>
+        <Text style={styles.sectionTitle}>{`Events from Convex (${cityFilteredEvents.length})`}</Text>
         {cityFilteredEvents.length === 0 && (
           <Text style={styles.eventDesc}>No events found. Add some via the admin or scraper.</Text>
         )}
@@ -360,30 +340,7 @@ const styles = StyleSheet.create((theme) => ({
   },
 
   // Data source toggle
-  toggleRow: {
-    flexDirection: "row",
-    gap: theme.spacing.sm,
-  },
-  toggleBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.borderStrong,
-    alignItems: "center",
-  },
-  toggleBtnActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  toggleText: {
-    fontFamily: theme.font.family.medium,
-    fontSize: theme.font.size.base,
-    color: theme.colors.textSecondary,
-  },
-  toggleTextActive: {
-    color: theme.colors.primaryForeground,
-  },
+  // (Removed test-data toggle; Convex-only)
 
   // Loading
   loadingRow: {

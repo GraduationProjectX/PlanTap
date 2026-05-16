@@ -47,6 +47,8 @@ type SeedReview = {
 
 function withEventDefaults(event: SeedEvent) {
   return {
+    externalSource: null,
+    externalId: null,
     descriptionShort: null,
     descriptionShortAr: null,
     startAt: null,

@@ -31,32 +31,27 @@ const UNAVAILABLE_RESULT = {
  */
 function useAiContextInner(city: string | undefined, enabled: boolean) {
   const user = useQuery(api.users.current, enabled ? {} : "skip");
-  const events = useQuery(
-    api.events.listApproved,
-    enabled ? { city, limit: 100 } : "skip",
-  );
+  const events = useQuery(api.events.listApproved, { city, limit: 100 });
 
-  if (!enabled) {
-    return { isLoading: false, userContext: null, events: null, unavailable: false };
-  }
-
-  const isLoading = user === undefined || events === undefined;
+  const isLoading = (enabled && user === undefined) || events === undefined;
 
   if (isLoading) {
     return { isLoading: true as const, userContext: null, events: null, unavailable: false as const };
   }
 
-  const userContext: UserContext = {
-    locale: user?.locale ?? "en",
-    interests: user?.preferences?.likedTags ?? [],
-    dislikedTags: user?.preferences?.dislikedTags ?? [],
-    city: city ?? user?.city,
-    groupType: user?.defaults?.groupType,
-    indoorOutdoor: user?.defaults?.indoorOutdoor,
-    budgetMin: user?.defaults?.budgetMin,
-    budgetMax: user?.defaults?.budgetMax,
-    pastEventTags: [],
-  };
+  const userContext: UserContext | null = enabled
+    ? {
+        locale: user?.locale ?? "en",
+        interests: user?.preferences?.likedTags ?? [],
+        dislikedTags: user?.preferences?.dislikedTags ?? [],
+        city: city ?? user?.city,
+        groupType: user?.defaults?.groupType,
+        indoorOutdoor: user?.defaults?.indoorOutdoor,
+        budgetMin: user?.defaults?.budgetMin,
+        budgetMax: user?.defaults?.budgetMax,
+        pastEventTags: [],
+      }
+    : null;
 
   const eventSummaries: EventSummary[] = (events ?? []).map((e: any) => ({
     id: e._id,

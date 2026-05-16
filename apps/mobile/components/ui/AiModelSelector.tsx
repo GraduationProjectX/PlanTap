@@ -7,7 +7,7 @@
  * Mobile-optimized: compact, collapsible design.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, ScrollView, Text, TextInput, View, Pressable } from "react-native";
 import { isRunningInExpoGo } from "expo";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,16 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useAiStore } from "@/stores";
 import { setApiKey } from "@/services/ai/secureKeys";
-import { AVAILABLE_MODELS, downloadModel, modelFilePath } from "@/services/ai/modelDownloader";
+import {
+  AVAILABLE_MODELS,
+  cancelDownload,
+  deleteModel,
+  downloadModel,
+  isModelDownloaded,
+  modelFilePath,
+  pauseDownload,
+  resumeDownload,
+} from "@/services/ai/modelDownloader";
 import { getRNFS } from "@/services/nativeFileSystem";
 
 type TabMode = "api" | "local";
@@ -32,10 +41,14 @@ export function AiModelSelector() {
   const localModelPath = useAiStore((s) => s.localModelPath);
   const aiStoreIsDownloading = useAiStore((s) => s.isDownloading);
   const aiStoreProgress = useAiStore((s) => s.downloadProgress);
+  const downloadStatus = useAiStore((s) => s.downloadStatus);
+  const downloadModelId = useAiStore((s) => s.downloadModelId);
+  const downloadCanResume = useAiStore((s) => s.downloadCanResume);
 
   const [apiKey, setApiKeyInput] = useState<string>("");
   const [selectedApi, setSelectedApi] = useState<"gemini" | "openai" | "claude">("gemini");
   const [downloadingModelId, setDownloadingModelId] = useState<string | null>(null);
+  const [downloadedById, setDownloadedById] = useState<Record<string, boolean>>({});
 
   const handleApiKeyChange = (value: string) => {
     setApiKeyInput(value);
@@ -84,6 +97,24 @@ export function AiModelSelector() {
       setDownloadingModelId(null);
     }
   };
+
+  const refreshDownloaded = async () => {
+    if (!rnfs) {
+      setDownloadedById({});
+      return;
+    }
+
+    const entries: Record<string, boolean> = {};
+    for (const model of AVAILABLE_MODELS) {
+      entries[model.id] = await isModelDownloaded(model.filename);
+    }
+    setDownloadedById(entries);
+  };
+
+  useEffect(() => {
+    if (!isExpanded) return;
+    void refreshDownloaded();
+  }, [isExpanded, aiStoreIsDownloading, downloadStatus, localModelPath, rnfs]);
 
   return (
     <View style={styles.container}>
@@ -165,8 +196,11 @@ export function AiModelSelector() {
                   </View>
                 )}
                 {AVAILABLE_MODELS.map((model) => {
-                  const isDownloadingThisModel = downloadingModelId === model.id && aiStoreIsDownloading;
+                  const isDownloadingThisModel = downloadStatus === "downloading" && downloadModelId === model.id;
+                  const isPausedThisModel = downloadStatus === "paused" && downloadModelId === model.id;
                   const isActive = localModelPath === modelFilePath(model.filename);
+                  const isDownloaded = isActive || downloadedById[model.id] === true;
+                  const isBusy = downloadStatus === "downloading" || downloadStatus === "paused";
 
                   return (
                     <View key={model.id} style={styles.modelItem}>
@@ -177,17 +211,65 @@ export function AiModelSelector() {
                         </Text>
                       </View>
 
-                      {isDownloadingThisModel ? (
-                        <View style={styles.progress}>
-                          <Text style={styles.progressText}>{aiStoreProgress}%</Text>
+                      {isDownloadingThisModel && (
+                        <View style={styles.progressColumn}>
+                          <View style={styles.progress}>
+                            <Text style={styles.progressText}>{aiStoreProgress}%</Text>
+                          </View>
+                          <View style={styles.actionRow}>
+                            <Pressable onPress={pauseDownload} style={styles.smallBtn}>
+                              <Text style={styles.smallBtnText}>Pause</Text>
+                            </Pressable>
+                            <Pressable onPress={cancelDownload} style={[styles.smallBtn, styles.cancelBtn]}>
+                              <Text style={styles.smallBtnText}>Cancel</Text>
+                            </Pressable>
+                          </View>
                         </View>
-                      ) : isActive ? (
-                        <Text style={styles.activeText}>✓ Active</Text>
-                      ) : (
+                      )}
+
+                      {isPausedThisModel && (
+                        <View style={styles.actionRow}>
+                          <Pressable
+                            onPress={resumeDownload}
+                            style={[styles.smallBtn, !downloadCanResume && styles.smallBtnDisabled]}
+                            disabled={!downloadCanResume}
+                          >
+                            <Text style={styles.smallBtnText}>Resume</Text>
+                          </Pressable>
+                          <Pressable onPress={cancelDownload} style={[styles.smallBtn, styles.cancelBtn]}>
+                            <Text style={styles.smallBtnText}>Cancel</Text>
+                          </Pressable>
+                        </View>
+                      )}
+
+                      {!isDownloadingThisModel && !isPausedThisModel && isActive && (
+                        <View style={styles.actionRow}>
+                          <Text style={styles.activeText}>✓ Active</Text>
+                          <Pressable onPress={() => deleteModel(model.filename)} style={[styles.smallBtn, styles.deleteBtn]}>
+                            <Text style={styles.smallBtnText}>Delete</Text>
+                          </Pressable>
+                        </View>
+                      )}
+
+                      {!isDownloadingThisModel && !isPausedThisModel && !isActive && isDownloaded && (
+                        <View style={styles.actionRow}>
+                          <Pressable
+                            onPress={() => setProvider("local")}
+                            style={styles.smallBtn}
+                          >
+                            <Text style={styles.smallBtnText}>Use</Text>
+                          </Pressable>
+                          <Pressable onPress={() => deleteModel(model.filename)} style={[styles.smallBtn, styles.deleteBtn]}>
+                            <Text style={styles.smallBtnText}>Delete</Text>
+                          </Pressable>
+                        </View>
+                      )}
+
+                      {!isDownloadingThisModel && !isPausedThisModel && !isDownloaded && (
                         <Pressable
                           onPress={() => handleDownloadModel(model.id)}
-                          style={[styles.downloadBtn, (!rnfs || aiStoreIsDownloading || downloadingModelId === model.id) && styles.downloadBtnDisabled]}
-                          disabled={!rnfs || aiStoreIsDownloading || downloadingModelId === model.id}
+                          style={[styles.downloadBtn, (!rnfs || isBusy) && styles.downloadBtnDisabled]}
+                          disabled={!rnfs || isBusy}
                         >
                           <Text style={styles.downloadText}>{!rnfs ? "Need Dev Build" : (downloadingModelId === model.id ? "Starting..." : "Download")}</Text>
                         </Pressable>
@@ -337,9 +419,38 @@ const styles = StyleSheet.create({
     width: 60,
     alignItems: "center",
   },
+  progressColumn: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
   progressText: {
     fontSize: 12,
     fontWeight: "500",
+  },
+  actionRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  smallBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: "#E5E7EB",
+  },
+  smallBtnDisabled: {
+    opacity: 0.5,
+  },
+  smallBtnText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  cancelBtn: {
+    backgroundColor: "#FEE2E2",
+  },
+  deleteBtn: {
+    backgroundColor: "#FEE2E2",
   },
   downloadBtn: {
     paddingHorizontal: 12,

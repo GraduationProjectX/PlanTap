@@ -137,7 +137,7 @@ Verify:
 ```
 Action:
   1. Open dev-ai-bench screen
-  2. Select dataset source: "Sample"
+  2. Sign in (to load Convex dataset)
   3. Set iterations: 1
   4. Tap "Run Benchmark"
 Expected:

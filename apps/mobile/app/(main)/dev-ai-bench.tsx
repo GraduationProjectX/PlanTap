@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Share, Platform, NativeModules } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, Share, Platform, NativeModules, TextInput } from "react-native";
 
 import { GeminiProvider } from "@/services/ai/providers/gemini";
 import { OpenAIProvider } from "@/services/ai/providers/openai";
@@ -7,6 +7,7 @@ import { ClaudeProvider } from "@/services/ai/providers/claude";
 import { LocalProvider } from "@/services/ai/providers/local";
 import { useAiStore } from "@/stores/ai-store";
 import { useAiContext } from "@/hooks/useAiContext";
+import { useAuth } from "@clerk/clerk-expo";
 import type { EventSummary, UserContext } from "@/services/ai/types";
 import { JAILBREAK_TEST_SUITE } from "@/services/ai/benchmarking/jailbreakTests";
 import { calculateMetrics, confidenceInterval95 } from "@/services/ai/benchmarking/statisticalAnalysis";
@@ -20,34 +21,31 @@ type BenchPrompt = {
   groundTruth?: string[]; // expected eventIds for accuracy measurement
 };
 
-const SAMPLE_EVENTS: EventSummary[] = [
-  { id: "e1", title: "Morning Yoga", categories: ["fitness"], tags: ["yoga"], location: "Park" },
-  { id: "e2", title: "Indie Concert", categories: ["music"], tags: ["concert"], location: "Club" },
-  { id: "e3", title: "Craft Market", categories: ["shopping"], tags: ["market"], location: "Square" },
-  { id: "e4", title: "Kids Storytime", categories: ["family"], tags: ["kids"], location: "Library" },
-  { id: "e5", title: "Tech Meetup", categories: ["tech"], tags: ["networking"], location: "Co‑work" },
-];
-
-const USER_CONTEXT: UserContext = {
-  locale: "en-US",
-  interests: ["music", "tech"],
-  pastEventTags: ["concert"],
-  city: "Testville",
-};
-
 const PROMPTS: BenchPrompt[] = [
-  { id: "normal", label: "Normal prompt", userMessage: "Recommend up to 3 events for this user.", groundTruth: ["e2", "e5", "e3"] },
-  { id: "precision", label: "Precision prompt (tight)", userMessage: "Recommend the best event for this user (1 result).", groundTruth: ["e2"] },
+  { id: "normal", label: "Normal prompt", userMessage: "Recommend up to 3 events for this user." },
+  { id: "precision", label: "Precision prompt (tight)", userMessage: "Recommend the best event for this user (1 result)." },
   // Jailbreak attack vectors from security test suite
-  { id: "jailbreak_override", label: "Jailbreak: Direct Override", userMessage: JAILBREAK_TEST_SUITE[0].payload, groundTruth: [] },
-  { id: "jailbreak_roleplay", label: "Jailbreak: Role-Play Escape", userMessage: JAILBREAK_TEST_SUITE[1].payload, groundTruth: [] },
-  { id: "jailbreak_base64", label: "Jailbreak: Base64 Injection", userMessage: JAILBREAK_TEST_SUITE[2].payload, groundTruth: [] },
-  { id: "jailbreak_json", label: "Jailbreak: JSON Schema Attack", userMessage: JAILBREAK_TEST_SUITE[3].payload, groundTruth: [] },
-  { id: "jailbreak_authority", label: "Jailbreak: Authority Claim", userMessage: JAILBREAK_TEST_SUITE[4].payload, groundTruth: [] },
-  { id: "jailbreak_nested", label: "Jailbreak: Nested Injection", userMessage: JAILBREAK_TEST_SUITE[5].payload, groundTruth: [] },
-  { id: "jailbreak_token", label: "Jailbreak: Token Smuggling", userMessage: JAILBREAK_TEST_SUITE[6].payload, groundTruth: [] },
-  { id: "jailbreak_multilingual", label: "Jailbreak: Multilingual Bypass", userMessage: JAILBREAK_TEST_SUITE[7].payload, groundTruth: [] },
+  { id: "jailbreak_override", label: "Jailbreak: Direct Override", userMessage: JAILBREAK_TEST_SUITE[0].payload },
+  { id: "jailbreak_roleplay", label: "Jailbreak: Role-Play Escape", userMessage: JAILBREAK_TEST_SUITE[1].payload },
+  { id: "jailbreak_base64", label: "Jailbreak: Base64 Injection", userMessage: JAILBREAK_TEST_SUITE[2].payload },
+  { id: "jailbreak_json", label: "Jailbreak: JSON Schema Attack", userMessage: JAILBREAK_TEST_SUITE[3].payload },
+  { id: "jailbreak_authority", label: "Jailbreak: Authority Claim", userMessage: JAILBREAK_TEST_SUITE[4].payload },
+  { id: "jailbreak_nested", label: "Jailbreak: Nested Injection", userMessage: JAILBREAK_TEST_SUITE[5].payload },
+  { id: "jailbreak_token", label: "Jailbreak: Token Smuggling", userMessage: JAILBREAK_TEST_SUITE[6].payload },
+  { id: "jailbreak_multilingual", label: "Jailbreak: Multilingual Bypass", userMessage: JAILBREAK_TEST_SUITE[7].payload },
 ];
+
+function isNumber(value: unknown): value is number {
+  return Object.prototype.toString.call(value) === "[object Number]";
+}
+
+function isString(value: unknown): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
+}
+
+function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
+  return Object.prototype.toString.call(value) === "[object Function]";
+}
 
 function validateEventIds(ids: string[] | undefined, candidates: EventSummary[]) {
   if (!ids) return { valid: false, reason: "no ids" };
@@ -58,16 +56,18 @@ function validateEventIds(ids: string[] | undefined, candidates: EventSummary[])
 
 export default function DevAIBenchScreen() {
   const { localModelPath } = useAiStore();
-  const aiContext = useAiContext();
+  const { isLoaded, isSignedIn } = useAuth();
+  const isAuthenticated = isLoaded && isSignedIn;
+  const aiContext = useAiContext(undefined, isAuthenticated);
   const [running, setRunning] = useState(false);
   const [rawRuns, setRawRuns] = useState<any[]>([]);
   const [aggregated, setAggregated] = useState<any[]>([]);
-  const [source, setSource] = useState<"sample" | "convex">("sample");
   const [iterations, setIterations] = useState<number>(3);
   const [recordRaw, setRecordRaw] = useState<boolean>(false);
   const [executionMode, setExecutionMode] = useState<"byProvider" | "byPrompt">("byProvider");
   const [delayMs, setDelayMs] = useState<number>(200);
   const [lastExportPath, setLastExportPath] = useState<string | null>(null);
+  const [exportName, setExportName] = useState<string>("");
 
   const providers: Array<{ key: string; name: string; ctor: () => any }> = [
     { key: "gemini", name: "Gemini", ctor: () => new GeminiProvider() },
@@ -89,17 +89,21 @@ export default function DevAIBenchScreen() {
   }
 
   async function runBench() {
-    const eventsSource: EventSummary[] | null = source === "sample" ? SAMPLE_EVENTS : (aiContext.unavailable ? null : aiContext.events ?? null);
-    const userContext: UserContext | null = source === "sample" ? USER_CONTEXT : (aiContext.unavailable ? null : aiContext.userContext ?? null);
+    const eventsSource: EventSummary[] | null = aiContext.unavailable ? null : aiContext.events ?? null;
+    const userContext: UserContext | null = aiContext.unavailable ? null : aiContext.userContext ?? null;
 
     if (!eventsSource || !userContext) {
-      Alert.alert("Dataset unavailable", "Convex dataset not available. Switch to sample or ensure Convex is configured.");
+      Alert.alert(
+        "Dataset unavailable",
+        isAuthenticated
+          ? "Convex dataset not available. Ensure Convex is configured and you have events."
+          : "Sign in to load the Convex dataset.",
+      );
       return;
     }
 
-    // Type narrowing: after the check above, eventsSource and userContext are non-null
-    const events = eventsSource as EventSummary[];
-    const user = userContext as UserContext;
+    const events = eventsSource;
+    const user = userContext;
 
     setRunning(true);
     const runs: any[] = [];
@@ -111,9 +115,9 @@ export default function DevAIBenchScreen() {
         // dynamic require so this doesn't hard-depend on expo-battery
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const battery = require("expo-battery");
-        if (battery && typeof battery.getBatteryLevelAsync === "function") {
+        if (battery && isFunction(battery.getBatteryLevelAsync)) {
           const lvl = await battery.getBatteryLevelAsync();
-          if (typeof lvl === "number" && lvl >= 0) return lvl;
+          if (isNumber(lvl) && lvl >= 0) return lvl;
         }
       } catch {}
       return null;
@@ -121,11 +125,10 @@ export default function DevAIBenchScreen() {
 
     function getTotalMemory(): number | null {
       try {
-        const modules = NativeModules as Record<string, unknown>;
-        const deviceInfo = modules.DeviceInfo as { getConstants?: () => Record<string, unknown> } | undefined;
-        const constants = deviceInfo?.getConstants?.();
+        const deviceInfo = NativeModules.DeviceInfo;
+        const constants = isFunction(deviceInfo?.getConstants) ? deviceInfo.getConstants() : null;
         const totalMemory = constants?.TotalMemory;
-        if (typeof totalMemory === "number") return totalMemory as number;
+        if (isNumber(totalMemory)) return totalMemory;
       } catch {}
       return null;
     }
@@ -173,12 +176,12 @@ export default function DevAIBenchScreen() {
           // dynamic require (optional dependency)
           // eslint-disable-next-line @typescript-eslint/no-var-requires
           const rnDeviceInfo = require("react-native-device-info");
-          if (rnDeviceInfo && typeof rnDeviceInfo.getBatteryCapacity === "function") {
+          if (rnDeviceInfo && isFunction(rnDeviceInfo.getBatteryCapacity)) {
             // some builds expose this sync/async; handle both
             const cap = rnDeviceInfo.getBatteryCapacity();
-            if (cap && typeof cap.then === "function") {
+            if (cap && isFunction(cap.then)) {
               capacityMah = await cap;
-            } else if (typeof cap === "number") {
+            } else if (isNumber(cap)) {
               capacityMah = cap;
             }
           }
@@ -186,7 +189,8 @@ export default function DevAIBenchScreen() {
 
         if (capacityMah == null) {
           try {
-            const constants = (NativeModules as any)?.DeviceInfo?.getConstants?.();
+            const deviceInfo = NativeModules.DeviceInfo;
+            const constants = isFunction(deviceInfo?.getConstants) ? deviceInfo.getConstants() : null;
             const keys = [
               "BatteryCapacity",
               "BatteryCapacityMah",
@@ -196,11 +200,11 @@ export default function DevAIBenchScreen() {
             ];
             for (const k of keys) {
               const v = constants?.[k];
-              if (typeof v === "number" && v > 0) {
+              if (isNumber(v) && v > 0) {
                 capacityMah = v;
                 break;
               }
-              if (typeof v === "string" && !isNaN(Number(v))) {
+              if (isString(v) && Number.isFinite(Number(v))) {
                 capacityMah = Number(v);
                 break;
               }
@@ -211,7 +215,7 @@ export default function DevAIBenchScreen() {
         const assumedCapacityMah = capacityMah ?? 4000; // fallback default
         const nominalVoltage = 3.8; // V, typical Li-ion nominal
         record.estimatedWatts = null;
-        if (record.batteryDelta != null && record.batteryDelta > 0 && typeof record.latencyMs === "number" && record.latencyMs > 0) {
+        if (isNumber(record.batteryDelta) && record.batteryDelta > 0 && isNumber(record.latencyMs) && record.latencyMs > 0) {
           // energy (Wh) = (mAh/1000) * V * deltaFraction
           const energyWh = (assumedCapacityMah / 1000) * nominalVoltage * record.batteryDelta;
           const durationHours = Math.max(1e-6, record.latencyMs / 3600000);
@@ -242,10 +246,12 @@ export default function DevAIBenchScreen() {
           }
 
           // aggregate per provider+prompt
-          const latencies = perRuns.filter((r) => r.success).map((r) => r.latencyMs as number);
+          const latencies = perRuns.filter((r) => r.success).map((r) => r.latencyMs).filter(isNumber);
           const successes = perRuns.map((r) => (r.success ? 1 : 0));
           const integrity = perRuns.map((r) => (r.integrity_validIds ? 1 : 0));
-          const recalls = perRuns.map((r) => (typeof r.accuracy_recall === "number" ? r.accuracy_recall : null)).filter((v) => v != null) as number[];
+          const recalls = perRuns.map((r) => r.accuracy_recall).filter(isNumber);
+          const batteryDeltas = perRuns.map((r) => r.batteryDelta).filter(isNumber);
+          const estimatedWatts = perRuns.map((r) => r.estimatedWatts).filter(isNumber);
 
           const aggregatedRecord = {
             provider: providerLabel,
@@ -253,18 +259,14 @@ export default function DevAIBenchScreen() {
             promptLabel: prompt.label,
             iterations: perRuns.length,
             latency: stats(latencies),
-            successRate: successes.length ? (successes.reduce((a: number, b: number) => a + b, 0) as number) / successes.length : 0,
-            integrityRate: integrity.length ? (integrity.reduce((a: number, b: number) => a + b, 0) as number) / integrity.length : 0,
-            recall: recalls.length ? { mean: (recalls.reduce((a: number, b: number) => a + b, 0) as number) / recalls.length } : null,
+            successRate: successes.length ? successes.reduce((a: number, b: number) => a + b, 0) / successes.length : 0,
+            integrityRate: integrity.length ? integrity.reduce((a: number, b: number) => a + b, 0) / integrity.length : 0,
+            recall: recalls.length ? { mean: recalls.reduce((a: number, b: number) => a + b, 0) / recalls.length } : null,
             battery: {
-              meanDelta: perRuns.map((r) => r.batteryDelta).filter((v) => typeof v === 'number').reduce((a: number, b: number) => a + b, 0) / Math.max(1, perRuns.map((r) => r.batteryDelta).filter((v) => typeof v === 'number').length),
+              meanDelta: batteryDeltas.length ? batteryDeltas.reduce((a: number, b: number) => a + b, 0) / batteryDeltas.length : 0,
             },
             power: {
-              meanWatts: (() => {
-                const vals = perRuns.map((r) => r.estimatedWatts).filter((v) => typeof v === 'number') as number[];
-                if (!vals.length) return null;
-                return vals.reduce((a, b) => a + b, 0) / vals.length;
-              })(),
+              meanWatts: estimatedWatts.length ? estimatedWatts.reduce((a, b) => a + b, 0) / estimatedWatts.length : null,
             },
           };
           agg.push(aggregatedRecord);
@@ -295,28 +297,26 @@ export default function DevAIBenchScreen() {
           byProvider.get(r.provider)!.push(r);
         }
         for (const [providerLabel, perRuns] of byProvider.entries()) {
-          const latencies = perRuns.filter((r: any) => r.success).map((r: any) => r.latencyMs as number);
+          const latencies = perRuns.filter((r: any) => r.success).map((r: any) => r.latencyMs).filter(isNumber);
           const successes = perRuns.map((r: any) => (r.success ? 1 : 0));
           const integrity = perRuns.map((r: any) => (r.integrity_validIds ? 1 : 0));
-          const recalls = perRuns.map((r: any) => (typeof r.accuracy_recall === "number" ? r.accuracy_recall : null)).filter((v: any) => v != null) as number[];
+          const recalls = perRuns.map((r: any) => r.accuracy_recall).filter(isNumber);
+          const batteryDeltas = perRuns.map((r: any) => r.batteryDelta).filter(isNumber);
+          const estimatedWatts = perRuns.map((r: any) => r.estimatedWatts).filter(isNumber);
           const aggregatedRecord = {
             provider: providerLabel,
             prompt: prompt.id,
             promptLabel: prompt.label,
             iterations: perRuns.length,
             latency: stats(latencies),
-            successRate: successes.length ? (successes.reduce((a: number, b: number) => a + b, 0) as number) / successes.length : 0,
-            integrityRate: integrity.length ? (integrity.reduce((a: number, b: number) => a + b, 0) as number) / integrity.length : 0,
-            recall: recalls.length ? { mean: (recalls.reduce((a: number, b: number) => a + b, 0) as number) / recalls.length } : null,
+            successRate: successes.length ? successes.reduce((a: number, b: number) => a + b, 0) / successes.length : 0,
+            integrityRate: integrity.length ? integrity.reduce((a: number, b: number) => a + b, 0) / integrity.length : 0,
+            recall: recalls.length ? { mean: recalls.reduce((a: number, b: number) => a + b, 0) / recalls.length } : null,
             battery: {
-              meanDelta: perRuns.map((r: any) => r.batteryDelta).filter((v: any) => typeof v === 'number').reduce((a: number, b: number) => a + b, 0) / Math.max(1, perRuns.map((r: any) => r.batteryDelta).filter((v: any) => typeof v === 'number').length),
+              meanDelta: batteryDeltas.length ? batteryDeltas.reduce((a: number, b: number) => a + b, 0) / batteryDeltas.length : 0,
             },
             power: {
-              meanWatts: (() => {
-                const vals = perRuns.map((r: any) => r.estimatedWatts).filter((v: any) => typeof v === 'number') as number[];
-                if (!vals.length) return null;
-                return vals.reduce((a, b) => a + b, 0) / vals.length;
-              })(),
+              meanWatts: estimatedWatts.length ? estimatedWatts.reduce((a, b) => a + b, 0) / estimatedWatts.length : null,
             },
           };
           agg.push(aggregatedRecord);
@@ -374,7 +374,9 @@ export default function DevAIBenchScreen() {
       const report = generateReport(summaries, jailbreakByProvider);
 
       // Export as markdown
-      const filename = `ai-bench-academic-${Date.now()}.md`;
+      const filename = exportName.trim()
+        ? `${exportName.trim()}-academic.md`
+        : `ai-bench-academic-${Date.now()}.md`;
       const path = `${RNFS.DocumentDirectoryPath}/${filename}`;
       const markdown = exportMarkdown(report);
 
@@ -386,16 +388,20 @@ export default function DevAIBenchScreen() {
     }
   }
 
-  async function exportJson() {
+  async function exportJson(): Promise<string | null> {
     try {
       const RNFS = requireRNFS();
-      const filename = `ai-bench-agg-${Date.now()}.json`;
+      const filename = exportName.trim()
+        ? `${exportName.trim()}.json`
+        : `ai-bench-agg-${Date.now()}.json`;
       const path = `${RNFS.DocumentDirectoryPath}/${filename}`;
-      await RNFS.writeFile(path, JSON.stringify({ meta: { date: new Date().toISOString(), source, iterations }, aggregated, rawRuns }, null, 2), "utf8");
+      await RNFS.writeFile(path, JSON.stringify({ meta: { date: new Date().toISOString(), iterations }, aggregated, rawRuns }, null, 2), "utf8");
       setLastExportPath(path);
       Alert.alert("Exported", `Saved results to ${path}`);
+      return path;
     } catch (e) {
       Alert.alert("Error", "Failed to save results");
+      return null;
     }
   }
 
@@ -404,8 +410,7 @@ export default function DevAIBenchScreen() {
       const RNFS = requireRNFS();
       let path = lastExportPath;
       if (!path) {
-        await exportJson();
-        path = lastExportPath;
+        path = await exportJson();
       }
       if (!path) {
         Alert.alert("Nothing to share", "Run and export results first.");
@@ -413,7 +418,7 @@ export default function DevAIBenchScreen() {
       }
 
       const url = Platform.OS === "android" ? `file://${path}` : path;
-      await Share.share({ url, title: "AI Benchmark Results", message: "AI benchmark results exported." } as any);
+      await Share.share({ url, title: "AI Benchmark Results", message: "AI benchmark results exported." });
     } catch (e) {
       Alert.alert("Share failed", String(e));
     }
@@ -425,16 +430,9 @@ export default function DevAIBenchScreen() {
       <Text style={{ color: "#666" }}>Run controlled prompts across providers and export results as JSON for analysis.</Text>
 
       <View style={{ marginTop: 8 }}>
-        <Text style={{ fontWeight: "600" }}>Dataset source</Text>
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
-          <Pressable onPress={() => setSource("sample")} style={{ padding: 8, backgroundColor: source === "sample" ? "#0a84ff" : "#eee", borderRadius: 8 }}>
-            <Text style={{ color: source === "sample" ? "#fff" : "#000" }}>Sample</Text>
-          </Pressable>
-          <Pressable onPress={() => setSource("convex")} style={{ padding: 8, backgroundColor: source === "convex" ? "#0a84ff" : "#eee", borderRadius: 8 }}>
-            <Text style={{ color: source === "convex" ? "#fff" : "#000" }}>Convex</Text>
-          </Pressable>
-        </View>
-        {source === "convex" && aiContext.unavailable && <Text style={{ color: "#a00", marginTop: 8 }}>Convex dataset unavailable — ensure backend is configured.</Text>}
+        <Text style={{ fontWeight: "600" }}>Dataset</Text>
+        <Text style={{ color: "#666", marginTop: 6 }}>Convex (live)</Text>
+        {aiContext.unavailable && <Text style={{ color: "#a00", marginTop: 8 }}>Convex dataset unavailable — ensure backend is configured.</Text>}
       </View>
 
       <View style={{ marginTop: 8 }}>
@@ -473,6 +471,33 @@ export default function DevAIBenchScreen() {
             <Text style={{ color: recordRaw ? "#fff" : "#000" }}>{recordRaw ? "Record Raw" : "Record Raw"}</Text>
           </Pressable>
           <Text style={{ color: "#666", marginLeft: 8 }}>Record raw provider outputs</Text>
+        </View>
+
+        <View style={{ marginBottom: 8 }}>
+          <Text style={{ fontWeight: "600" }}>Export name (optional)</Text>
+          <TextInput
+            style={{ marginTop: 6, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: "#ddd" }}
+            placeholder="e.g. may11-run-1"
+            placeholderTextColor="#999"
+            value={exportName}
+            onChangeText={setExportName}
+          />
+          {(() => {
+            try {
+              const RNFS = requireRNFS();
+              return (
+                <Text style={{ color: "#666", marginTop: 6 }}>
+                  Exports save to: {RNFS.DocumentDirectoryPath}
+                </Text>
+              );
+            } catch {
+              return (
+                <Text style={{ color: "#a00", marginTop: 6 }}>
+                  File system unavailable in this build.
+                </Text>
+              );
+            }
+          })()}
         </View>
 
         <Pressable onPress={runBench} disabled={running} style={{ padding: 12, backgroundColor: running ? "#888" : "#0a84ff", borderRadius: 8 }}>

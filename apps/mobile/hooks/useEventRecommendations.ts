@@ -2,12 +2,10 @@
  * Hook that fetches events + user data from Convex and runs AI recommendations.
  *
  * Returns the top 3 event IDs along with loading / error states.
- * Can also be called with test data for offline development.
  */
 
 import { useState } from "react";
 import { getRecommendations } from "@/services/ai";
-import { getTestPromptData } from "@/services/ai/prompts";
 import type { EventSummary, RecommendationResult, UserContext } from "@/services/ai/types";
 
 type RecommendationState = {
@@ -24,7 +22,7 @@ type RecommendationState = {
  *
  * Usage:
  * ```tsx
- * const { eventIds, isLoading, error, recommend, recommendTest } =
+ * const { eventIds, isLoading, error, recommend } =
  *   useEventRecommendations();
  * ```
  */
@@ -58,18 +56,8 @@ export function useEventRecommendations() {
     }
   };
 
-  /**
-   * Run recommendations using the hardcoded test prompt.
-   * Useful to verify the pipeline end-to-end without Convex.
-   */
-  const recommendTest = async (userMessage?: string) => {
-    const { userContext, events } = getTestPromptData();
-    return recommend(userContext, events, userMessage);
-  };
-
   return {
     ...state,
     recommend,
-    recommendTest,
   };
 }

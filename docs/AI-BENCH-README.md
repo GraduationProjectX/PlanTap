@@ -24,7 +24,6 @@ pnpm --filter mobile dev -- -c
 4. Press `Export JSON` to save results to the device Documents folder. The path will be shown in an alert.
 
 Options
-- **Dataset source:** choose `Sample` (built-in small dataset) or `Convex` (fetch your dataset from the backend). If `Convex` is selected but the Convex backend is not configured or available, the bench will prompt you and fall back to the sample dataset.
 - **Iterations:** run each prompt multiple times (1/3/5/10) to measure variance; the bench computes mean, median and std for latency and aggregated rates for success and integrity.
 - **Record raw responses:** (in the screen) you can optionally keep raw provider outputs in the per-run records for deeper analysis; the exported JSON contains both aggregated summaries and raw runs.
 
@@ -42,12 +41,12 @@ The exported JSON contains an object with `meta` and `results` fields. Each resu
 - `error`: error message (if failed)
 
 Notes & limitations
-- The small sample dataset and prompts given are illustrative. For academic experiments you should replace `SAMPLE_EVENTS` and `PROMPTS` with representative datasets and ground truth labels.
+- The benchmark runs against your live Convex dataset; for academic experiments you may want to curate your own dataset and ground-truth labels.
 - Local-provider tests run on-device and measure the on-device inference latency, which will vary greatly between devices.
 - Cloud provider latency includes network time from device to provider and back; for reproducible experiments use a stable network or run from a consistent host.
 - The jailbreak prompts included are simple and intended only to illustrate pipeline detection; for formal safety evaluation use a curated set of adversarial prompts and safety labels.
 
 Next steps
-- Replace the SAMPLE_EVENTS and PROMPTS with your research datasets.
+- Curate representative datasets and ground-truth labels for your experiments.
 - Add additional metrics (e.g., token usage, response length, confidence scores) if supported by providers.
 - Add automated export/upload to a backend or S3 for centralized collection.
