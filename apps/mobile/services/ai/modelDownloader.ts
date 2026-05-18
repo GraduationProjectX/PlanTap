@@ -347,6 +347,8 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
 
   const tempPath = destPath + TMP_SUFFIX;
 
+  let keepJobForResume = false;
+
   const downloadAttempt = async (): Promise<string> => {
     // remove any leftover temp file from previous attempts
     try {
@@ -444,19 +446,19 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
             }
           })
           .catch(async (err) => {
-            _currentJobId = null;
-            _currentTempPath = null;
             const netInfo = getNetInfo();
             const net = netInfo ? await netInfo.fetch() : { isConnected: null };
             const isConnected = net.isConnected;
             _isConnectedCache = isConnected ?? null;
             if (isConnected === false) {
+              keepJobForResume = true;
               useAiStore.getState().setDownloadCanResume(true);
               useAiStore.getState().setDownloadPaused();
               // leave temp file for resume
               reject(new Error("Network disconnected during download; resume available"));
             } else {
               if (_pauseRequested) {
+                keepJobForResume = true;
                 useAiStore.getState().setDownloadPaused();
                 reject(new Error("Download paused"));
                 return;
@@ -472,6 +474,11 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
                 useAiStore.getState().setDownloadError();
               }
               reject(err);
+            }
+
+            if (!keepJobForResume) {
+              _currentJobId = null;
+              _currentTempPath = null;
             }
           });
       };
@@ -494,7 +501,15 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
   };
 
   try {
-    const resultPath = await retry(() => downloadAttempt(), 2, 4000);
+    const resultPath = await retry(
+      () => downloadAttempt(),
+      2,
+      4000,
+      (err) =>
+        !(err instanceof Error) ||
+        (err.message !== "Download paused" &&
+          err.message !== "Network disconnected during download; resume available"),
+    );
     return resultPath;
   } catch (err) {
     const shouldKeepTemp =
@@ -510,8 +525,10 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
     }
     throw err;
   } finally {
-    _currentJobId = null;
-    _currentTempPath = null;
+    if (!keepJobForResume) {
+      _currentJobId = null;
+      _currentTempPath = null;
+    }
     _cancelRequested = false;
     _pauseRequested = false;
   }

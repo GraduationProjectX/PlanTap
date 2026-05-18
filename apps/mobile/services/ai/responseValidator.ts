@@ -45,6 +45,15 @@ export function validateResponse(
     };
   }
 
+  if (parsed.type !== "recommendations") {
+    return {
+      valid: true,
+      result: parsed,
+      isJailbreakAttempt: false,
+      invalidIds: [],
+    };
+  }
+
   // Check if all returned IDs are in the candidate set
   const invalidIds = parsed.eventIds.filter((id) => !candidateIds.has(id));
 
@@ -109,7 +118,7 @@ export function classifyJailbreakAttempt(
 ): "prompt_injection" | "hallucination" | "role_play" | "unknown" {
   if (invalidIds.length === 0) return "unknown";
 
-  const rawStr = typeof raw === "string" ? raw.toLowerCase() : String(raw);
+  const rawStr = isString(raw) ? raw.toLowerCase() : String(raw).toLowerCase();
 
   // Heuristics for attack type classification
   if (
@@ -125,6 +134,10 @@ export function classifyJailbreakAttempt(
 
   // Default to hallucination if no injection patterns detected
   return "hallucination";
+}
+
+function isString(value: unknown): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
 }
 
 /**

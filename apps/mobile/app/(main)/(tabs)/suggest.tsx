@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
-import { Select } from "heroui-native";
+import { BottomSheet, Button, Select } from "heroui-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { useDirection } from "@/rtl";
@@ -11,6 +11,11 @@ import { useEventRecommendations } from "@/hooks/useEventRecommendations";
 import { useAiContext } from "@/hooks/useAiContext";
 import { AiModelSelector } from "@/components/ui/AiModelSelector";
 import { SUPPORTED_CITIES } from "@/features/filters/utils";
+import { SectionHeader } from "@/components/home/SectionHeader";
+import { EventCard } from "@/components/events/EventCard";
+import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
+import { useEvents, type EventDoc } from "@/hooks/use-events";
+import type { RecommendationResult } from "@/services/ai/types";
 
 function eventMatchesCity(location: string | undefined, city: string | undefined): boolean {
   if (!city) return true;
@@ -31,10 +36,13 @@ export default function SuggestScreen() {
   const provider = useAiStore((s) => s.provider);
   const localModelDownloaded = useAiStore((s) => s.localModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
-  const { eventIds, isLoading, error, recommend } =
+  const { eventIds, isLoading, error, response, recommend } =
     useEventRecommendations();
   const [userNote, setUserNote] = useState("");
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetInput, setSheetInput] = useState("");
+  const [sheetResponse, setSheetResponse] = useState<RecommendationResult | null>(null);
 
   const convexData = useAiContext(selectedCity, isAuthenticated);
 
@@ -43,6 +51,7 @@ export default function SuggestScreen() {
   const fallbackCity = cityOptions[0];
   const resolvedCity = selectedCity ?? defaultCity ?? fallbackCity;
   const router = useRouter();
+  const { events: fullEvents, isLoading: isFullEventsLoading } = useEvents(resolvedCity, true);
 
   useEffect(() => {
     if (!selectedCity && resolvedCity) {
@@ -50,12 +59,28 @@ export default function SuggestScreen() {
     }
   }, [resolvedCity, selectedCity]);
 
+  useEffect(() => {
+    if (!response) {
+      return;
+    }
+
+    if (response.type === "recommendations") {
+      setSheetOpen(false);
+      setSheetResponse(null);
+      return;
+    }
+
+    setSheetResponse(response);
+    setSheetInput("");
+    setSheetOpen(true);
+  }, [response]);
+
   const events = convexData.isLoading ? [] : convexData.events ?? [];
   const cityFilteredEvents = resolvedCity
     ? events.filter((event) => eventMatchesCity(event.location, resolvedCity))
     : events;
 
-  const handleRun = () => {
+  const runRecommendation = (message?: string) => {
     if (provider === "local" && (!localModelDownloaded || !localModelPath)) {
       return;
     }
@@ -69,9 +94,41 @@ export default function SuggestScreen() {
       const contextEvents = resolvedCity
         ? convexData.events.filter((event) => eventMatchesCity(event.location, resolvedCity))
         : convexData.events;
-      recommend(context, contextEvents, userNote || undefined);
+      recommend(context, contextEvents, message);
     }
   };
+
+  const handleRun = () => {
+    runRecommendation(userNote || undefined);
+  };
+
+  const handleFollowUpSubmit = () => {
+    if (!sheetResponse || sheetResponse.type !== "follow_up") {
+      setSheetOpen(false);
+      return;
+    }
+
+    const trimmed = sheetInput.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const nextMessage = userNote.trim().length > 0
+      ? `${userNote.trim()}\nFollow-up: ${trimmed}`
+      : trimmed;
+    setSheetOpen(false);
+    runRecommendation(nextMessage);
+  };
+
+  const handleEventPress = (id: string) => {
+    router.push({ pathname: "/event/[id]", params: { id } });
+  };
+
+  const recommendedEvents = fullEvents && eventIds.length > 0
+    ? eventIds
+        .map((id) => fullEvents.find((event) => event._id === id))
+        .filter(isEventDoc)
+    : [];
 
   return (
     <ScrollView
@@ -80,7 +137,7 @@ export default function SuggestScreen() {
     >
       <Text style={[styles.title, { textAlign }]}>{t("tabs.suggest")}</Text>
       <Text style={[styles.subtitle, { textAlign }]}>
-        AI test — provider: {provider}
+        {t("ai.testProvider", { provider })}
       </Text>
 
       {/* AI Model Selector (collapsible) */}
@@ -89,56 +146,44 @@ export default function SuggestScreen() {
       {provider === "local" && (!localModelDownloaded || !localModelPath) && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>
-            Local provider is selected, but no model is active. Go to Settings and download/use a local model first.
+            {t("ai.localModelMissing")}
           </Text>
         </View>
       )}
 
       {isLoaded && !isSignedIn && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>Sign in to personalize recommendations. Public events are shown below.</Text>
+          <Text style={styles.errorText}>{t("ai.signInPrompt")}</Text>
         </View>
       )}
 
       {isAuthenticated && convexData.isLoading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Loading Convex data…</Text>
+          <Text style={styles.loadingText}>{t("ai.loadingConvex")}</Text>
         </View>
       )}
 
       {convexData.unavailable && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>
-            Convex backend not linked yet.
+            {t("ai.convexUnavailable")}
           </Text>
         </View>
       )}
 
-      {isAuthenticated && !convexData.isLoading && convexData.userContext && (
-        <View style={styles.contextBox}>
-          <Text style={styles.contextTitle}>Your Profile (from Convex)</Text>
-          <Text style={styles.contextItem}>City: {convexData.userContext.city ?? "—"}</Text>
-          <Text style={styles.contextItem}>
-            Interests: {convexData.userContext.interests?.join(", ") || "none set"}
-          </Text>
-          <Text style={styles.contextItem}>
-            Group: {convexData.userContext.groupType ?? "any"} · Indoor/Outdoor: {convexData.userContext.indoorOutdoor ?? "any"}
-          </Text>
-        </View>
-      )}
 
       {/* ---------- Benchmark Link ---------- */}
       <Pressable
         onPress={() => router.push("/dev-ai-bench")}
         style={styles.benchLink}
       >
-        <Text style={styles.benchLinkText}>Open AI Benchmark</Text>
+        <Text style={styles.benchLinkText}>{t("ai.openBenchmark")}</Text>
       </Pressable>
 
       {/* ---------- City selection ---------- */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>Your city</Text>
+        <Text style={styles.inputLabel}>{t("ai.cityLabel")}</Text>
         <Select
           presentation="bottom-sheet"
           value={resolvedCity ? { value: resolvedCity, label: resolvedCity } : undefined}
@@ -146,7 +191,7 @@ export default function SuggestScreen() {
         >
           <Select.Trigger style={styles.selectTrigger}>
             <View style={[styles.selectInner, { flexDirection }]}>
-              <Select.Value placeholder="Choose a city" />
+              <Select.Value placeholder={t("ai.cityPlaceholder")} />
             </View>
             <Select.TriggerIndicator>
               <Text style={styles.selectIndicator}>▼</Text>
@@ -156,7 +201,7 @@ export default function SuggestScreen() {
           <Select.Portal>
             <Select.Overlay style={styles.selectOverlay} />
             <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
-              <Select.ListLabel>City</Select.ListLabel>
+              <Select.ListLabel>{t("ai.cityListLabel")}</Select.ListLabel>
               {cityOptions.map((city) => (
                 <Select.Item key={city} value={city} label={city}>
                   <View style={styles.selectItemInner}>
@@ -172,12 +217,12 @@ export default function SuggestScreen() {
 
       {/* ---------- User note ---------- */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>What are you in the mood for?</Text>
+        <Text style={styles.inputLabel}>{t("ai.userNoteLabel")}</Text>
         <TextInput
           style={styles.textInput}
           value={userNote}
           onChangeText={setUserNote}
-          placeholder="e.g. something techy and outdoors, or a fun food event..."
+          placeholder={t("ai.userNotePlaceholder")}
           placeholderTextColor="#999"
           multiline
           maxLength={300}
@@ -201,7 +246,7 @@ export default function SuggestScreen() {
           <ActivityIndicator color="#fff" size="small" />
         ) : (
           <Text style={styles.btnText}>
-            Get Suggestions
+            {t("ai.getSuggestions")}
           </Text>
         )}
       </Pressable>
@@ -213,23 +258,27 @@ export default function SuggestScreen() {
         </View>
       )}
 
-      {/* ---------- Results ---------- */}
-      {eventIds.length > 0 && (
-        <View style={styles.resultBox}>
-          <Text style={styles.resultTitle}>Recommended Event IDs</Text>
-          {eventIds.map((id, i) => (
-            <Text key={id} style={styles.resultItem}>
-              {i + 1}. {id}
-            </Text>
-          ))}
+      {/* ---------- Recommendations ---------- */}
+      {recommendedEvents.length > 0 && (
+        <View style={styles.recommendationsSection}>
+          <SectionHeader title={t("ai.recommendationsTitle")} />
+          <UpcomingEventsList events={recommendedEvents} onEventPress={handleEventPress} />
+        </View>
+      )}
+
+      {!isFullEventsLoading && eventIds.length > 0 && recommendedEvents.length === 0 && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>{t("ai.recommendationsMissing")}</Text>
         </View>
       )}
 
       {/* ---------- Events fed to the model ---------- */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{`Events from Convex (${cityFilteredEvents.length})`}</Text>
+        <Text style={styles.sectionTitle}>
+          {t("ai.convexEventsTitle", { count: cityFilteredEvents.length })}
+        </Text>
         {cityFilteredEvents.length === 0 && (
-          <Text style={styles.eventDesc}>No events found. Add some via the admin or scraper.</Text>
+          <Text style={styles.eventDesc}>{t("ai.noEventsFound")}</Text>
         )}
         {cityFilteredEvents.map((evt) => (
           <View key={evt.id} style={styles.eventCard}>
@@ -243,8 +292,73 @@ export default function SuggestScreen() {
           </View>
         ))}
       </View>
+
+      <BottomSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} animation="disable-all">
+        <BottomSheet.Portal>
+          <BottomSheet.Overlay animation="disabled" />
+          <BottomSheet.Content snapPoints={["45%", "65%"]} animation="disabled">
+            <BottomSheet.Close />
+            <BottomSheet.Title style={styles.sheetTitle}>
+              {sheetResponse?.type === "follow_up"
+                ? t("ai.followUpTitle")
+                : sheetResponse?.type === "invalid_prompt"
+                  ? t("ai.invalidPromptTitle")
+                  : t("ai.noMatchesTitle")}
+            </BottomSheet.Title>
+            <BottomSheet.Description style={styles.sheetDescription}>
+              {sheetResponse?.message ?? ""}
+            </BottomSheet.Description>
+
+            {sheetResponse?.type === "invalid_prompt" && sheetResponse.examples && (
+              <View style={styles.sheetList}>
+                {sheetResponse.examples.map((example) => (
+                  <Text key={example} style={styles.sheetListItem}>
+                    • {example}
+                  </Text>
+                ))}
+              </View>
+            )}
+
+            {sheetResponse?.type === "no_matches" && sheetResponse.suggestions && (
+              <View style={styles.sheetList}>
+                {sheetResponse.suggestions.map((suggestion) => (
+                  <Text key={suggestion} style={styles.sheetListItem}>
+                    • {suggestion}
+                  </Text>
+                ))}
+              </View>
+            )}
+
+            {sheetResponse?.type === "follow_up" && (
+              <View style={styles.sheetFollowUp}>
+                <TextInput
+                  style={styles.sheetInput}
+                  value={sheetInput}
+                  onChangeText={setSheetInput}
+                  placeholder={sheetResponse.inputPlaceholder ?? t("ai.followUpPlaceholder")}
+                  placeholderTextColor="#999"
+                  maxLength={240}
+                />
+                <Button
+                  variant="primary"
+                  size="lg"
+                  feedbackVariant="scale"
+                  onPress={handleFollowUpSubmit}
+                  isDisabled={sheetInput.trim().length === 0}
+                >
+                  {sheetResponse.submitLabel ?? t("ai.followUpSubmit")}
+                </Button>
+              </View>
+            )}
+          </BottomSheet.Content>
+        </BottomSheet.Portal>
+      </BottomSheet>
     </ScrollView>
   );
+}
+
+function isEventDoc(value: EventDoc | undefined): value is EventDoc {
+  return value != null;
 }
 
 const styles = StyleSheet.create((theme) => ({
@@ -309,23 +423,8 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.font.family.regular,
   },
 
-  // Results
-  resultBox: {
-    backgroundColor: theme.colors.success + "18",
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    gap: theme.spacing.xs,
-  },
-  resultTitle: {
-    fontFamily: theme.font.family.bold,
-    fontSize: theme.font.size.base,
-    color: theme.colors.text,
-    marginBottom: 4,
-  },
-  resultItem: {
-    fontSize: theme.font.size.base,
-    fontFamily: theme.font.family.medium,
-    color: theme.colors.text,
+  recommendationsSection: {
+    gap: theme.spacing.sm,
   },
 
   // Section
@@ -354,24 +453,6 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.textSecondary,
   },
 
-  // Context box
-  contextBox: {
-    backgroundColor: theme.colors.info + "18",
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-    gap: 4,
-  },
-  contextTitle: {
-    fontFamily: theme.font.family.bold,
-    fontSize: theme.font.size.base,
-    color: theme.colors.text,
-    marginBottom: 2,
-  },
-  contextItem: {
-    fontFamily: theme.font.family.regular,
-    fontSize: theme.font.size.md,
-    color: theme.colors.text,
-  },
 
   // User note input
   inputSection: {
@@ -450,5 +531,39 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.font.family.regular,
     fontSize: theme.font.size.md,
     color: theme.colors.textMuted,
+  },
+  sheetTitle: {
+    fontSize: theme.font.size.lg,
+    fontFamily: theme.font.family.bold,
+    color: theme.colors.text,
+  },
+  sheetDescription: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
+  },
+  sheetList: {
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.md,
+  },
+  sheetListItem: {
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.medium,
+    color: theme.colors.text,
+  },
+  sheetFollowUp: {
+    gap: theme.spacing.sm,
+  },
+  sheetInput: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    padding: theme.spacing.md,
+    fontSize: theme.font.size.base,
+    fontFamily: theme.font.family.regular,
+    color: theme.colors.text,
+    minHeight: 48,
   },
 }));

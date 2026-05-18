@@ -1,5 +1,6 @@
 import { initLlama, type LlamaContext } from "llama.rn";
-import { buildSystemPrompt, buildUserPrompt, EVENT_IDS_GBNF } from "../prompts";
+import { buildSystemPrompt, buildUserPrompt, AI_RESPONSE_GBNF } from "../prompts";
+import { rankEventsByRelevance } from "../eventRanker";
 import { validateResponse } from "../responseValidator";
 import type {
   AiProvider,
@@ -12,6 +13,11 @@ let _ctx: LlamaContext | null = null;
 let _ctxModelPath: string | null = null;
 let _initPromise: Promise<LlamaContext> | null = null;
 let _initPromiseModelPath: string | null = null;
+
+const LOCAL_RAG_EVENT_LIMIT = 20;
+const LOCAL_MAX_TAGS = 5;
+const LOCAL_MAX_DESCRIPTION = 90;
+const LOCAL_MAX_TITLE = 80;
 
 function getDeviceCores(): number {
   try {
@@ -97,6 +103,21 @@ export async function releaseLocalModel(): Promise<void> {
   }
 }
 
+function compactLocalEvents(
+  events: EventSummary[],
+  userContext: UserContext,
+): EventSummary[] {
+  const ranked = rankEventsByRelevance(events, userContext, LOCAL_RAG_EVENT_LIMIT);
+
+  return ranked.map((event) => ({
+    ...event,
+    title: event.title.slice(0, LOCAL_MAX_TITLE),
+    categories: event.categories.slice(0, LOCAL_MAX_TAGS),
+    tags: event.tags.slice(0, LOCAL_MAX_TAGS),
+    description: event.description ? event.description.slice(0, LOCAL_MAX_DESCRIPTION) : undefined,
+  }));
+}
+
 export class LocalProvider implements AiProvider {
   readonly name = "Local (on-device)";
 
@@ -107,32 +128,38 @@ export class LocalProvider implements AiProvider {
     events: EventSummary[],
     userMessage?: string,
   ): Promise<RecommendationResult> {
-    if (!this.modelPath) {
-      throw new Error("No local model downloaded");
+    try {
+      if (!this.modelPath) {
+        throw new Error("No local model downloaded");
+      }
+
+      const ctx = await getContext(this.modelPath);
+
+      const systemPrompt = buildSystemPrompt();
+      const compactEvents = compactLocalEvents(events, userContext);
+      const userPrompt = buildUserPrompt(userContext, compactEvents, userMessage);
+
+      const result = await ctx.completion(
+        {
+          messages: [
+            { role: "system" as const, content: systemPrompt },
+            { role: "user" as const, content: userPrompt },
+          ],
+          n_predict: 256,
+          temperature: 0.3,
+          grammar: AI_RESPONSE_GBNF,
+        },
+      );
+
+      const candidateIds = new Set(compactEvents.map((e) => e.id));
+      const validation = validateResponse(result.text, candidateIds);
+      if (!validation.valid) {
+        throw new Error(validation.error || "Response validation failed");
+      }
+      return validation.result!;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(`Local model failed: ${message}`);
     }
-
-    const ctx = await getContext(this.modelPath);
-
-    const systemPrompt = buildSystemPrompt();
-    const userPrompt = buildUserPrompt(userContext, events, userMessage);
-
-    const result = await ctx.completion(
-      {
-        messages: [
-          { role: "system" as const, content: systemPrompt },
-          { role: "user" as const, content: userPrompt },
-        ],
-        n_predict: 256,
-        temperature: 0.3,
-        grammar: EVENT_IDS_GBNF,
-      },
-    );
-
-    const candidateIds = new Set(events.map((e) => e.id));
-    const validation = validateResponse(result.text, candidateIds);
-    if (!validation.valid) {
-      throw new Error(validation.error || "Response validation failed");
-    }
-    return validation.result!;
   }
 }

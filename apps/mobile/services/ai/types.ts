@@ -32,10 +32,34 @@ export type UserContext = {
   pastEventTags?: string[];
 };
 
+export type RecommendationType =
+  | "recommendations"
+  | "no_matches"
+  | "follow_up"
+  | "invalid_prompt";
+
 /** The structured response we expect from every provider. */
-export type RecommendationResult = {
-  eventIds: string[];
-};
+export type RecommendationResult =
+  | {
+      type: "recommendations";
+      eventIds: string[];
+    }
+  | {
+      type: "no_matches";
+      message: string;
+      suggestions?: string[];
+    }
+  | {
+      type: "follow_up";
+      message: string;
+      inputPlaceholder?: string;
+      submitLabel?: string;
+    }
+  | {
+      type: "invalid_prompt";
+      message: string;
+      examples?: string[];
+    };
 
 /** Abstract interface every AI provider must implement. */
 export interface AiProvider {

@@ -9,7 +9,9 @@ import { getRecommendations } from "@/services/ai";
 import type { EventSummary, RecommendationResult, UserContext } from "@/services/ai/types";
 
 type RecommendationState = {
-  /** Top-3 recommended event IDs */
+  /** Latest provider response */
+  response: RecommendationResult | null;
+  /** Top recommended event IDs (if any) */
   eventIds: string[];
   /** Whether a recommendation request is in flight */
   isLoading: boolean;
@@ -28,6 +30,7 @@ type RecommendationState = {
  */
 export function useEventRecommendations() {
   const [state, setState] = useState<RecommendationState>({
+    response: null,
     eventIds: [],
     isLoading: false,
     error: null,
@@ -38,7 +41,7 @@ export function useEventRecommendations() {
    * Typically called after fetching events + user profile from Convex.
    */
   const recommend = async (userContext: UserContext, events: EventSummary[], userMessage?: string) => {
-    setState({ eventIds: [], isLoading: true, error: null });
+    setState({ response: null, eventIds: [], isLoading: true, error: null });
 
     try {
       const result: RecommendationResult = await getRecommendations(
@@ -46,13 +49,14 @@ export function useEventRecommendations() {
         events,
         userMessage,
       );
-      setState({ eventIds: result.eventIds, isLoading: false, error: null });
-      return result.eventIds;
+      const eventIds = result.type === "recommendations" ? result.eventIds : [];
+      setState({ response: result, eventIds, isLoading: false, error: null });
+      return result;
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Unknown error";
-      setState({ eventIds: [], isLoading: false, error: message });
-      return [];
+        err instanceof Error ? err.message : String(err);
+      setState({ response: null, eventIds: [], isLoading: false, error: message });
+      return null;
     }
   };
 

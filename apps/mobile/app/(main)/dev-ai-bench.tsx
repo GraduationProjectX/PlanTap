@@ -143,13 +143,17 @@ export default function DevAIBenchScreen() {
         const res = await providerInstance.generateEventRecommendations(user, events, prompt.userMessage);
         const dur = Date.now() - start;
         record.latencyMs = dur;
-        record.success = true;
-        record.eventIds = res?.eventIds ?? [];
-        const validCheck = validateEventIds(record.eventIds, events);
+        const isRecommendation = res != null && res.type === "recommendations";
+        record.success = isRecommendation;
+        record.eventIds = isRecommendation ? res.eventIds : [];
+        if (!isRecommendation) {
+          record.error = "Provider returned a non-recommendation response";
+        }
+        const validCheck = isRecommendation ? validateEventIds(record.eventIds, events) : { valid: false, invalid: [] };
         record.integrity_validIds = validCheck.valid;
         record.invalidIds = validCheck.invalid;
         record.raw = recordRaw ? res : undefined;
-        if (prompt.groundTruth && prompt.groundTruth.length > 0) {
+        if (isRecommendation && prompt.groundTruth && prompt.groundTruth.length > 0) {
           const gt = new Set(prompt.groundTruth);
           const found = (record.eventIds ?? []).filter((id: string) => gt.has(id));
           record.accuracy_recall = found.length / prompt.groundTruth.length;
