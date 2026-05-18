@@ -12,7 +12,6 @@ import { useAiContext } from "@/hooks/useAiContext";
 import { AiModelSelector } from "@/components/ui/AiModelSelector";
 import { SUPPORTED_CITIES } from "@/features/filters/utils";
 import { SectionHeader } from "@/components/home/SectionHeader";
-import { EventCard } from "@/components/events/EventCard";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
 import type { RecommendationResult } from "@/services/ai/types";
@@ -74,11 +73,6 @@ export default function SuggestScreen() {
     setSheetInput("");
     setSheetOpen(true);
   }, [response]);
-
-  const events = convexData.isLoading ? [] : convexData.events ?? [];
-  const cityFilteredEvents = resolvedCity
-    ? events.filter((event) => eventMatchesCity(event.location, resolvedCity))
-    : events;
 
   const runRecommendation = (message?: string) => {
     if (provider === "local" && (!localModelDownloaded || !localModelPath)) {
@@ -272,27 +266,6 @@ export default function SuggestScreen() {
         </View>
       )}
 
-      {/* ---------- Events fed to the model ---------- */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          {t("ai.convexEventsTitle", { count: cityFilteredEvents.length })}
-        </Text>
-        {cityFilteredEvents.length === 0 && (
-          <Text style={styles.eventDesc}>{t("ai.noEventsFound")}</Text>
-        )}
-        {cityFilteredEvents.map((evt) => (
-          <View key={evt.id} style={styles.eventCard}>
-            <Text style={styles.eventTitle}>{evt.title}</Text>
-            <Text style={styles.eventMeta}>
-              {evt.id} · {evt.categories.join(", ")}
-            </Text>
-            <Text style={styles.eventDesc} numberOfLines={2}>
-              {evt.description}
-            </Text>
-          </View>
-        ))}
-      </View>
-
       <BottomSheet isOpen={sheetOpen} onOpenChange={setSheetOpen} animation="disable-all">
         <BottomSheet.Portal>
           <BottomSheet.Overlay animation="disabled" />
@@ -427,17 +400,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
 
-  // Section
-  section: {
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.md,
-  },
-  sectionTitle: {
-    fontFamily: theme.font.family.bold,
-    fontSize: theme.font.size.lg,
-    color: theme.colors.text,
-  },
-
   // Data source toggle
   // (Removed test-data toggle; Convex-only)
 
@@ -509,29 +471,6 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
 
-  // Event cards
-  eventCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.xl,
-    padding: theme.spacing.md,
-    gap: 4,
-    ...theme.shadow.sm,
-  },
-  eventTitle: {
-    fontFamily: theme.font.family.semiBold,
-    fontSize: theme.font.size.base,
-    color: theme.colors.text,
-  },
-  eventMeta: {
-    fontFamily: theme.font.family.regular,
-    fontSize: theme.font.size.md,
-    color: theme.colors.textSecondary,
-  },
-  eventDesc: {
-    fontFamily: theme.font.family.regular,
-    fontSize: theme.font.size.md,
-    color: theme.colors.textMuted,
-  },
   sheetTitle: {
     fontSize: theme.font.size.lg,
     fontFamily: theme.font.family.bold,
