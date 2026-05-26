@@ -2,17 +2,105 @@ import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
+function determineGoogleCategories(query: string, title: string, placeTypes: string[]): string[] {
+  // Combine everything into a lowercase string for easy scanning
+  const lowerTitle = title.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const typeString = placeTypes.join(" ").toLowerCase();
+  
+  const categories = new Set<string>(); 
+
+  if (
+    typeString.includes("restaurant") || 
+    typeString.includes("cafe") || 
+    typeString.includes("coffee") || 
+    typeString.includes("bakery") || 
+    typeString.includes("food") ||
+    lowerQuery.includes("coffee") ||
+    lowerQuery.includes("tea") ||
+    lowerQuery.includes("burger") ||
+    lowerTitle.includes("كافيه") || 
+    lowerTitle.includes("مقهى") || 
+    lowerTitle.includes("مطعم") ||
+    lowerTitle.includes("مخبز")
+  ) {
+    categories.add("Food & Dining");
+  }
+
+
+  if (
+    typeString.includes("museum") || 
+    typeString.includes("art_gallery") || 
+    typeString.includes("cultural_center") ||
+    lowerQuery.includes("museum") ||
+    lowerQuery.includes("gallery") ||
+    lowerTitle.includes("متحف") || 
+    lowerTitle.includes("معرض")
+  ) {
+    categories.add("Culture & History");
+  }
+
+
+  if (
+    typeString.includes("shopping_mall") || 
+    typeString.includes("department_store") || 
+    typeString.includes("store") ||
+    lowerQuery.includes("mall") ||
+    lowerQuery.includes("shopping") ||
+    lowerTitle.includes("مول") || 
+    lowerTitle.includes("مجمع") ||
+    lowerTitle.includes("سوق")
+  ) {
+    categories.add("Shopping");
+  }
+
+
+  if (
+    typeString.includes("amusement_park") || 
+    typeString.includes("amusement_center") || 
+    typeString.includes("park") || 
+    typeString.includes("tourist_attraction") ||
+    lowerQuery.includes("park") ||
+    lowerTitle.includes("حديقة") || 
+    lowerTitle.includes("منتزه") || 
+    lowerTitle.includes("ملاهي")
+  ) {
+    categories.add("Entertainment");
+  }
+
+
+  if (
+    lowerQuery.includes("hookah") || 
+    lowerQuery.includes("lounge") || 
+    lowerTitle.includes("لاونج") || 
+    lowerTitle.includes("شيشه")
+  ) {
+    categories.add("Nightlife & Lounges"); 
+  }
+  
+
+  if (categories.size === 0) {
+    categories.add("Attractions");
+  }
+
+  return Array.from(categories);
+}
+
 const SEARCH_MATRIX = [
-  "specialty coffee in Olaya Khobar",
-  "bakeries in Rakkah Khobar",
-  "seafood restaurants on Khobar Corniche",
-  "fine dining in Al Muraikabat Dammam",
-  "shopping malls in Dhahran",
-  "hookah lounges in Aziziyah Khobar",
-  "museums and galleries in Eastern Province",
-  "amusement parks in Dammam",
-  "breakfast spots in Al Dawashir Dammam",
-  "burger joints in Doha Al Janubiyah"
+  "specialty coffee",
+  "tea shop",
+  "bakery",
+  "seafood restaurant",
+  "fine dining",
+  "shopping mall",
+  "hookah lounge",
+  "museum",
+  "art gallery",
+  "amusement park",
+  "breakfast spot",
+  "burger joint",
+  "Pizza restaurant",
+  "Gift shop"
 ];
 
 export const fetchAndSync = internalAction({
@@ -28,17 +116,28 @@ export const fetchAndSync = internalAction({
     const matrixToRun = args.customMatrix || SEARCH_MATRIX;
     let totalSynced = 0;
 
-   
     for (const query of matrixToRun) {
-      console.log(`📡 Fetching matrix item: ${query}`);
+      console.log(`📡 Fetching matrix item (20km radius): ${query}`);
       
       let pageToken = "";
       let pagesFetched = 0;
       const MAX_PAGES = 3; 
 
-      //max 60 per query ;D
       while (pagesFetched < MAX_PAGES) {
-        const requestBody: any = { textQuery: query };
+        const requestBody: any = { 
+          textQuery: query,
+          locationBias: {
+            circle: {
+              center: {
+                latitude: 26.3044, 
+                longitude: 50.1478 //this is basically putting the circle pin on dharan ish since its the middle city
+              },
+              radius: 20000.0 // this mf is in meters
+            }
+          }
+        };
+
+        // If we have a page token, we MUST add it to get the next 20 results
         if (pageToken) {
           requestBody.pageToken = pageToken;
         }
@@ -48,14 +147,14 @@ export const fetchAndSync = internalAction({
           headers: {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': apiKey,
-            'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.businessStatus,nextPageToken'
+            'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.businessStatus,places.types,places.primaryType,places.primaryTypeDisplayName,nextPageToken'
           },
           body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
           console.error(`Skipping query "${query}" due to API error: ${response.status}`);
-          break; // itll break but loop to another query ;D
+          break; 
         }
         
         const data = await response.json();
@@ -66,6 +165,41 @@ export const fetchAndSync = internalAction({
 
         for (const place of data.places) {
           if (place.businessStatus === "CLOSED_PERMANENTLY") continue;
+          let detectedCity = "Eastern Province"; // Fallback
+          const addressString = place.formattedAddress?.toLowerCase() || "";
+
+          
+          if (
+            addressString.includes("khobar") || 
+            addressString.includes("alkhobar") || 
+            addressString.includes("الخبر")
+          ) {
+            detectedCity = "Khobar";
+          } 
+          else if (
+            addressString.includes("dammam") || 
+            addressString.includes("الدمام")
+          ) {
+            detectedCity = "Dammam";
+          } 
+          else if (
+            addressString.includes("dhahran") || 
+            addressString.includes("الظهران")
+          ) {
+            detectedCity = "Dhahran";
+          }
+        const googlePrimaryName = place.primaryTypeDisplayName?.text || place.primaryType || "";
+
+          // 2. Call the smart categorizer engine
+          const smartCategories = determineGoogleCategories(
+            query, 
+            place.displayName?.text || "", 
+            place.types || []
+          );
+
+          // 3. Create the clean tags array
+          const rawTags = [query, googlePrimaryName, ...(place.types || [])];
+          const cleanTags = Array.from(new Set(rawTags.filter(t => t !== "")));  
 
           const mappedEvent = {
             externalId: place.id, 
@@ -74,13 +208,13 @@ export const fetchAndSync = internalAction({
             descriptionShort: place.formattedAddress || "Great local spot.",
             descriptionShortAr: null,
             type: "activity" as const, 
-            categories: ["Places"], 
-            tags: ["Google Places"], 
+            categories: smartCategories, 
+            tags: cleanTags, 
             startAt: Date.now(), 
             endAt: null,
-            city: "Khobar", 
-            locationLat: place.location?.latitude || 26.2144, 
-            locationLng: place.location?.longitude || 50.1971,
+            city: "Eastern Province", // fallback lmao
+            locationLat: place.location?.latitude || 26.3044, 
+            locationLng: place.location?.longitude || 50.1478,
             locationAddress: place.formattedAddress || "Unknown Address", 
             locationAddressAr: null,
             priceMin: null,
@@ -109,10 +243,10 @@ export const fetchAndSync = internalAction({
         }
       }
 
-      // Pause for 2 seconds before moving to the next completely new query
+// timer for 2 seconds so we dont get banned haha
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
 
-    return `Sweep Complete! Successfully synced ${totalSynced} places across ${matrixToRun.length} queries.`;
+    return `Sweep Complete! Successfully synced ${totalSynced} places across ${matrixToRun.length} categories in the tri-city area.`;
   },
 });
