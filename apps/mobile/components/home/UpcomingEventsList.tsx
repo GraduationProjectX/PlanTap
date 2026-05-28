@@ -13,10 +13,7 @@ function keyExtractor(item: EventDoc) {
   return item._id;
 }
 
-export function UpcomingEventsList({
-  events,
-  onEventPress,
-}: UpcomingEventsListProps) {
+export function UpcomingEventsList({ events, onEventPress }: UpcomingEventsListProps) {
   const visibleEvents = events.slice(0, 4);
 
   const renderItem = ({ item }: { item: EventDoc }) => {

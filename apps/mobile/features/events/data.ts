@@ -29,7 +29,20 @@ export type EventFilters = {
   activityMode: FilterActivityMode;
 };
 
-const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -63,7 +76,12 @@ export function isDefaultEventFilters(filters: EventFilters): boolean {
 
 export function isEventLiveNow(event: EventTimeFields): boolean {
   const now = Date.now();
-  return !!(event.startAt != null && event.endAt != null && event.startAt <= now && event.endAt > now);
+  return !!(
+    event.startAt != null &&
+    event.endAt != null &&
+    event.startAt <= now &&
+    event.endAt > now
+  );
 }
 
 export function toTagLabel(tag: string): string {
@@ -78,7 +96,9 @@ export function getEventTagLabels(event: EventTagFields, maxTags: number): strin
   const tags = event.tags ?? [];
 
   const derivedTags = [
-    event.indoorOutdoor && event.indoorOutdoor !== "unknown" ? toTagLabel(event.indoorOutdoor) : null,
+    event.indoorOutdoor && event.indoorOutdoor !== "unknown"
+      ? toTagLabel(event.indoorOutdoor)
+      : null,
     event.familyFriendly ? "For Kids" : null,
   ].filter((tag): tag is string => !!tag);
 

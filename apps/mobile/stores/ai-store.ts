@@ -42,7 +42,11 @@ type AiState = {
   setDownloadError: () => void;
   setDownloadJobId: (jobId: number | null) => void;
   setDownloadCanResume: (canResume: boolean) => void;
-  setLocalModelMeta: (meta: { filename: string; sizeBytes?: number | null; etag?: string | null }) => void;
+  setLocalModelMeta: (meta: {
+    filename: string;
+    sizeBytes?: number | null;
+    etag?: string | null;
+  }) => void;
   cancelDownload: () => void;
   deleteLocalModel: () => void;
 };
@@ -51,7 +55,11 @@ const initialState = {
   provider: "gemini" as AiProvider,
   localModelDownloaded: false,
   localModelPath: null as string | null,
-  localModelMeta: null as { filename: string; sizeBytes?: number | null; etag?: string | null } | null,
+  localModelMeta: null as {
+    filename: string;
+    sizeBytes?: number | null;
+    etag?: string | null;
+  } | null,
   isDownloading: false,
   downloadProgress: 0,
   downloadStatus: "idle" as DownloadStatus,
@@ -81,8 +89,7 @@ export const useAiStore = create<AiState>()(
           downloadCanResume: false,
         }),
 
-      setDownloadProgress: (progress) =>
-        set({ downloadProgress: progress }),
+      setDownloadProgress: (progress) => set({ downloadProgress: progress }),
 
       setDownloadComplete: (modelPath) =>
         set({
@@ -114,11 +121,9 @@ export const useAiStore = create<AiState>()(
           downloadStatus: "error",
         }),
 
-      setDownloadJobId: (jobId) =>
-        set({ downloadJobId: jobId }),
+      setDownloadJobId: (jobId) => set({ downloadJobId: jobId }),
 
-      setDownloadCanResume: (canResume) =>
-        set({ downloadCanResume: canResume }),
+      setDownloadCanResume: (canResume) => set({ downloadCanResume: canResume }),
 
       setLocalModelMeta: (meta) => set({ localModelMeta: meta }),
 

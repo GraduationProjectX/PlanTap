@@ -28,11 +28,7 @@ export function StarRating({
 
     if (interactive) {
       return (
-        <Pressable
-          key={starValue}
-          onPress={() => onRatingChange?.(starValue)}
-          hitSlop={4}
-        >
+        <Pressable key={starValue} onPress={() => onRatingChange?.(starValue)} hitSlop={4}>
           <FontAwesome name={name} size={size} color={color} />
         </Pressable>
       );

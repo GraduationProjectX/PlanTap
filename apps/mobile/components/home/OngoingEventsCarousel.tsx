@@ -16,23 +16,13 @@ function keyExtractor(item: EventDoc) {
   return item._id;
 }
 
-export function OngoingEventsCarousel({
-  events,
-  onEventPress,
-}: OngoingEventsCarouselProps) {
+export function OngoingEventsCarousel({ events, onEventPress }: OngoingEventsCarouselProps) {
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = screenWidth * 0.75;
   const cardSizeWithGap = cardWidth + CARD_GAP;
 
   const renderItem = ({ item }: { item: EventDoc }) => {
-    return (
-      <EventCard
-        event={item}
-        variant="medium"
-        onPress={onEventPress}
-        width={cardWidth}
-      />
-    );
+    return <EventCard event={item} variant="medium" onPress={onEventPress} width={cardWidth} />;
   };
 
   return (

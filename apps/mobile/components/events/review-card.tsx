@@ -27,20 +27,14 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
     <View style={cardStyles.root}>
       <View style={[cardStyles.header, { flexDirection }]}>
         <View style={[cardStyles.authorRow, { flexDirection }]}>
-          <Avatar
-            size="md"
-            animation="disable-all"
-            alt={review.authorName}
-          >
+          <Avatar size="md" animation="disable-all" alt={review.authorName}>
             {review.authorImageUrl ? (
               <Avatar.Image source={{ uri: review.authorImageUrl }} />
             ) : null}
             <Avatar.Fallback>{initials}</Avatar.Fallback>
           </Avatar>
           <View style={cardStyles.authorInfo}>
-            <Text style={[cardStyles.authorName, { textAlign }]}>
-              {review.authorName}
-            </Text>
+            <Text style={[cardStyles.authorName, { textAlign }]}>{review.authorName}</Text>
             <StarRating rating={review.rating} size={12} />
           </View>
         </View>

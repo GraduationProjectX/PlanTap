@@ -17,11 +17,7 @@ type CategoryChipsProps = {
   onSelect: (id: string) => void;
 };
 
-export function CategoryChips({
-  categories,
-  selected,
-  onSelect,
-}: CategoryChipsProps) {
+export function CategoryChips({ categories, selected, onSelect }: CategoryChipsProps) {
   return (
     <ScrollView
       horizontal
@@ -45,11 +41,7 @@ export function CategoryChips({
             ]}
           >
             <View style={styles.chipContent}>
-              <FontAwesome
-                name={iconName}
-                size={14}
-                color={isActive ? "#000000" : "#FFFFFF"}
-              />
+              <FontAwesome name={iconName} size={14} color={isActive ? "#000000" : "#FFFFFF"} />
               <Text style={[styles.chipText, isActive ? styles.textActive : styles.textInactive]}>
                 {cat.label}
               </Text>

@@ -2,12 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
 import { Button, Card, Chip } from "heroui-native";
 import { useTranslation } from "react-i18next";
-import {
-  Pressable as RNPressable,
-  Text,
-  type GestureResponderEvent,
-  View,
-} from "react-native";
+import { Pressable as RNPressable, Text, type GestureResponderEvent, View } from "react-native";
 import Transition from "react-native-screen-transitions";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -42,7 +37,6 @@ type EventCardProps = {
   isBookmarked?: boolean;
   showCountdown?: boolean;
 };
-
 
 function EventCardComponent({
   event,
@@ -133,7 +127,10 @@ function EventCardComponent({
               )}
             </View>
 
-            <Text style={[styles.previewTitle, isGrid && styles.previewTitleGrid, { textAlign }]} numberOfLines={2}>
+            <Text
+              style={[styles.previewTitle, isGrid && styles.previewTitleGrid, { textAlign }]}
+              numberOfLines={2}
+            >
               {event.title}
             </Text>
 
@@ -179,11 +176,7 @@ function EventCardComponent({
               style={styles.bookmarkGridHeartButton}
               hitSlop={8}
             >
-              <FontAwesome
-                name={isBookmarked ? "heart" : "heart-o"}
-                size={14}
-                color="#FFFFFF"
-              />
+              <FontAwesome name={isBookmarked ? "heart" : "heart-o"} size={14} color="#FFFFFF" />
             </RNPressable>
           )}
 
@@ -240,16 +233,15 @@ function EventCardComponent({
               style={styles.bookmarkHeroHeartButton}
               hitSlop={8}
             >
-              <FontAwesome
-                name={isBookmarked ? "heart" : "heart-o"}
-                size={16}
-                color="#FFFFFF"
-              />
+              <FontAwesome name={isBookmarked ? "heart" : "heart-o"} size={16} color="#FFFFFF" />
             </RNPressable>
           )}
           <View style={styles.bookmarkHeroTopSpacer} />
           <View
-            style={[styles.bookmarkHeroTopBadges, { alignItems: isRTL ? "flex-start" : "flex-end" }]}
+            style={[
+              styles.bookmarkHeroTopBadges,
+              { alignItems: isRTL ? "flex-start" : "flex-end" },
+            ]}
           >
             {meta.dateLabel && (
               <View style={styles.bookmarkHeroDateBadge}>
@@ -336,7 +328,7 @@ function EventCardComponent({
           )}
 
           <Card.Body style={styles.mediumContent}>
-            <View style={[styles.mediumLocationRow, { flexDirection }]}> 
+            <View style={[styles.mediumLocationRow, { flexDirection }]}>
               <Text style={styles.locationIcon}>📍</Text>
               <Text style={[styles.mediumLocationText, { textAlign }]} numberOfLines={1}>
                 {meta.locationLabel}
@@ -352,21 +344,25 @@ function EventCardComponent({
                 isIconOnly={mapActionLabel == null}
                 onPress={handleCardPress}
                 feedbackVariant="scale"
-                style={
-                  mapActionLabel
-                    ? styles.mapEventCardActionButton
-                    : styles.mediumArrowButton
-                }
+                style={mapActionLabel ? styles.mapEventCardActionButton : styles.mediumArrowButton}
               >
                 {mapActionLabel ? (
                   <>
                     <Text style={styles.mapEventCardActionText} numberOfLines={1}>
                       {mapActionLabel}
                     </Text>
-                    <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={13} color="#000000" />
+                    <FontAwesome
+                      name={isRTL ? "arrow-left" : "arrow-right"}
+                      size={13}
+                      color="#000000"
+                    />
                   </>
                 ) : (
-                  <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={12} color="#000000" />
+                  <FontAwesome
+                    name={isRTL ? "arrow-left" : "arrow-right"}
+                    size={12}
+                    color="#000000"
+                  />
                 )}
               </Button>
             </View>

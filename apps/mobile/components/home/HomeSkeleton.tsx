@@ -15,10 +15,7 @@ export function HomeSkeleton() {
             <SkeletonGroup.Item className="h-4 w-16 rounded-md" />
           </View>
           <View style={styles.carouselRow}>
-            <SkeletonGroup.Item
-              className="rounded-2xl"
-              style={{ width: cardWidth, height: 220 }}
-            />
+            <SkeletonGroup.Item className="rounded-2xl" style={{ width: cardWidth, height: 220 }} />
             <SkeletonGroup.Item
               className="rounded-2xl"
               style={{ width: cardWidth * 0.4, height: 220 }}
@@ -50,7 +47,10 @@ export function HomeSkeleton() {
           <View style={styles.activitiesGrid}>
             {[1, 2].map((i) => (
               <View key={i} style={styles.activitiesCard}>
-                <SkeletonGroup.Item className="rounded-xl" style={{ aspectRatio: 1, width: "100%" }} />
+                <SkeletonGroup.Item
+                  className="rounded-xl"
+                  style={{ aspectRatio: 1, width: "100%" }}
+                />
                 <View style={styles.activitiesInfo}>
                   <SkeletonGroup.Item className="h-4 w-full rounded-md" />
                   <SkeletonGroup.Item className="h-3 w-3/4 rounded-md" />

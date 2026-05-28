@@ -11,13 +11,7 @@ type FilterPillProps = {
   iconSize?: number;
 };
 
-export function FilterPill({
-  label,
-  active,
-  onPress,
-  iconName,
-  iconSize = 13,
-}: FilterPillProps) {
+export function FilterPill({ label, active, onPress, iconName, iconSize = 13 }: FilterPillProps) {
   return (
     <Chip
       size="md"

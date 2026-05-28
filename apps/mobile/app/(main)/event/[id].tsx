@@ -109,8 +109,7 @@ export default function EventDetailsScreen() {
 
     try {
       await Share.share({ message: `${shareTitle}\nPlanTap` });
-    } catch {
-    }
+    } catch {}
   };
 
   const handleOpenMaps = (lat: number, lng: number, label: string) => {
@@ -206,9 +205,7 @@ export default function EventDetailsScreen() {
         <Card animation="disable-all" style={styles.notFoundCard}>
           <Card.Body style={styles.notFoundBody}>
             <Text style={styles.notFoundTitle}>{t("eventDetail.notFoundTitle")}</Text>
-            <Text style={styles.notFoundDescription}>
-              {t("eventDetail.notFoundDescription")}
-            </Text>
+            <Text style={styles.notFoundDescription}>{t("eventDetail.notFoundDescription")}</Text>
             <Button feedbackVariant="scale" onPress={handleBackPress} style={styles.notFoundButton}>
               <Button.Label style={styles.notFoundButtonLabel}>{t("common.back")}</Button.Label>
             </Button>
@@ -279,141 +276,115 @@ export default function EventDetailsScreen() {
           <Card.Body
             style={[styles.sheetBody, { paddingBottom: insets.bottom + theme.spacing.xxl }]}
           >
-          <View style={[styles.sheetHeader, { flexDirection }]}>
-            <Text style={[styles.title, { textAlign, flex: 1 }]}>{title}</Text>
-          </View>
-
-          {dateLabel || timeLabel || locationLabel ? (
-            <View style={[styles.metaRow, { flexDirection }]}>
-              {dateLabel ? (
-                <View style={[styles.metaItem, { flexDirection }]}>
-                  <FontAwesome
-                    name="calendar-o"
-                    size={14}
-                    color={theme.colors.textSecondary}
-                  />
-                  <Text style={[styles.metaText, { textAlign }]}>{dateLabel}</Text>
-                </View>
-              ) : null}
-
-              {dateLabel && timeLabel ? (
-                <Text style={styles.metaDot}>|</Text>
-              ) : null}
-
-              {timeLabel ? (
-                <View style={[styles.metaItem, { flexDirection }]}>
-                  <FontAwesome name="clock-o" size={14} color={theme.colors.textSecondary} />
-                  <Text style={[styles.metaText, { textAlign }]}>{timeLabel}</Text>
-                </View>
-              ) : null}
-
-              {(dateLabel || timeLabel) && locationLabel ? (
-                <Text style={styles.metaDot}>|</Text>
-              ) : null}
-
-              {locationLabel ? (
-                <View style={[styles.metaItem, styles.metaItemLocation, { flexDirection }]}>
-                  <FontAwesome
-                    name="map-marker"
-                    size={14}
-                    color={theme.colors.textSecondary}
-                  />
-                  <Text style={[styles.metaText, { textAlign }]} numberOfLines={1}>
-                    {locationLabel}
-                  </Text>
-                </View>
-              ) : null}
+            <View style={[styles.sheetHeader, { flexDirection }]}>
+              <Text style={[styles.title, { textAlign, flex: 1 }]}>{title}</Text>
             </View>
-          ) : null}
 
-          <View style={[styles.actionsRow, { flexDirection }]}>
-            <Button
-              feedbackVariant="scale"
-              onPress={handleBookmarkPress}
-              isDisabled={isBookmarkPending}
-              style={styles.primaryAction}
-            >
-              <FontAwesome
-                name={isBookmarked ? "bookmark-o" : "bookmark"}
-                size={16}
-                color={theme.colors.primaryForeground}
-              />
-              <Button.Label style={styles.primaryActionLabel}>{bookmarkLabel}</Button.Label>
-            </Button>
+            {dateLabel || timeLabel || locationLabel ? (
+              <View style={[styles.metaRow, { flexDirection }]}>
+                {dateLabel ? (
+                  <View style={[styles.metaItem, { flexDirection }]}>
+                    <FontAwesome name="calendar-o" size={14} color={theme.colors.textSecondary} />
+                    <Text style={[styles.metaText, { textAlign }]}>{dateLabel}</Text>
+                  </View>
+                ) : null}
 
-            <Button
-              isIconOnly
-              feedbackVariant="scale"
-              onPress={handleShare}
-              style={styles.secondaryAction}
-              accessibilityLabel={t("eventDetail.share")}
-            >
-              <FontAwesome
-                name="share"
-                size={18}
-                color={theme.colors.text}
-              />
-            </Button>
-          </View>
+                {dateLabel && timeLabel ? <Text style={styles.metaDot}>|</Text> : null}
 
-          {description ? (
-            <View style={styles.aboutSection}>
-              <Text style={[styles.sectionLabel, { textAlign }]}>{t("eventDetail.about")}</Text>
-              <Text style={[styles.description, { textAlign }]}>{description}</Text>
+                {timeLabel ? (
+                  <View style={[styles.metaItem, { flexDirection }]}>
+                    <FontAwesome name="clock-o" size={14} color={theme.colors.textSecondary} />
+                    <Text style={[styles.metaText, { textAlign }]}>{timeLabel}</Text>
+                  </View>
+                ) : null}
+
+                {(dateLabel || timeLabel) && locationLabel ? (
+                  <Text style={styles.metaDot}>|</Text>
+                ) : null}
+
+                {locationLabel ? (
+                  <View style={[styles.metaItem, styles.metaItemLocation, { flexDirection }]}>
+                    <FontAwesome name="map-marker" size={14} color={theme.colors.textSecondary} />
+                    <Text style={[styles.metaText, { textAlign }]} numberOfLines={1}>
+                      {locationLabel}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
+            <View style={[styles.actionsRow, { flexDirection }]}>
+              <Button
+                feedbackVariant="scale"
+                onPress={handleBookmarkPress}
+                isDisabled={isBookmarkPending}
+                style={styles.primaryAction}
+              >
+                <FontAwesome
+                  name={isBookmarked ? "bookmark-o" : "bookmark"}
+                  size={16}
+                  color={theme.colors.primaryForeground}
+                />
+                <Button.Label style={styles.primaryActionLabel}>{bookmarkLabel}</Button.Label>
+              </Button>
+
+              <Button
+                isIconOnly
+                feedbackVariant="scale"
+                onPress={handleShare}
+                style={styles.secondaryAction}
+                accessibilityLabel={t("eventDetail.share")}
+              >
+                <FontAwesome name="share" size={18} color={theme.colors.text} />
+              </Button>
             </View>
-          ) : null}
 
-          {locationLabel ? (
-            <View style={styles.locationSection}>
-              <Separator />
-              <Text style={[styles.sectionLabel, { textAlign }]}>
-                {t("eventDetail.location")}
-              </Text>
-              <Text style={[styles.locationAddress, { textAlign }]} selectable>
-                {locationLabel}
-              </Text>
-              {event.locationLat != null && event.locationLng != null ? (
-                <Button
-                  variant="outline"
-                  feedbackVariant="scale"
-                  onPress={() =>
-                    handleOpenMaps(
-                      event.locationLat,
-                      event.locationLng,
-                      locationLabel,
-                    )
-                  }
-                  style={styles.mapButton}
-                >
-                  <FontAwesome
-                    name="map-o"
-                    size={16}
-                    color={theme.colors.text}
-                  />
-                  <Button.Label style={styles.mapButtonLabel}>
-                    {t("eventDetail.openInMaps")}
-                  </Button.Label>
-                </Button>
-              ) : null}
-            </View>
-          ) : null}
+            {description ? (
+              <View style={styles.aboutSection}>
+                <Text style={[styles.sectionLabel, { textAlign }]}>{t("eventDetail.about")}</Text>
+                <Text style={[styles.description, { textAlign }]}>{description}</Text>
+              </View>
+            ) : null}
 
-          <ReviewsSection
-            averageRating={averageRating}
-            reviewCount={reviewCount}
-            reviews={reviews}
-            isLoading={areReviewsLoading}
-            onWriteReview={handleWriteReview}
-          />
-        </Card.Body>
-      </Card>
+            {locationLabel ? (
+              <View style={styles.locationSection}>
+                <Separator />
+                <Text style={[styles.sectionLabel, { textAlign }]}>
+                  {t("eventDetail.location")}
+                </Text>
+                <Text style={[styles.locationAddress, { textAlign }]} selectable>
+                  {locationLabel}
+                </Text>
+                {event.locationLat != null && event.locationLng != null ? (
+                  <Button
+                    variant="outline"
+                    feedbackVariant="scale"
+                    onPress={() =>
+                      handleOpenMaps(event.locationLat, event.locationLng, locationLabel)
+                    }
+                    style={styles.mapButton}
+                  >
+                    <FontAwesome name="map-o" size={16} color={theme.colors.text} />
+                    <Button.Label style={styles.mapButtonLabel}>
+                      {t("eventDetail.openInMaps")}
+                    </Button.Label>
+                  </Button>
+                ) : null}
+              </View>
+            ) : null}
 
+            <ReviewsSection
+              averageRating={averageRating}
+              reviewCount={reviewCount}
+              reviews={reviews}
+              isLoading={areReviewsLoading}
+              onWriteReview={handleWriteReview}
+            />
+          </Card.Body>
+        </Card>
       </ScrollView>
 
-      <View
-        style={[styles.stickyTopBar, { paddingTop: insets.top + 8 }]}
-        pointerEvents="box-none"
-      >
+      <View style={[styles.stickyTopBar, { paddingTop: insets.top + 8 }]} pointerEvents="box-none">
         <View style={[styles.heroTopRow, { flexDirection }]}>
           <Button
             isIconOnly
@@ -436,11 +407,7 @@ export default function EventDetailsScreen() {
             style={styles.overlayButton}
             accessibilityLabel={bookmarkLabel}
           >
-            <Fontisto
-              name={isBookmarked ? "bookmark" : "bookmark-alt"}
-              size={20}
-              color="#FFFFFF"
-            />
+            <Fontisto name={isBookmarked ? "bookmark" : "bookmark-alt"} size={20} color="#FFFFFF" />
           </Button>
         </View>
       </View>

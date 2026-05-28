@@ -1,9 +1,5 @@
 import { useRouter } from "expo-router";
-import Mapbox, {
-  Camera,
-  LocationPuck,
-  MapView,
-} from "@rnmapbox/maps";
+import Mapbox, { Camera, LocationPuck, MapView } from "@rnmapbox/maps";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { FlashList } from "@shopify/flash-list";
 import { Button } from "heroui-native";
@@ -16,11 +12,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EventCard } from "@/components/events/EventCard";
 import { CategoryChips } from "@/components/home/CategoryChips";
 import { SearchBar } from "@/components/ui/SearchBar";
-import {
-  getBottomCameraPadding,
-  getCategoryOptions,
-  getVisibleEvents,
-} from "@/features/map/data";
+import { getBottomCameraPadding, getCategoryOptions, getVisibleEvents } from "@/features/map/data";
 import { MapMarkers } from "@/features/map/map-markers";
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
@@ -73,10 +65,7 @@ export default function MapScreen() {
   const cardHeight = 174;
   const cardSizeWithGap = cardWidth + CARD_GAP;
   const carouselEdgePadding = Math.max((screenWidth - cardWidth) / 2, HORIZONTAL_PADDING);
-  const carouselLeftPadding = Math.max(
-    carouselEdgePadding - CAROUSEL_LEFT_PADDING_REDUCTION,
-    8,
-  );
+  const carouselLeftPadding = Math.max(carouselEdgePadding - CAROUSEL_LEFT_PADDING_REDUCTION, 8);
   const cameraRef = useRef<Camera>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchValue, setSearchValue] = useState("");
@@ -112,12 +101,7 @@ export default function MapScreen() {
   const activityTypeLabel = t("map.markerActivity");
   const query = searchValue.trim().toLowerCase();
 
-  const visibleEvents = getVisibleEvents(
-    events ?? [],
-    selectedCategory,
-    query,
-    userCoordinates,
-  );
+  const visibleEvents = getVisibleEvents(events ?? [], selectedCategory, query, userCoordinates);
 
   const selectedEvent = visibleEvents.find((event) => event._id === selectedEventId);
 
@@ -216,9 +200,7 @@ export default function MapScreen() {
     router.push({ pathname: "/event/[id]", params: { id: eventId } });
   };
 
-  const handleViewableItemsChanged = (
-    event: { viewableItems: Array<{ item: EventDoc }> },
-  ) => {
+  const handleViewableItemsChanged = (event: { viewableItems: Array<{ item: EventDoc }> }) => {
     const nextCenteredItem = event.viewableItems[0]?.item;
     if (!nextCenteredItem) {
       return;
@@ -319,11 +301,7 @@ export default function MapScreen() {
       </MapView>
 
       <View style={[styles.topOverlay, { paddingTop: insets.top + 12 }]}>
-        <SearchBar
-          value={searchValue}
-          onChange={setSearchValue}
-          placeholder={t("home.search")}
-        />
+        <SearchBar value={searchValue} onChange={setSearchValue} placeholder={t("home.search")} />
         <CategoryChips
           categories={categoryOptions}
           selected={selectedCategory}
@@ -354,10 +332,7 @@ export default function MapScreen() {
 
               return (
                 <View
-                  style={[
-                    styles.carouselItem,
-                    isSelected ? styles.carouselItemSelected : null,
-                  ]}
+                  style={[styles.carouselItem, isSelected ? styles.carouselItemSelected : null]}
                 >
                   <EventCard
                     event={item}

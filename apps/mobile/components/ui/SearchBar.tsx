@@ -26,11 +26,7 @@ export function SearchBar({
 }: SearchBarProps) {
   return (
     <View
-      style={[
-        styles.wrapper,
-        !withHorizontalPadding && styles.wrapperNoHorizontalPadding,
-        style,
-      ]}
+      style={[styles.wrapper, !withHorizontalPadding && styles.wrapperNoHorizontalPadding, style]}
     >
       <SearchField value={value} onChange={onChange} className="flex-1">
         <SearchField.Group>

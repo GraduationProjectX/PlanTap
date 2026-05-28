@@ -2,12 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
 import { validateResponse } from "../responseValidator";
-import type {
-  AiProvider,
-  EventSummary,
-  RecommendationResult,
-  UserContext,
-} from "../types";
+import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
 
 export class ClaudeProvider implements AiProvider {
   readonly name = "Claude";
@@ -29,9 +24,7 @@ export class ClaudeProvider implements AiProvider {
       max_tokens: 256,
       temperature: 0.3,
       system: buildSystemPrompt(),
-      messages: [
-        { role: "user", content: buildUserPrompt(userContext, events, userMessage) },
-      ],
+      messages: [{ role: "user", content: buildUserPrompt(userContext, events, userMessage) }],
     });
 
     // Anthropic may return structured blocks; prefer text blocks but tolerate

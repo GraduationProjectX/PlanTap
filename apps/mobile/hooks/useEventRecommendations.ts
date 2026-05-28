@@ -40,7 +40,11 @@ export function useEventRecommendations() {
    * Run recommendations with the provided data.
    * Typically called after fetching events + user profile from Convex.
    */
-  const recommend = async (userContext: UserContext, events: EventSummary[], userMessage?: string) => {
+  const recommend = async (
+    userContext: UserContext,
+    events: EventSummary[],
+    userMessage?: string,
+  ) => {
     setState({ response: null, eventIds: [], isLoading: true, error: null });
 
     try {
@@ -53,8 +57,7 @@ export function useEventRecommendations() {
       setState({ response: result, eventIds, isLoading: false, error: null });
       return result;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : String(err);
+      const message = err instanceof Error ? err.message : String(err);
       setState({ response: null, eventIds: [], isLoading: false, error: message });
       return null;
     }

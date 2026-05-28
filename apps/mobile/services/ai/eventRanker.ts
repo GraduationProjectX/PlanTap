@@ -26,21 +26,15 @@ interface ScoredEvent {
  *
  * Total possible: 0-100
  */
-function calculateEventScore(
-  event: EventSummary,
-  userContext: UserContext,
-): number {
+function calculateEventScore(event: EventSummary, userContext: UserContext): number {
   let score = 0;
 
   // 1. Interest matching (0-30 pts)
-  const eventTags = new Set([
-    ...(event.tags ?? []),
-    ...(event.categories ?? []),
-  ].map((t) => t.toLowerCase()));
-
-  const userInterests = (userContext.interests ?? []).map((i) =>
-    i.toLowerCase(),
+  const eventTags = new Set(
+    [...(event.tags ?? []), ...(event.categories ?? [])].map((t) => t.toLowerCase()),
   );
+
+  const userInterests = (userContext.interests ?? []).map((i) => i.toLowerCase());
   let interestMatches = 0;
   for (const interest of userInterests) {
     if (eventTags.has(interest)) {
@@ -50,9 +44,7 @@ function calculateEventScore(
   score += Math.min(30, interestMatches * 10);
 
   // 2. Disliked tags penalty (0 to -30 pts)
-  const dislikedTags = (userContext.dislikedTags ?? []).map((t) =>
-    t.toLowerCase(),
-  );
+  const dislikedTags = (userContext.dislikedTags ?? []).map((t) => t.toLowerCase());
   let dislikedMatches = 0;
   for (const disliked of dislikedTags) {
     if (eventTags.has(disliked)) {
@@ -81,9 +73,7 @@ function calculateEventScore(
   // if (event.priceMin != null && event.priceMax != null && ...)
 
   // 7. Variety: penalize events with tags the user has attended before (0 to -15 pts)
-  const pastTags = (userContext.pastEventTags ?? []).map((t) =>
-    t.toLowerCase(),
-  );
+  const pastTags = (userContext.pastEventTags ?? []).map((t) => t.toLowerCase());
   let pastTagMatches = 0;
   for (const pastTag of pastTags) {
     if (eventTags.has(pastTag)) {

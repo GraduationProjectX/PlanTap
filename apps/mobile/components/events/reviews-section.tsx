@@ -44,9 +44,7 @@ export function ReviewsSection({
     <View style={sectionStyles.root}>
       <Separator />
 
-      <Text style={[sectionStyles.sectionLabel, { textAlign }]}>
-        {t("eventDetail.reviews")}
-      </Text>
+      <Text style={[sectionStyles.sectionLabel, { textAlign }]}>{t("eventDetail.reviews")}</Text>
 
       <View style={[sectionStyles.summaryRow, { flexDirection }]}>
         {reviewCount > 0 ? (
@@ -64,16 +62,8 @@ export function ReviewsSection({
             {t("eventDetail.noReviewsTitle")}
           </Text>
         )}
-        <Button
-          feedbackVariant="scale"
-          onPress={onWriteReview}
-          style={sectionStyles.writeButton}
-        >
-          <FontAwesome
-            name="pencil"
-            size={14}
-            color={theme.colors.primaryForeground}
-          />
+        <Button feedbackVariant="scale" onPress={onWriteReview} style={sectionStyles.writeButton}>
+          <FontAwesome name="pencil" size={14} color={theme.colors.primaryForeground} />
           <Button.Label style={sectionStyles.writeButtonLabel}>
             {t("eventDetail.writeReview")}
           </Button.Label>

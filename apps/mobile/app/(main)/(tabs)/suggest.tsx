@@ -35,8 +35,7 @@ export default function SuggestScreen() {
   const provider = useAiStore((s) => s.provider);
   const localModelDownloaded = useAiStore((s) => s.localModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
-  const { eventIds, isLoading, error, response, recommend } =
-    useEventRecommendations();
+  const { eventIds, isLoading, error, response, recommend } = useEventRecommendations();
   const [userNote, setUserNote] = useState("");
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -101,9 +100,8 @@ export default function SuggestScreen() {
       return;
     }
 
-    const nextMessage = userNote.trim().length > 0
-      ? `${userNote.trim()}\nFollow-up: ${trimmed}`
-      : trimmed;
+    const nextMessage =
+      userNote.trim().length > 0 ? `${userNote.trim()}\nFollow-up: ${trimmed}` : trimmed;
     setSheetOpen(false);
     runRecommendation(nextMessage);
   };
@@ -112,11 +110,10 @@ export default function SuggestScreen() {
     router.push({ pathname: "/event/[id]", params: { id } });
   };
 
-  const recommendedEvents = fullEvents && eventIds.length > 0
-    ? eventIds
-        .map((id) => fullEvents.find((event) => event._id === id))
-        .filter(isEventDoc)
-    : [];
+  const recommendedEvents =
+    fullEvents && eventIds.length > 0
+      ? eventIds.map((id) => fullEvents.find((event) => event._id === id)).filter(isEventDoc)
+      : [];
 
   return (
     <ScrollView
@@ -126,9 +123,7 @@ export default function SuggestScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <Text style={[styles.title, { textAlign }]}>{t("tabs.suggest")}</Text>
-      <Text style={[styles.subtitle, { textAlign }]}>
-        {t("ai.testProvider", { provider })}
-      </Text>
+      <Text style={[styles.subtitle, { textAlign }]}>{t("ai.testProvider", { provider })}</Text>
 
       {/* AI Model Selector (collapsible) */}
       <AiModelSelector />
@@ -143,14 +138,18 @@ export default function SuggestScreen() {
 
       {isLoaded && !isSignedIn && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText} selectable>{t("ai.signInPrompt")}</Text>
+          <Text style={styles.errorText} selectable>
+            {t("ai.signInPrompt")}
+          </Text>
         </View>
       )}
 
       {isAuthenticated && convexData.isLoading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText} selectable>{t("ai.loadingConvex")}</Text>
+          <Text style={styles.loadingText} selectable>
+            {t("ai.loadingConvex")}
+          </Text>
         </View>
       )}
 
@@ -162,18 +161,11 @@ export default function SuggestScreen() {
         </View>
       )}
 
-
-      {/* ---------- Benchmark Link ---------- */}
-      <Pressable
-        onPress={() => router.push("/dev-ai-bench")}
-        style={styles.benchLink}
-      >
-        <Text style={styles.benchLinkText}>{t("ai.openBenchmark")}</Text>
-      </Pressable>
-
       {/* ---------- City selection ---------- */}
       <View style={styles.inputSection}>
-          <Text style={styles.inputLabel} selectable>{t("ai.cityLabel")}</Text>
+        <Text style={styles.inputLabel} selectable>
+          {t("ai.cityLabel")}
+        </Text>
         <Select
           presentation="bottom-sheet"
           value={resolvedCity ? { value: resolvedCity, label: resolvedCity } : undefined}
@@ -207,7 +199,9 @@ export default function SuggestScreen() {
 
       {/* ---------- User note ---------- */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel} selectable>{t("ai.userNoteLabel")}</Text>
+        <Text style={styles.inputLabel} selectable>
+          {t("ai.userNoteLabel")}
+        </Text>
         <TextInput
           style={styles.textInput}
           value={userNote}
@@ -218,12 +212,17 @@ export default function SuggestScreen() {
           maxLength={300}
           textAlignVertical="top"
         />
-        <Text style={styles.charCount} selectable>{userNote.length}/300</Text>
+        <Text style={styles.charCount} selectable>
+          {userNote.length}/300
+        </Text>
       </View>
 
       {/* ---------- Run ---------- */}
       <Pressable
-        style={[styles.btn, (isLoading || !isAuthenticated || convexData.isLoading) && styles.btnDisabled]}
+        style={[
+          styles.btn,
+          (isLoading || !isAuthenticated || convexData.isLoading) && styles.btnDisabled,
+        ]}
         onPress={handleRun}
         disabled={
           isLoading ||
@@ -244,7 +243,9 @@ export default function SuggestScreen() {
       {/* ---------- Error ---------- */}
       {error && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText} selectable>{error}</Text>
+          <Text style={styles.errorText} selectable>
+            {error}
+          </Text>
         </View>
       )}
 
@@ -258,7 +259,9 @@ export default function SuggestScreen() {
 
       {!isFullEventsLoading && eventIds.length > 0 && recommendedEvents.length === 0 && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText} selectable>{t("ai.recommendationsMissing")}</Text>
+          <Text style={styles.errorText} selectable>
+            {t("ai.recommendationsMissing")}
+          </Text>
         </View>
       )}
 
@@ -410,7 +413,6 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.font.size.base,
     color: theme.colors.textSecondary,
   },
-
 
   // User note input
   inputSection: {

@@ -2,12 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
 import { validateResponse } from "../responseValidator";
-import type {
-  AiProvider,
-  EventSummary,
-  RecommendationResult,
-  UserContext,
-} from "../types";
+import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
 
 /** Gemini free-tier: 15 RPM / 1M TPM. We retry with exponential backoff. */
 const MAX_RETRIES = 3;

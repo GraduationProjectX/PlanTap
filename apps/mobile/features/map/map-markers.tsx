@@ -10,10 +10,7 @@ import { Image as ExpoImage } from "expo-image";
 import { type ElementRef, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
-import {
-  getMarkerFeatures,
-  getMarkerThumbnailName,
-} from "@/features/map/data";
+import { getMarkerFeatures, getMarkerThumbnailName } from "@/features/map/data";
 import type { EventDoc } from "@/hooks/use-events";
 
 const MARKER_LABELS_ZOOM_LEVEL = 11;
@@ -128,10 +125,7 @@ export function MapMarkers({
             }}
             name={getMarkerThumbnailName(event._id)}
           >
-            <View
-              collapsable={false}
-              style={[styles.markerThumbnailSprite, { backgroundColor }]}
-            >
+            <View collapsable={false} style={[styles.markerThumbnailSprite, { backgroundColor }]}>
               <ExpoImage
                 source={{ uri: event.images[0] }}
                 style={styles.markerThumbnailImage}

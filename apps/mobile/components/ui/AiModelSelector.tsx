@@ -73,9 +73,8 @@ export function AiModelSelector() {
     try {
       await setApiKey(selectedApi, apiKey);
       setProvider(selectedApi);
-      if (selectedApi !== "local") {
-        releaseLocalModel().catch(console.error);
-      }
+      // Since selectedApi is a cloud provider, release local model.
+      releaseLocalModel().catch(console.error);
       Alert.alert(t("common.success"), t("ai.apiKeySaved", { provider: selectedApi }));
       setApiKeyInput("");
     } catch {
@@ -149,14 +148,18 @@ export function AiModelSelector() {
               onPress={() => setTab("api")}
               style={[styles.tab, tab === "api" && styles.tabActive]}
             >
-              <Text style={[styles.tabText, tab === "api" && styles.tabTextActive]}>{t("ai.apiProviders")}</Text>
+              <Text style={[styles.tabText, tab === "api" && styles.tabTextActive]}>
+                {t("ai.apiProviders")}
+              </Text>
             </Pressable>
             {!inExpoGo && (
               <Pressable
                 onPress={() => setTab("local")}
                 style={[styles.tab, tab === "local" && styles.tabActive]}
               >
-                <Text style={[styles.tabText, tab === "local" && styles.tabTextActive]}>{t("ai.localModels")}</Text>
+                <Text style={[styles.tabText, tab === "local" && styles.tabTextActive]}>
+                  {t("ai.localModels")}
+                </Text>
               </Pressable>
             )}
           </View>
@@ -171,10 +174,7 @@ export function AiModelSelector() {
                   <Pressable
                     key={p}
                     onPress={() => setSelectedApi(p)}
-                    style={[
-                      styles.provider,
-                      selectedApi === p && styles.providerActive,
-                    ]}
+                    style={[styles.provider, selectedApi === p && styles.providerActive]}
                   >
                     <Text style={styles.providerText}>
                       {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -210,8 +210,10 @@ export function AiModelSelector() {
                   </View>
                 )}
                 {AVAILABLE_MODELS.map((model) => {
-                  const isDownloadingThisModel = downloadStatus === "downloading" && downloadModelId === model.id;
-                  const isPausedThisModel = downloadStatus === "paused" && downloadModelId === model.id;
+                  const isDownloadingThisModel =
+                    downloadStatus === "downloading" && downloadModelId === model.id;
+                  const isPausedThisModel =
+                    downloadStatus === "paused" && downloadModelId === model.id;
                   const isActive = localModelPath === modelFilePath(model.filename);
                   const isDownloaded = isActive || downloadedById[model.id] === true;
                   const isBusy = downloadStatus === "downloading" || downloadStatus === "paused";
@@ -221,7 +223,8 @@ export function AiModelSelector() {
                       <View style={styles.modelInfo}>
                         <Text style={styles.modelName}>{model.label}</Text>
                         <Text style={styles.modelDesc}>
-                          {model.sizeLabel} {model.recommendedForMobile ? t("ai.mobileFriendly") : ""}
+                          {model.sizeLabel}{" "}
+                          {model.recommendedForMobile ? t("ai.mobileFriendly") : ""}
                         </Text>
                       </View>
 
@@ -234,7 +237,10 @@ export function AiModelSelector() {
                             <Pressable onPress={pauseDownload} style={styles.smallBtn}>
                               <Text style={styles.smallBtnText}>{t("ai.pause")}</Text>
                             </Pressable>
-                            <Pressable onPress={cancelDownload} style={[styles.smallBtn, styles.cancelBtn]}>
+                            <Pressable
+                              onPress={cancelDownload}
+                              style={[styles.smallBtn, styles.cancelBtn]}
+                            >
                               <Text style={styles.smallBtnText}>{t("common.cancel")}</Text>
                             </Pressable>
                           </View>
@@ -250,7 +256,10 @@ export function AiModelSelector() {
                           >
                             <Text style={styles.smallBtnText}>{t("ai.resume")}</Text>
                           </Pressable>
-                          <Pressable onPress={cancelDownload} style={[styles.smallBtn, styles.cancelBtn]}>
+                          <Pressable
+                            onPress={cancelDownload}
+                            style={[styles.smallBtn, styles.cancelBtn]}
+                          >
                             <Text style={styles.smallBtnText}>{t("common.cancel")}</Text>
                           </Pressable>
                         </View>
@@ -259,36 +268,50 @@ export function AiModelSelector() {
                       {!isDownloadingThisModel && !isPausedThisModel && isActive && (
                         <View style={styles.actionRow}>
                           <Text style={styles.activeText}>{t("ai.active")}</Text>
-                          <Pressable onPress={() => deleteModel(model.filename)} style={[styles.smallBtn, styles.deleteBtn]}>
+                          <Pressable
+                            onPress={() => deleteModel(model.filename)}
+                            style={[styles.smallBtn, styles.deleteBtn]}
+                          >
                             <Text style={styles.smallBtnText}>{t("ai.delete")}</Text>
                           </Pressable>
                         </View>
                       )}
 
-                      {!isDownloadingThisModel && !isPausedThisModel && !isActive && isDownloaded && (
-                        <View style={styles.actionRow}>
-                          <Pressable
-                            onPress={() => handleUseLocalModel(model.filename)}
-                            style={styles.smallBtn}
-                          >
-                            <Text style={styles.smallBtnText}>{t("ai.use")}</Text>
-                          </Pressable>
-                          <Pressable onPress={() => deleteModel(model.filename)} style={[styles.smallBtn, styles.deleteBtn]}>
-                            <Text style={styles.smallBtnText}>{t("ai.delete")}</Text>
-                          </Pressable>
-                        </View>
-                      )}
+                      {!isDownloadingThisModel &&
+                        !isPausedThisModel &&
+                        !isActive &&
+                        isDownloaded && (
+                          <View style={styles.actionRow}>
+                            <Pressable
+                              onPress={() => handleUseLocalModel(model.filename)}
+                              style={styles.smallBtn}
+                            >
+                              <Text style={styles.smallBtnText}>{t("ai.use")}</Text>
+                            </Pressable>
+                            <Pressable
+                              onPress={() => deleteModel(model.filename)}
+                              style={[styles.smallBtn, styles.deleteBtn]}
+                            >
+                              <Text style={styles.smallBtnText}>{t("ai.delete")}</Text>
+                            </Pressable>
+                          </View>
+                        )}
 
                       {!isDownloadingThisModel && !isPausedThisModel && !isDownloaded && (
                         <Pressable
                           onPress={() => handleDownloadModel(model.id)}
-                          style={[styles.downloadBtn, (!rnfs || isBusy) && styles.downloadBtnDisabled]}
+                          style={[
+                            styles.downloadBtn,
+                            (!rnfs || isBusy) && styles.downloadBtnDisabled,
+                          ]}
                           disabled={!rnfs || isBusy}
                         >
                           <Text style={styles.downloadText}>
                             {!rnfs
                               ? t("ai.needDevBuild")
-                              : (downloadingModelId === model.id ? t("ai.starting") : t("ai.download"))}
+                              : downloadingModelId === model.id
+                                ? t("ai.starting")
+                                : t("ai.download")}
                           </Text>
                         </Pressable>
                       )}

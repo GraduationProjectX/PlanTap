@@ -88,10 +88,7 @@ export function FiltersCitySection({
             animation={CITY_SELECT_OVERLAY_ANIMATION}
             style={CITY_SELECT_OVERLAY_STYLE}
           />
-          <Select.Content
-            presentation="bottom-sheet"
-            snapPoints={["65%"]}
-          >
+          <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
             <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
             <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
               <View style={styles.selectItemInner}>

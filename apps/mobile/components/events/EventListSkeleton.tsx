@@ -21,14 +21,14 @@ export function EventListSkeleton({
       <SkeletonGroup isLoading isSkeletonOnly>
         <View style={{ paddingTop: topInset + insets.top }}>
           {withFilterSummary && (
-          <View style={styles.summaryContainer}>
-            <SkeletonGroup.Item style={styles.summaryCount} className="rounded-md" />
-            <View style={styles.summaryTagsRow}>
-              <SkeletonGroup.Item style={styles.summaryTagWide} className="rounded-full" />
-              <SkeletonGroup.Item style={styles.summaryTag} className="rounded-full" />
-              <SkeletonGroup.Item style={styles.summaryTag} className="rounded-full" />
+            <View style={styles.summaryContainer}>
+              <SkeletonGroup.Item style={styles.summaryCount} className="rounded-md" />
+              <View style={styles.summaryTagsRow}>
+                <SkeletonGroup.Item style={styles.summaryTagWide} className="rounded-full" />
+                <SkeletonGroup.Item style={styles.summaryTag} className="rounded-full" />
+                <SkeletonGroup.Item style={styles.summaryTag} className="rounded-full" />
+              </View>
             </View>
-          </View>
           )}
 
           <View style={styles.gridContent}>

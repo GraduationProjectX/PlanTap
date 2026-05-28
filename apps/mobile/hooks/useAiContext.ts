@@ -41,7 +41,12 @@ function useAiContextInner(city: string | undefined, enabled: boolean) {
   const isLoading = (enabled && user === undefined) || events === undefined;
 
   if (isLoading) {
-    return { isLoading: true as const, userContext: null, events: null, unavailable: false as const };
+    return {
+      isLoading: true as const,
+      userContext: null,
+      events: null,
+      unavailable: false as const,
+    };
   }
 
   const userContext: UserContext | null = enabled

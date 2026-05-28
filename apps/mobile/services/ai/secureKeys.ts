@@ -6,8 +6,7 @@ export type AiProviderKey = "gemini" | "openai" | "claude";
 const SECURE_KEY_PREFIX = "plantap.ai-key.";
 
 /** Map provider → expo-secure-store key */
-const storeKey = (provider: AiProviderKey) =>
-  `${SECURE_KEY_PREFIX}${provider}` as const;
+const storeKey = (provider: AiProviderKey) => `${SECURE_KEY_PREFIX}${provider}` as const;
 
 /**
  * Env-variable fallback names, checked when SecureStore has no value.
@@ -23,9 +22,7 @@ const ENV_FALLBACK: Record<AiProviderKey, string | undefined> = {
  * Retrieve an API key for the given provider.
  * Fallback chain: SecureStore → env variable → null
  */
-export async function getApiKey(
-  provider: AiProviderKey,
-): Promise<string | null> {
+export async function getApiKey(provider: AiProviderKey): Promise<string | null> {
   try {
     const stored = await SecureStore.getItemAsync(storeKey(provider));
     if (stored) return stored;
@@ -36,10 +33,7 @@ export async function getApiKey(
 }
 
 /** Persist a user-provided API key in device Secure Store. */
-export async function setApiKey(
-  provider: AiProviderKey,
-  key: string,
-): Promise<void> {
+export async function setApiKey(provider: AiProviderKey, key: string): Promise<void> {
   await SecureStore.setItemAsync(storeKey(provider), key);
 }
 

@@ -2,12 +2,7 @@ import { initLlama, type LlamaContext } from "llama.rn";
 import { buildSystemPrompt, buildUserPrompt, AI_RESPONSE_GBNF } from "../prompts";
 import { rankEventsByRelevance } from "../eventRanker";
 import { validateResponse } from "../responseValidator";
-import type {
-  AiProvider,
-  EventSummary,
-  RecommendationResult,
-  UserContext,
-} from "../types";
+import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
 
 let _ctx: LlamaContext | null = null;
 let _ctxModelPath: string | null = null;
@@ -31,13 +26,7 @@ function getDeviceCores(): number {
     const modules = (global as any).NativeModules as Record<string, any> | undefined;
     const deviceInfo = modules?.DeviceInfo;
     const constants = deviceInfo?.getConstants?.();
-    const candidates = [
-      "NumberOfCores",
-      "NumberOfCPUs",
-      "ProcessorCount",
-      "cpuCount",
-      "numCores",
-    ];
+    const candidates = ["NumberOfCores", "NumberOfCPUs", "ProcessorCount", "cpuCount", "numCores"];
     for (const k of candidates) {
       const v = constants?.[k];
       if (isNumber(v) && v > 0) return v;
@@ -113,10 +102,7 @@ export async function releaseLocalModel(): Promise<void> {
   }
 }
 
-function compactLocalEvents(
-  events: EventSummary[],
-  userContext: UserContext,
-): EventSummary[] {
+function compactLocalEvents(events: EventSummary[], userContext: UserContext): EventSummary[] {
   const ranked = rankEventsByRelevance(events, userContext, LOCAL_RAG_EVENT_LIMIT);
 
   return ranked.map((event) => ({
@@ -180,17 +166,15 @@ export class LocalProvider implements AiProvider {
       const useCompactFirst = isCompactFirstModel(this.modelPath);
       const fallbackPrompt = buildLocalFallbackPrompt(userContext, compactEvents, userMessage);
 
-      const primary = await ctx.completion(
-        {
-          messages: [
-            { role: "system" as const, content: systemPrompt },
-            { role: "user" as const, content: useCompactFirst ? fallbackPrompt : userPrompt },
-          ],
-          n_predict: useCompactFirst ? LOCAL_RETRY_PREDICT : LOCAL_PRIMARY_PREDICT,
-          temperature: useCompactFirst ? 0 : 0.3,
-          grammar: AI_RESPONSE_GBNF,
-        },
-      );
+      const primary = await ctx.completion({
+        messages: [
+          { role: "system" as const, content: systemPrompt },
+          { role: "user" as const, content: useCompactFirst ? fallbackPrompt : userPrompt },
+        ],
+        n_predict: useCompactFirst ? LOCAL_RETRY_PREDICT : LOCAL_PRIMARY_PREDICT,
+        temperature: useCompactFirst ? 0 : 0.3,
+        grammar: AI_RESPONSE_GBNF,
+      });
 
       const primaryValidation = validateResponse(primary.text, candidateIds);
       if (primaryValidation.valid) {
@@ -198,22 +182,21 @@ export class LocalProvider implements AiProvider {
       }
 
       const errorMessage = primaryValidation.error ?? "Response validation failed";
-      const shouldRetry = !useCompactFirst && errorMessage.includes("Failed to parse provider response as JSON");
+      const shouldRetry =
+        !useCompactFirst && errorMessage.includes("Failed to parse provider response as JSON");
       if (!shouldRetry) {
         throw new Error(errorMessage);
       }
 
-      const fallback = await ctx.completion(
-        {
-          messages: [
-            { role: "system" as const, content: systemPrompt },
-            { role: "user" as const, content: fallbackPrompt },
-          ],
-          n_predict: LOCAL_RETRY_PREDICT,
-          temperature: 0,
-          grammar: AI_RESPONSE_GBNF,
-        },
-      );
+      const fallback = await ctx.completion({
+        messages: [
+          { role: "system" as const, content: systemPrompt },
+          { role: "user" as const, content: fallbackPrompt },
+        ],
+        n_predict: LOCAL_RETRY_PREDICT,
+        temperature: 0,
+        grammar: AI_RESPONSE_GBNF,
+      });
 
       const fallbackValidation = validateResponse(fallback.text, candidateIds);
       if (!fallbackValidation.valid) {

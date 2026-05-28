@@ -83,14 +83,9 @@ function eventMatchesCity(event: EventSummary, city: string): boolean {
   return location === normalizedCity || location.includes(normalizedCity);
 }
 
-function filterEventsForPrompt(
-  events: EventSummary[],
-  userContext: UserContext,
-): EventSummary[] {
+function filterEventsForPrompt(events: EventSummary[], userContext: UserContext): EventSummary[] {
   const city = userContext.city?.trim();
-  const locationFiltered = city
-    ? events.filter((event) => eventMatchesCity(event, city))
-    : events;
+  const locationFiltered = city ? events.filter((event) => eventMatchesCity(event, city)) : events;
 
   if (locationFiltered.length > MAX_RAG_EVENTS) {
     return rankEventsByRelevance(locationFiltered, userContext, MAX_RAG_EVENTS);
@@ -150,10 +145,7 @@ export function buildUserPrompt(
     2,
   );
 
-  const sanitized =
-    userMessage && userMessage.trim()
-      ? sanitizeUserNote(userMessage)
-      : null;
+  const sanitized = userMessage && userMessage.trim() ? sanitizeUserNote(userMessage) : null;
 
   // Sandwich pattern: data → note → data reminder → close.
   // The note sits between structured blocks so the model treats it as

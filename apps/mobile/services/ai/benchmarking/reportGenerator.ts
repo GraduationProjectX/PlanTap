@@ -15,7 +15,10 @@ export interface BenchmarkReport {
     ramMB?: number;
   };
   summaries: BenchmarkSummary[];
-  jailbreakResistanceByProvider: Record<string, { rate: number; attackTypeBreakdown: Record<string, number> }>;
+  jailbreakResistanceByProvider: Record<
+    string,
+    { rate: number; attackTypeBreakdown: Record<string, number> }
+  >;
   securityAnalysis: {
     mostResistantProvider: string;
     leastResistantProvider: string;
@@ -31,9 +34,7 @@ export function generateReport(
   jailbreakData: Record<string, { rate: number; breakdown: Record<string, number> }>,
   deviceInfo?: { model?: string; osVersion?: string; ramMB?: number },
 ): BenchmarkReport {
-  const sortedByResistance = Object.entries(jailbreakData).sort(
-    ([, a], [, b]) => b.rate - a.rate,
-  );
+  const sortedByResistance = Object.entries(jailbreakData).sort(([, a], [, b]) => b.rate - a.rate);
 
   return {
     timestamp: new Date().toISOString(),
@@ -49,8 +50,7 @@ export function generateReport(
     ),
     securityAnalysis: {
       mostResistantProvider: sortedByResistance[0]?.[0] || "N/A",
-      leastResistantProvider:
-        sortedByResistance[sortedByResistance.length - 1]?.[0] || "N/A",
+      leastResistantProvider: sortedByResistance[sortedByResistance.length - 1]?.[0] || "N/A",
       recommendations: [
         sortedByResistance[0]
           ? `${sortedByResistance[0][0]} shows highest jailbreak resistance (${sortedByResistance[0][1].rate}%)`
@@ -95,9 +95,7 @@ export function exportCSV(report: BenchmarkReport): string {
   }
 
   lines.push("\n# Jailbreak Resistance by Provider\n");
-  for (const [provider, data] of Object.entries(
-    report.jailbreakResistanceByProvider,
-  )) {
+  for (const [provider, data] of Object.entries(report.jailbreakResistanceByProvider)) {
     lines.push(`${provider},${data.rate}`);
     for (const [attackType, count] of Object.entries(data.attackTypeBreakdown)) {
       lines.push(`  ${attackType},${count}`);
@@ -128,12 +126,8 @@ export function exportMarkdown(report: BenchmarkReport): string {
   }
 
   lines.push("\n## Security Analysis\n");
-  lines.push(
-    `- **Most Resistant:** ${report.securityAnalysis.mostResistantProvider}\n`,
-  );
-  lines.push(
-    `- **Least Resistant:** ${report.securityAnalysis.leastResistantProvider}\n`,
-  );
+  lines.push(`- **Most Resistant:** ${report.securityAnalysis.mostResistantProvider}\n`);
+  lines.push(`- **Least Resistant:** ${report.securityAnalysis.leastResistantProvider}\n`);
 
   lines.push("\n### Recommendations\n");
   for (const rec of report.securityAnalysis.recommendations) {
@@ -172,9 +166,7 @@ export function formatForConsole(report: BenchmarkReport): string {
 
   lines.push("JAILBREAK RESISTANCE:");
   lines.push("─".repeat(60));
-  for (const [provider, data] of Object.entries(
-    report.jailbreakResistanceByProvider,
-  )) {
+  for (const [provider, data] of Object.entries(report.jailbreakResistanceByProvider)) {
     lines.push(`${provider.padEnd(12)} ${data.rate}% resistant`);
   }
 

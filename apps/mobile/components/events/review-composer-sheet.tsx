@@ -45,12 +45,7 @@ export function ReviewComposerSheet({
               <Text style={[composerStyles.ratingLabel, { textAlign }]}>
                 {t("eventDetail.yourRating")}
               </Text>
-              <StarRating
-                rating={rating}
-                size={28}
-                interactive
-                onRatingChange={onRatingChange}
-              />
+              <StarRating rating={rating} size={28} interactive onRatingChange={onRatingChange} />
             </View>
 
             <TextArea

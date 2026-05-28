@@ -40,7 +40,7 @@ export default function GoogleAuthButton() {
       {isLoading ? (
         <Spinner entering={FadeIn.delay(50)} color={theme.colors.text} size="sm" />
       ) : (
-        <GoogleIcon/>
+        <GoogleIcon />
       )}
       <Button.Label style={styles.label}>
         {isLoading ? "Signing in..." : "Continue with Google"}

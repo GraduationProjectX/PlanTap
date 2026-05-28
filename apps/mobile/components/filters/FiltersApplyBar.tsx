@@ -18,7 +18,13 @@ export function FiltersApplyBar({ onApply }: FiltersApplyBarProps) {
 
   return (
     <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 16 }]}>
-      <Button variant="primary" size="lg" feedbackVariant="scale" onPress={onApply} style={styles.applyBtn}>
+      <Button
+        variant="primary"
+        size="lg"
+        feedbackVariant="scale"
+        onPress={onApply}
+        style={styles.applyBtn}
+      >
         <Button.Label style={styles.applyLabel}>{t("filters.apply")}</Button.Label>
         <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={16} color="#FFF" />
       </Button>

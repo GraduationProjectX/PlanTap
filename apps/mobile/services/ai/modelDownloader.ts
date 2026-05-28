@@ -112,9 +112,7 @@ function formatBytes(bytes: number): string {
 function getEstimatedRamBytes(): number | null {
   try {
     const deviceInfo = NativeModules.DeviceInfo;
-    const constants = isFunction(deviceInfo?.getConstants)
-      ? deviceInfo.getConstants()
-      : null;
+    const constants = isFunction(deviceInfo?.getConstants) ? deviceInfo.getConstants() : null;
     const totalMemory = constants?.TotalMemory;
     if (isNumber(totalMemory) && Number.isFinite(totalMemory)) {
       return totalMemory;
@@ -138,10 +136,8 @@ async function getStorageInfo(): Promise<{
     }
 
     return {
-      freeSpaceBytes:
-        isNumber(info.freeSpace) ? info.freeSpace : null,
-      totalSpaceBytes:
-        isNumber(info.totalSpace) ? info.totalSpace : null,
+      freeSpaceBytes: isNumber(info.freeSpace) ? info.freeSpace : null,
+      totalSpaceBytes: isNumber(info.totalSpace) ? info.totalSpace : null,
     };
   } catch {
     return { freeSpaceBytes: null, totalSpaceBytes: null };
@@ -159,9 +155,7 @@ export function buildCustomModelEntry(url: string): ModelEntry {
     throw new Error("Custom URL must point directly to a .gguf file.");
   }
 
-  const page = cleanUrl.includes("/resolve/")
-    ? cleanUrl.split("/resolve/")[0]
-    : cleanUrl;
+  const page = cleanUrl.includes("/resolve/") ? cleanUrl.split("/resolve/")[0] : cleanUrl;
 
   return {
     id: `custom-${filename.toLowerCase()}`,
@@ -175,24 +169,20 @@ export function buildCustomModelEntry(url: string): ModelEntry {
   };
 }
 
-export async function assessDeviceSupport(
-  model: ModelEntry,
-): Promise<ModelSupportAssessment> {
+export async function assessDeviceSupport(model: ModelEntry): Promise<ModelSupportAssessment> {
   const { freeSpaceBytes, totalSpaceBytes } = await getStorageInfo();
   const estimatedRamBytes = getEstimatedRamBytes();
 
   const requiredDownloadBytes =
-    model.sizeBytes > 0
-      ? Math.ceil(model.sizeBytes * STORAGE_SAFETY_FACTOR)
-      : 0;
+    model.sizeBytes > 0 ? Math.ceil(model.sizeBytes * STORAGE_SAFETY_FACTOR) : 0;
 
   const canDownload =
     requiredDownloadBytes === 0 ||
     freeSpaceBytes == null ||
     freeSpaceBytes >= requiredDownloadBytes;
 
-  const estimatedRuntimeBytes = model.minRamBytes ??
-    (model.sizeBytes > 0 ? Math.ceil(model.sizeBytes * 2.6) : 0);
+  const estimatedRuntimeBytes =
+    model.minRamBytes ?? (model.sizeBytes > 0 ? Math.ceil(model.sizeBytes * 2.6) : 0);
 
   const likelyCanRun =
     estimatedRuntimeBytes === 0 ||
@@ -233,10 +223,9 @@ export async function assessDeviceSupport(
     canDownload: true,
     likelyCanRun: true,
     tier: "good",
-    reason:
-      model.recommendedForMobile
-        ? "Good fit for most modern phones."
-        : "Should run on mid/high-end devices.",
+    reason: model.recommendedForMobile
+      ? "Good fit for most modern phones."
+      : "Should run on mid/high-end devices.",
     freeSpaceBytes,
     totalSpaceBytes,
     estimatedRamBytes,
@@ -322,9 +311,16 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
   // Re-check free space with more accurate size when available
   const { freeSpaceBytes } = await getStorageInfo();
   const expectedSize = serverContentLength ?? (model.sizeBytes > 0 ? model.sizeBytes : 0);
-  const requiredDownloadBytes = expectedSize > 0 ? Math.ceil(expectedSize * STORAGE_SAFETY_FACTOR) : 0;
-  if (requiredDownloadBytes > 0 && freeSpaceBytes != null && freeSpaceBytes < requiredDownloadBytes) {
-    throw new Error(`Insufficient free storage for ${model.label}. Need about ${formatBytes(requiredDownloadBytes)}.`);
+  const requiredDownloadBytes =
+    expectedSize > 0 ? Math.ceil(expectedSize * STORAGE_SAFETY_FACTOR) : 0;
+  if (
+    requiredDownloadBytes > 0 &&
+    freeSpaceBytes != null &&
+    freeSpaceBytes < requiredDownloadBytes
+  ) {
+    throw new Error(
+      `Insufficient free storage for ${model.label}. Need about ${formatBytes(requiredDownloadBytes)}.`,
+    );
   }
 
   // If already downloaded and matches expected size, short-circuit
@@ -335,7 +331,11 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
       if (expectedSize === 0 || (expectedSize > 0 && actualSize === expectedSize)) {
         store.setDownloadComplete(destPath);
         // persist metadata if available
-        store.setLocalModelMeta({ filename: model.filename, sizeBytes: expectedSize || null, etag: serverEtag ?? null });
+        store.setLocalModelMeta({
+          filename: model.filename,
+          sizeBytes: expectedSize || null,
+          etag: serverEtag ?? null,
+        });
         return destPath;
       }
       // Mismatched size — remove and re-download
@@ -379,7 +379,8 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
             useAiStore.getState().setDownloadCanResume(true);
           },
           progress: (res) => {
-            const total = (res.contentLength && res.contentLength > 0) ? res.contentLength : serverContentLength;
+            const total =
+              res.contentLength && res.contentLength > 0 ? res.contentLength : serverContentLength;
             let progress = 0;
             if (total && total > 0) {
               progress = Math.round((res.bytesWritten / total) * 100);
@@ -402,11 +403,19 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
               try {
                 const st = await RNFS.stat(tempPath);
                 const size = Number(st.size);
-                if (serverContentLength && serverContentLength > 0 && size !== serverContentLength) {
+                if (
+                  serverContentLength &&
+                  serverContentLength > 0 &&
+                  size !== serverContentLength
+                ) {
                   // corrupted/incomplete
                   await RNFS.unlink(tempPath).catch(() => {});
                   useAiStore.getState().cancelDownload();
-                  reject(new Error(`Downloaded file size ${size} does not match expected ${serverContentLength}`));
+                  reject(
+                    new Error(
+                      `Downloaded file size ${size} does not match expected ${serverContentLength}`,
+                    ),
+                  );
                   return;
                 }
               } catch {
@@ -438,7 +447,11 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
 
               useAiStore.getState().setDownloadComplete(destPath);
               // save metadata
-              store.setLocalModelMeta({ filename: model.filename, sizeBytes: serverContentLength ?? (model.sizeBytes > 0 ? model.sizeBytes : null), etag: serverEtag ?? null });
+              store.setLocalModelMeta({
+                filename: model.filename,
+                sizeBytes: serverContentLength ?? (model.sizeBytes > 0 ? model.sizeBytes : null),
+                etag: serverEtag ?? null,
+              });
               resolve(destPath);
             } else {
               useAiStore.getState().cancelDownload();
@@ -514,7 +527,8 @@ export async function downloadModel(model: ModelEntry): Promise<string> {
   } catch (err) {
     const shouldKeepTemp =
       err instanceof Error &&
-      (err.message === "Download paused" || err.message === "Network disconnected during download; resume available");
+      (err.message === "Download paused" ||
+        err.message === "Network disconnected during download; resume available");
     if (!shouldKeepTemp) {
       try {
         if (await RNFS.exists(tempPath)) {

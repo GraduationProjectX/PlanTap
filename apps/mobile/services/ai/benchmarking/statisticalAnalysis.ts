@@ -19,8 +19,7 @@ export function standardDeviation(values: number[]): number {
   if (values.length < 2) return 0;
   const avg = mean(values);
   const variance =
-    values.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) /
-    (values.length - 1);
+    values.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / (values.length - 1);
   return Math.sqrt(variance);
 }
 
@@ -82,7 +81,10 @@ export function calculateMetrics(
  * Two-sample t-test to compare means of two groups.
  * Returns p-value (lower = more significant difference).
  */
-export function tTest(group1: number[], group2: number[]): {
+export function tTest(
+  group1: number[],
+  group2: number[],
+): {
   tStatistic: number;
   pValue: number;
   significant: boolean;
@@ -105,8 +107,7 @@ export function tTest(group1: number[], group2: number[]): {
   const tStatistic = (mean1 - mean2) / (stdErr || 1);
 
   // Approximate p-value using normal distribution (valid for n > 30)
-  const pValue =
-    2 * (1 - Math.min(0.9999, Math.abs(tStatistic) / 3.29));
+  const pValue = 2 * (1 - Math.min(0.9999, Math.abs(tStatistic) / 3.29));
 
   return {
     tStatistic,

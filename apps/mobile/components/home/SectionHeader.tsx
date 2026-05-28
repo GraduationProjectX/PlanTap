@@ -8,11 +8,7 @@ type SectionHeaderProps = {
   onAction?: () => void;
 };
 
-export function SectionHeader({
-  title,
-  actionLabel,
-  onAction,
-}: SectionHeaderProps) {
+export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderProps) {
   const { flexDirection, textAlign } = useDirection();
 
   return (

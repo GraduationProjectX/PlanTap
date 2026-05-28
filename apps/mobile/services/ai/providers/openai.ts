@@ -2,12 +2,7 @@ import OpenAI from "openai";
 import { getApiKey } from "../secureKeys";
 import { buildSystemPrompt, buildUserPrompt } from "../prompts";
 import { validateResponse } from "../responseValidator";
-import type {
-  AiProvider,
-  EventSummary,
-  RecommendationResult,
-  UserContext,
-} from "../types";
+import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
 
 export class OpenAIProvider implements AiProvider {
   readonly name = "OpenAI";

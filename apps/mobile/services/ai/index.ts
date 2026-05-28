@@ -5,12 +5,22 @@
  * user has selected in the AI settings store.
  */
 
-export { type AiProvider, type EventSummary, type RecommendationResult, type UserContext } from "./types";
+export {
+  type AiProvider,
+  type EventSummary,
+  type RecommendationResult,
+  type UserContext,
+} from "./types";
 export { getApiKey, setApiKey, clearApiKey } from "./secureKeys";
 export { releaseLocalModel } from "./providers/local";
 
 import { useAiStore } from "@/stores/ai-store";
-import type { AiProvider as IAiProvider, EventSummary, RecommendationResult, UserContext } from "./types";
+import type {
+  AiProvider as IAiProvider,
+  EventSummary,
+  RecommendationResult,
+  UserContext,
+} from "./types";
 import { GeminiProvider } from "./providers/gemini";
 import { OpenAIProvider } from "./providers/openai";
 import { ClaudeProvider } from "./providers/claude";

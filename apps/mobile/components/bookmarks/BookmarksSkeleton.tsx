@@ -8,9 +8,7 @@ type BookmarksSkeletonProps = {
   topInset?: number;
 };
 
-export function BookmarksSkeleton({
-  topInset = 0,
-}: BookmarksSkeletonProps) {
+export function BookmarksSkeleton({ topInset = 0 }: BookmarksSkeletonProps) {
   return (
     <View style={styles.root}>
       <SkeletonGroup isLoading isSkeletonOnly>

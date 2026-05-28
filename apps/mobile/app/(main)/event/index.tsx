@@ -21,7 +21,11 @@ import {
   normalizeEventListType,
   type EventListType,
 } from "@/features/events/data";
-import { buildFilterSummaryTags, getCityOptions, removeFilterBySummaryTag } from "@/features/filters/utils";
+import {
+  buildFilterSummaryTags,
+  getCityOptions,
+  removeFilterBySummaryTag,
+} from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 

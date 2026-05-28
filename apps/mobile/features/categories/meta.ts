@@ -2,7 +2,10 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import type { OnboardingTagOption } from "@/features/onboarding/types";
 
-const CATEGORY_ICON_NAME_BY_TOKEN: Record<string, React.ComponentProps<typeof FontAwesome>["name"]> = {
+const CATEGORY_ICON_NAME_BY_TOKEN: Record<
+  string,
+  React.ComponentProps<typeof FontAwesome>["name"]
+> = {
   all: "th-large",
   grid: "th-large",
   sports: "futbol-o",

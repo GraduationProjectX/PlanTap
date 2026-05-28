@@ -32,11 +32,7 @@ export type UserContext = {
   pastEventTags?: string[];
 };
 
-export type RecommendationType =
-  | "recommendations"
-  | "no_matches"
-  | "follow_up"
-  | "invalid_prompt";
+export type RecommendationType = "recommendations" | "no_matches" | "follow_up" | "invalid_prompt";
 
 /** The structured response we expect from every provider. */
 export type RecommendationResult =
