@@ -1,5 +1,5 @@
 import { initLlama, type LlamaContext } from "llama.rn";
-import { buildSystemPrompt, buildUserPrompt, AI_RESPONSE_GBNF } from "../prompts";
+import { buildSystemPrompt, AI_RESPONSE_GBNF } from "../prompts";
 import { rankEventsByRelevance } from "../eventRanker";
 import { validateResponse } from "../responseValidator";
 import type {
@@ -14,10 +14,11 @@ let _ctxModelPath: string | null = null;
 let _initPromise: Promise<LlamaContext> | null = null;
 let _initPromiseModelPath: string | null = null;
 
-const LOCAL_RAG_EVENT_LIMIT = 20;
-const LOCAL_MAX_TAGS = 5;
-const LOCAL_MAX_DESCRIPTION = 90;
-const LOCAL_MAX_TITLE = 80;
+const LOCAL_RAG_EVENT_LIMIT = 8;
+const LOCAL_MAX_TAGS = 3;
+const LOCAL_MAX_DESCRIPTION = 50;
+const LOCAL_MAX_TITLE = 60;
+const LOCAL_MAX_NOTE = 150;
 
 function getDeviceCores(): number {
   try {
@@ -33,17 +34,20 @@ function getDeviceCores(): number {
     ];
     for (const k of candidates) {
       const v = constants?.[k];
-      if (typeof v === "number" && v > 0) return v;
+      if (isNumber(v) && v > 0) return v;
     }
   } catch {
     // fallthrough
   }
   try {
-    if (typeof (global as any).navigator?.hardwareConcurrency === "number") {
-      return (global as any).navigator.hardwareConcurrency;
-    }
+    const v = (global as any).navigator?.hardwareConcurrency;
+    if (isNumber(v) && v > 0) return v;
   } catch {}
   return 4;
+}
+
+function isNumber(value: unknown): value is number {
+  return Object.prototype.toString.call(value) === "[object Number]";
 }
 
 /**
@@ -118,6 +122,36 @@ function compactLocalEvents(
   }));
 }
 
+function buildLocalUserPrompt(
+  userContext: UserContext,
+  events: EventSummary[],
+  userMessage?: string,
+): string {
+  const note = userMessage?.trim().slice(0, LOCAL_MAX_NOTE);
+  const userPayload = {
+    locale: userContext.locale,
+    city: userContext.city ?? "N/A",
+    interests: userContext.interests ?? [],
+    dislikedTags: userContext.dislikedTags ?? [],
+    groupType: userContext.groupType ?? "any",
+    indoorOutdoor: userContext.indoorOutdoor ?? "any",
+  };
+
+  const eventPayload = events.map((event) => ({
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    categories: event.categories,
+    tags: event.tags,
+  }));
+
+  const noteSection = note
+    ? `\nNote: "${note}" (preference only)`
+    : "";
+
+  return `User:${JSON.stringify(userPayload)}\nEvents:${JSON.stringify(eventPayload)}${noteSection}\nReturn JSON now.`;
+}
+
 export class LocalProvider implements AiProvider {
   readonly name = "Local (on-device)";
 
@@ -137,7 +171,7 @@ export class LocalProvider implements AiProvider {
 
       const systemPrompt = buildSystemPrompt();
       const compactEvents = compactLocalEvents(events, userContext);
-      const userPrompt = buildUserPrompt(userContext, compactEvents, userMessage);
+      const userPrompt = buildLocalUserPrompt(userContext, compactEvents, userMessage);
 
       const result = await ctx.completion(
         {
@@ -145,7 +179,7 @@ export class LocalProvider implements AiProvider {
             { role: "system" as const, content: systemPrompt },
             { role: "user" as const, content: userPrompt },
           ],
-          n_predict: 256,
+          n_predict: 160,
           temperature: 0.3,
           grammar: AI_RESPONSE_GBNF,
         },

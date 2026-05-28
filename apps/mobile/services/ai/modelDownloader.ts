@@ -540,6 +540,8 @@ export async function pauseDownload(): Promise<void> {
   if (_currentJobId != null) {
     _pauseRequested = true;
     RNFS?.stopDownload(_currentJobId);
+    useAiStore.getState().setDownloadPaused();
+    useAiStore.getState().setDownloadCanResume(true);
   }
 }
 
@@ -588,6 +590,9 @@ export async function deleteModel(filename: string): Promise<void> {
   if (!RNFS) {
     return;
   }
+
+  const { releaseLocalModel } = require("./providers/local");
+  await releaseLocalModel();
 
   const path = modelFilePath(filename);
   if (await RNFS.exists(path)) {

@@ -279,7 +279,7 @@ export default function SuggestScreen() {
                   : t("ai.noMatchesTitle")}
             </BottomSheet.Title>
             <BottomSheet.Description style={styles.sheetDescription}>
-              {sheetResponse?.message ?? ""}
+              {sheetResponse && "message" in sheetResponse ? sheetResponse.message : ""}
             </BottomSheet.Description>
 
             {sheetResponse?.type === "invalid_prompt" && sheetResponse.examples && (

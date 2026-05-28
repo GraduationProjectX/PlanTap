@@ -13,9 +13,14 @@ import type { EventSummary, UserContext } from "@/services/ai/types";
 let api: any;
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  api = require("backend/convex/_generated/api").api;
+  api = require("@/convex/_generated/api").api;
 } catch {
-  api = null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    api = require("backend/convex/_generated/api").api;
+  } catch {
+    api = null;
+  }
 }
 
 const UNAVAILABLE_RESULT = {
@@ -31,7 +36,7 @@ const UNAVAILABLE_RESULT = {
  */
 function useAiContextInner(city: string | undefined, enabled: boolean) {
   const user = useQuery(api.users.current, enabled ? {} : "skip");
-  const events = useQuery(api.events.listApproved, { city, limit: 100 });
+  const events = useQuery(api.events.list, city ? { city } : {});
 
   const isLoading = (enabled && user === undefined) || events === undefined;
 
@@ -53,7 +58,7 @@ function useAiContextInner(city: string | undefined, enabled: boolean) {
       }
     : null;
 
-  const eventSummaries: EventSummary[] = (events ?? []).map((e: any) => ({
+  const eventSummaries: EventSummary[] = (events ?? []).slice(0, 100).map((e: any) => ({
     id: e._id,
     title: e.title,
     categories: e.categories,

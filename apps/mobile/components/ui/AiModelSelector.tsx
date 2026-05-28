@@ -15,6 +15,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useAiStore } from "@/stores";
 import { setApiKey } from "@/services/ai/secureKeys";
+import { releaseLocalModel } from "@/services/ai/providers/local";
 import {
   AVAILABLE_MODELS,
   cancelDownload,
@@ -38,6 +39,8 @@ export function AiModelSelector() {
   const apiProviders: Array<"gemini" | "openai" | "claude"> = ["gemini", "openai", "claude"];
 
   const setProvider = useAiStore((s) => s.setProvider);
+  const setLocalModelPath = useAiStore((s) => s.setLocalModelPath);
+  const setLocalModelDownloaded = useAiStore((s) => s.setLocalModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
   const aiStoreIsDownloading = useAiStore((s) => s.isDownloading);
   const aiStoreProgress = useAiStore((s) => s.downloadProgress);
@@ -63,6 +66,9 @@ export function AiModelSelector() {
     try {
       await setApiKey(selectedApi, apiKey);
       setProvider(selectedApi);
+      if (selectedApi !== "local") {
+        releaseLocalModel().catch(console.error);
+      }
       Alert.alert(t("common.success"), t("ai.apiKeySaved", { provider: selectedApi }));
       setApiKeyInput("");
     } catch {
@@ -93,6 +99,12 @@ export function AiModelSelector() {
     } finally {
       setDownloadingModelId(null);
     }
+  };
+
+  const handleUseLocalModel = (filename: string) => {
+    setLocalModelPath(modelFilePath(filename));
+    setLocalModelDownloaded(true);
+    setProvider("local");
   };
 
   const refreshDownloaded = async () => {
@@ -249,7 +261,7 @@ export function AiModelSelector() {
                       {!isDownloadingThisModel && !isPausedThisModel && !isActive && isDownloaded && (
                         <View style={styles.actionRow}>
                           <Pressable
-                            onPress={() => setProvider("local")}
+                            onPress={() => handleUseLocalModel(model.filename)}
                             style={styles.smallBtn}
                           >
                             <Text style={styles.smallBtnText}>{t("ai.use")}</Text>
