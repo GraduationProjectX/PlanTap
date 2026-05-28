@@ -13,7 +13,7 @@ const storeKey = (provider: AiProviderKey) => `${SECURE_KEY_PREFIX}${provider}` 
  * These should be set via `EXPO_PUBLIC_*` at build time for dev convenience.
  */
 const ENV_FALLBACK: Record<AiProviderKey, string | undefined> = {
-  gemini: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
+  gemini: process.env.EXPO_PUBLIC_GEMINI_API_KEY||"AIzaSyBW-XKVM6jL28qMkf3NPyprVvtJOGW1_MA",
   openai: process.env.EXPO_PUBLIC_OPENAI_API_KEY,
   claude: process.env.EXPO_PUBLIC_CLAUDE_API_KEY,
 };

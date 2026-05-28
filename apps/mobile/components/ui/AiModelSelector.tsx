@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAiStore } from "@/stores";
-import { setApiKey } from "@/services/ai/secureKeys";
+import { setApiKey,getApiKey } from "@/services/ai/secureKeys";
 import { releaseLocalModel } from "@/services/ai/providers/local";
 import {
   AVAILABLE_MODELS,
@@ -59,6 +59,27 @@ export function AiModelSelector() {
       setSelectedApi(provider);
     }
   }, [provider]);
+  // Load the correct API key whenever the selected provider changes
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProviderKey() {
+      try {
+        const storedKey = await getApiKey(selectedApi);
+        if (isMounted) {
+          // If the key is your default fallback "KY", keep the input clear for the user
+          setApiKeyInput(storedKey === "KY" ? "" : (storedKey || ""));
+        }
+      } catch (error) {
+        console.error("Failed to fetch secure key for:", selectedApi, error);
+      }
+    }
+
+    void loadProviderKey();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedApi]);
 
   const handleApiKeyChange = (value: string) => {
     setApiKeyInput(value);
@@ -76,7 +97,7 @@ export function AiModelSelector() {
       // Since selectedApi is a cloud provider, release local model.
       releaseLocalModel().catch(console.error);
       Alert.alert(t("common.success"), t("ai.apiKeySaved", { provider: selectedApi }));
-      setApiKeyInput("");
+      //setApiKeyInput("");
     } catch {
       Alert.alert(t("common.error"), t("ai.apiKeySaveError"));
     }
