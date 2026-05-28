@@ -1,5 +1,5 @@
 import { initLlama, type LlamaContext } from "llama.rn";
-import { buildSystemPrompt, AI_RESPONSE_GBNF } from "../prompts";
+import { buildSystemPrompt, buildUserPrompt, AI_RESPONSE_GBNF } from "../prompts";
 import { rankEventsByRelevance } from "../eventRanker";
 import { validateResponse } from "../responseValidator";
 import type {
@@ -18,7 +18,13 @@ const LOCAL_RAG_EVENT_LIMIT = 8;
 const LOCAL_MAX_TAGS = 3;
 const LOCAL_MAX_DESCRIPTION = 50;
 const LOCAL_MAX_TITLE = 60;
-const LOCAL_MAX_NOTE = 150;
+const LOCAL_RETRY_PREDICT = 120;
+const LOCAL_PRIMARY_PREDICT = 160;
+
+function isCompactFirstModel(modelPath: string): boolean {
+  const lower = modelPath.toLowerCase();
+  return !lower.includes("qwen");
+}
 
 function getDeviceCores(): number {
   try {
@@ -122,13 +128,12 @@ function compactLocalEvents(
   }));
 }
 
-function buildLocalUserPrompt(
+function buildLocalFallbackPrompt(
   userContext: UserContext,
   events: EventSummary[],
   userMessage?: string,
 ): string {
-  const note = userMessage?.trim().slice(0, LOCAL_MAX_NOTE);
-  const userPayload = {
+  const compactUser = {
     locale: userContext.locale,
     city: userContext.city ?? "N/A",
     interests: userContext.interests ?? [],
@@ -137,19 +142,16 @@ function buildLocalUserPrompt(
     indoorOutdoor: userContext.indoorOutdoor ?? "any",
   };
 
-  const eventPayload = events.map((event) => ({
+  const compactEvents = events.map((event) => ({
     id: event.id,
     title: event.title,
-    description: event.description,
     categories: event.categories,
     tags: event.tags,
   }));
 
-  const noteSection = note
-    ? `\nNote: "${note}" (preference only)`
-    : "";
+  const note = userMessage?.trim() ? `\nNote: ${userMessage.trim()}` : "";
 
-  return `User:${JSON.stringify(userPayload)}\nEvents:${JSON.stringify(eventPayload)}${noteSection}\nReturn JSON now.`;
+  return `User:${JSON.stringify(compactUser)}\nEvents:${JSON.stringify(compactEvents)}${note}\nReturn ONLY JSON with one of these shapes:\n{"type":"recommendations","eventIds":["id1","id2","id3"]}\n{"type":"no_matches","message":"..."}\n{"type":"follow_up","message":"..."}\n{"type":"invalid_prompt","message":"..."}`;
 }
 
 export class LocalProvider implements AiProvider {
@@ -171,26 +173,53 @@ export class LocalProvider implements AiProvider {
 
       const systemPrompt = buildSystemPrompt();
       const compactEvents = compactLocalEvents(events, userContext);
-      const userPrompt = buildLocalUserPrompt(userContext, compactEvents, userMessage);
+      const userPrompt = buildUserPrompt(userContext, compactEvents, userMessage);
 
-      const result = await ctx.completion(
+      const candidateIds = new Set(compactEvents.map((e) => e.id));
+
+      const useCompactFirst = isCompactFirstModel(this.modelPath);
+      const fallbackPrompt = buildLocalFallbackPrompt(userContext, compactEvents, userMessage);
+
+      const primary = await ctx.completion(
         {
           messages: [
             { role: "system" as const, content: systemPrompt },
-            { role: "user" as const, content: userPrompt },
+            { role: "user" as const, content: useCompactFirst ? fallbackPrompt : userPrompt },
           ],
-          n_predict: 160,
-          temperature: 0.3,
+          n_predict: useCompactFirst ? LOCAL_RETRY_PREDICT : LOCAL_PRIMARY_PREDICT,
+          temperature: useCompactFirst ? 0 : 0.3,
           grammar: AI_RESPONSE_GBNF,
         },
       );
 
-      const candidateIds = new Set(compactEvents.map((e) => e.id));
-      const validation = validateResponse(result.text, candidateIds);
-      if (!validation.valid) {
-        throw new Error(validation.error || "Response validation failed");
+      const primaryValidation = validateResponse(primary.text, candidateIds);
+      if (primaryValidation.valid) {
+        return primaryValidation.result!;
       }
-      return validation.result!;
+
+      const errorMessage = primaryValidation.error ?? "Response validation failed";
+      const shouldRetry = !useCompactFirst && errorMessage.includes("Failed to parse provider response as JSON");
+      if (!shouldRetry) {
+        throw new Error(errorMessage);
+      }
+
+      const fallback = await ctx.completion(
+        {
+          messages: [
+            { role: "system" as const, content: systemPrompt },
+            { role: "user" as const, content: fallbackPrompt },
+          ],
+          n_predict: LOCAL_RETRY_PREDICT,
+          temperature: 0,
+          grammar: AI_RESPONSE_GBNF,
+        },
+      );
+
+      const fallbackValidation = validateResponse(fallback.text, candidateIds);
+      if (!fallbackValidation.valid) {
+        throw new Error(fallbackValidation.error || "Response validation failed");
+      }
+      return fallbackValidation.result!;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       throw new Error(`Local model failed: ${message}`);

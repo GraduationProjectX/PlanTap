@@ -128,17 +128,65 @@ function normalizeProviderJsonText(raw: string): string {
     text = fenceMatch[1].trim();
   }
 
-  // If there is any leading/trailing chatter, try to extract the first JSON object.
-  const firstBrace = text.indexOf("{");
-  const lastBrace = text.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    text = text.slice(firstBrace, lastBrace + 1).trim();
+  // Remove leading control characters and zero-width markers that can
+  // appear before the JSON payload.
+  text = text.replace(/^[\u0000-\u001F\u200B-\u200D\uFEFF]+/g, "");
+
+  const balancedJson = extractBalancedJsonObject(text);
+  if (balancedJson) {
+    text = balancedJson;
   }
 
-  // Remove leading control characters before the JSON object.
-  text = text.replace(/^[\u0000-\u001F]+/g, "");
-
   return text;
+}
+
+function extractBalancedJsonObject(text: string): string | null {
+  let startIndex = -1;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+
+    if (startIndex === -1) {
+      if (char === "{") {
+        startIndex = index;
+        depth = 1;
+      }
+      continue;
+    }
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (char === "{") {
+      depth += 1;
+      continue;
+    }
+
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return text.slice(startIndex, index + 1).trim();
+      }
+    }
+  }
+
+  return null;
 }
 
 /**

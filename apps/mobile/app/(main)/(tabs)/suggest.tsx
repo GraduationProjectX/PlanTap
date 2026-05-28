@@ -53,12 +53,6 @@ export default function SuggestScreen() {
   const { events: fullEvents, isLoading: isFullEventsLoading } = useEvents(resolvedCity, true);
 
   useEffect(() => {
-    if (!selectedCity && resolvedCity) {
-      setSelectedCity(resolvedCity);
-    }
-  }, [resolvedCity, selectedCity]);
-
-  useEffect(() => {
     if (!response) {
       return;
     }
@@ -128,6 +122,8 @@ export default function SuggestScreen() {
     <ScrollView
       style={styles.scroll}
       contentContainerStyle={styles.container}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
     >
       <Text style={[styles.title, { textAlign }]}>{t("tabs.suggest")}</Text>
       <Text style={[styles.subtitle, { textAlign }]}>
@@ -139,7 +135,7 @@ export default function SuggestScreen() {
 
       {provider === "local" && (!localModelDownloaded || !localModelPath) && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>
+          <Text style={styles.errorText} selectable>
             {t("ai.localModelMissing")}
           </Text>
         </View>
@@ -147,20 +143,20 @@ export default function SuggestScreen() {
 
       {isLoaded && !isSignedIn && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{t("ai.signInPrompt")}</Text>
+          <Text style={styles.errorText} selectable>{t("ai.signInPrompt")}</Text>
         </View>
       )}
 
       {isAuthenticated && convexData.isLoading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t("ai.loadingConvex")}</Text>
+          <Text style={styles.loadingText} selectable>{t("ai.loadingConvex")}</Text>
         </View>
       )}
 
       {convexData.unavailable && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>
+          <Text style={styles.errorText} selectable>
             {t("ai.convexUnavailable")}
           </Text>
         </View>
@@ -177,7 +173,7 @@ export default function SuggestScreen() {
 
       {/* ---------- City selection ---------- */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>{t("ai.cityLabel")}</Text>
+          <Text style={styles.inputLabel} selectable>{t("ai.cityLabel")}</Text>
         <Select
           presentation="bottom-sheet"
           value={resolvedCity ? { value: resolvedCity, label: resolvedCity } : undefined}
@@ -211,7 +207,7 @@ export default function SuggestScreen() {
 
       {/* ---------- User note ---------- */}
       <View style={styles.inputSection}>
-        <Text style={styles.inputLabel}>{t("ai.userNoteLabel")}</Text>
+        <Text style={styles.inputLabel} selectable>{t("ai.userNoteLabel")}</Text>
         <TextInput
           style={styles.textInput}
           value={userNote}
@@ -222,7 +218,7 @@ export default function SuggestScreen() {
           maxLength={300}
           textAlignVertical="top"
         />
-        <Text style={styles.charCount}>{userNote.length}/300</Text>
+        <Text style={styles.charCount} selectable>{userNote.length}/300</Text>
       </View>
 
       {/* ---------- Run ---------- */}
@@ -239,7 +235,7 @@ export default function SuggestScreen() {
         {isLoading ? (
           <ActivityIndicator color="#fff" size="small" />
         ) : (
-          <Text style={styles.btnText}>
+          <Text style={styles.btnText} selectable>
             {t("ai.getSuggestions")}
           </Text>
         )}
@@ -248,7 +244,7 @@ export default function SuggestScreen() {
       {/* ---------- Error ---------- */}
       {error && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorText} selectable>{error}</Text>
         </View>
       )}
 
@@ -262,7 +258,7 @@ export default function SuggestScreen() {
 
       {!isFullEventsLoading && eventIds.length > 0 && recommendedEvents.length === 0 && (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{t("ai.recommendationsMissing")}</Text>
+          <Text style={styles.errorText} selectable>{t("ai.recommendationsMissing")}</Text>
         </View>
       )}
 

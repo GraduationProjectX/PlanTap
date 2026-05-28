@@ -39,6 +39,7 @@ export function AiModelSelector() {
   const apiProviders: Array<"gemini" | "openai" | "claude"> = ["gemini", "openai", "claude"];
 
   const setProvider = useAiStore((s) => s.setProvider);
+  const provider = useAiStore((s) => s.provider);
   const setLocalModelPath = useAiStore((s) => s.setLocalModelPath);
   const setLocalModelDownloaded = useAiStore((s) => s.setLocalModelDownloaded);
   const localModelPath = useAiStore((s) => s.localModelPath);
@@ -52,6 +53,12 @@ export function AiModelSelector() {
   const [selectedApi, setSelectedApi] = useState<"gemini" | "openai" | "claude">("gemini");
   const [downloadingModelId, setDownloadingModelId] = useState<string | null>(null);
   const [downloadedById, setDownloadedById] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (provider !== "local") {
+      setSelectedApi(provider);
+    }
+  }, [provider]);
 
   const handleApiKeyChange = (value: string) => {
     setApiKeyInput(value);
