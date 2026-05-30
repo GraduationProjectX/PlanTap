@@ -1,5 +1,6 @@
 import { initLlama, type LlamaContext } from "llama.rn";
-import { buildSystemPrompt, buildUserPrompt, AI_RESPONSE_GBNF } from "../prompts";
+import { NativeModules } from "react-native";
+import { buildPromptPayload, buildSystemPrompt, AI_RESPONSE_GBNF } from "../prompts";
 import { rankEventsByRelevance } from "../eventRanker";
 import { validateResponse } from "../responseValidator";
 import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
@@ -23,8 +24,7 @@ function isCompactFirstModel(modelPath: string): boolean {
 
 function getDeviceCores(): number {
   try {
-    const modules = (global as any).NativeModules as Record<string, any> | undefined;
-    const deviceInfo = modules?.DeviceInfo;
+    const deviceInfo = NativeModules.DeviceInfo;
     const constants = deviceInfo?.getConstants?.();
     const candidates = ["NumberOfCores", "NumberOfCPUs", "ProcessorCount", "cpuCount", "numCores"];
     for (const k of candidates) {
@@ -34,10 +34,6 @@ function getDeviceCores(): number {
   } catch {
     // fallthrough
   }
-  try {
-    const v = (global as any).navigator?.hardwareConcurrency;
-    if (isNumber(v) && v > 0) return v;
-  } catch {}
   return 4;
 }
 
@@ -159,26 +155,28 @@ export class LocalProvider implements AiProvider {
 
       const systemPrompt = buildSystemPrompt();
       const compactEvents = compactLocalEvents(events, userContext);
-      const userPrompt = buildUserPrompt(userContext, compactEvents, userMessage);
-
-      const candidateIds = new Set(compactEvents.map((e) => e.id));
+      const promptPayload = buildPromptPayload(userContext, compactEvents, userMessage);
 
       const useCompactFirst = isCompactFirstModel(this.modelPath);
-      const fallbackPrompt = buildLocalFallbackPrompt(userContext, compactEvents, userMessage);
+      const fallbackPrompt = buildLocalFallbackPrompt(
+        userContext,
+        promptPayload.candidateEvents,
+        userMessage,
+      );
 
       const primary = await ctx.completion({
         messages: [
-          { role: "system" as const, content: systemPrompt },
-          { role: "user" as const, content: useCompactFirst ? fallbackPrompt : userPrompt },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: useCompactFirst ? fallbackPrompt : promptPayload.prompt },
         ],
         n_predict: useCompactFirst ? LOCAL_RETRY_PREDICT : LOCAL_PRIMARY_PREDICT,
         temperature: useCompactFirst ? 0 : 0.3,
         grammar: AI_RESPONSE_GBNF,
       });
 
-      const primaryValidation = validateResponse(primary.text, candidateIds);
-      if (primaryValidation.valid) {
-        return primaryValidation.result!;
+      const primaryValidation = validateResponse(primary.text, promptPayload.candidateIds);
+      if (primaryValidation.valid && primaryValidation.result) {
+        return primaryValidation.result;
       }
 
       const errorMessage = primaryValidation.error ?? "Response validation failed";
@@ -190,19 +188,19 @@ export class LocalProvider implements AiProvider {
 
       const fallback = await ctx.completion({
         messages: [
-          { role: "system" as const, content: systemPrompt },
-          { role: "user" as const, content: fallbackPrompt },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: fallbackPrompt },
         ],
         n_predict: LOCAL_RETRY_PREDICT,
         temperature: 0,
         grammar: AI_RESPONSE_GBNF,
       });
 
-      const fallbackValidation = validateResponse(fallback.text, candidateIds);
-      if (!fallbackValidation.valid) {
+      const fallbackValidation = validateResponse(fallback.text, promptPayload.candidateIds);
+      if (!fallbackValidation.valid || !fallbackValidation.result) {
         throw new Error(fallbackValidation.error || "Response validation failed");
       }
-      return fallbackValidation.result!;
+      return fallbackValidation.result;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       throw new Error(`Local model failed: ${message}`);

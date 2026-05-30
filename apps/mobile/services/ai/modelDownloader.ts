@@ -6,7 +6,9 @@
  */
 
 import { NativeModules } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { useAiStore } from "@/stores/ai-store";
+import { releaseLocalModel } from "./providers/local";
 import { fetchWithTimeout, retry } from "./utils";
 import { getRNFS, requireRNFS } from "../nativeFileSystem";
 
@@ -85,10 +87,6 @@ export type ModelSupportAssessment = {
 
 function isNumber(value: unknown): value is number {
   return Object.prototype.toString.call(value) === "[object Number]";
-}
-
-function isString(value: unknown): value is string {
-  return Object.prototype.toString.call(value) === "[object String]";
 }
 
 function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
@@ -266,12 +264,7 @@ let _pauseRequested = false;
 let _isConnectedCache: boolean | null = null;
 
 function getNetInfo(): { fetch: () => Promise<{ isConnected: boolean | null }> } | null {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require("@react-native-community/netinfo");
-  } catch {
-    return null;
-  }
+  return NetInfo;
 }
 
 /**
@@ -605,7 +598,6 @@ export async function deleteModel(filename: string): Promise<void> {
     return;
   }
 
-  const { releaseLocalModel } = require("./providers/local");
   await releaseLocalModel();
 
   const path = modelFilePath(filename);

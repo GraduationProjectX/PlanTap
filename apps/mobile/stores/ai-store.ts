@@ -51,20 +51,30 @@ type AiState = {
   deleteLocalModel: () => void;
 };
 
-const initialState = {
-  provider: "gemini" as AiProvider,
+type AiInitialState = Pick<
+  AiState,
+  | "provider"
+  | "localModelDownloaded"
+  | "localModelPath"
+  | "localModelMeta"
+  | "isDownloading"
+  | "downloadProgress"
+  | "downloadStatus"
+  | "downloadJobId"
+  | "downloadModelId"
+  | "downloadCanResume"
+>;
+
+const initialState: AiInitialState = {
+  provider: "gemini",
   localModelDownloaded: false,
-  localModelPath: null as string | null,
-  localModelMeta: null as {
-    filename: string;
-    sizeBytes?: number | null;
-    etag?: string | null;
-  } | null,
+  localModelPath: null,
+  localModelMeta: null,
   isDownloading: false,
   downloadProgress: 0,
-  downloadStatus: "idle" as DownloadStatus,
-  downloadJobId: null as number | null,
-  downloadModelId: null as string | null,
+  downloadStatus: "idle",
+  downloadJobId: null,
+  downloadModelId: null,
   downloadCanResume: false,
 };
 

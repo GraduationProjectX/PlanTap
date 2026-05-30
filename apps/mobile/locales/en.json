@@ -43,7 +43,7 @@
     "download": "Download",
     "modelDownloaded": "{{model}} downloaded",
     "modelDownloadFailed": "Failed to download model: {{message}}",
-    "testProvider": "AI test — provider: {{provider}}",
+    "testProvider": "AI Provider: {{provider}}",
     "localModelMissing": "Local provider is selected, but no model is active. Go to Settings and download/use a local model first.",
     "signInPrompt": "Sign in to personalize recommendations. Public events are shown below.",
     "loadingConvex": "Loading Convex data…",

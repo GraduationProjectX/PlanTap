@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKey } from "../secureKeys";
-import { buildSystemPrompt, buildUserPrompt } from "../prompts";
+import { buildPromptPayload, buildSystemPrompt } from "../prompts";
 import { validateResponse } from "../responseValidator";
 import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "../types";
 
@@ -36,18 +36,15 @@ export class GeminiProvider implements AiProvider {
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const result = await model.generateContent([
-          buildSystemPrompt(),
-          buildUserPrompt(userContext, events, userMessage),
-        ]);
+        const promptPayload = buildPromptPayload(userContext, events, userMessage);
+        const result = await model.generateContent([buildSystemPrompt(), promptPayload.prompt]);
 
         const text = await result.response.text();
-        const candidateIds = new Set(events.map((e) => e.id));
-        const validation = validateResponse(text, candidateIds);
-        if (!validation.valid) {
+        const validation = validateResponse(text, promptPayload.candidateIds);
+        if (!validation.valid || !validation.result) {
           throw new Error(validation.error || "Response validation failed");
         }
-        return validation.result!;
+        return validation.result;
       } catch (err: unknown) {
         lastError = err;
         const is429 =

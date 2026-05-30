@@ -128,9 +128,7 @@ function normalizeProviderJsonText(raw: string): string {
     text = fenceMatch[1].trim();
   }
 
-  // Remove leading control characters and zero-width markers that can
-  // appear before the JSON payload.
-  text = text.replace(/^[\u0000-\u001F\u200B-\u200D\uFEFF]+/g, "");
+  text = trimProviderJsonPrefix(text);
 
   const balancedJson = extractBalancedJsonObject(text);
   if (balancedJson) {
@@ -189,6 +187,24 @@ function extractBalancedJsonObject(text: string): string | null {
   return null;
 }
 
+function trimProviderJsonPrefix(text: string): string {
+  let start = 0;
+
+  while (start < text.length) {
+    const code = text.charCodeAt(start);
+    const isPrefixMarker =
+      code <= 31 || code === 0x200b || code === 0x200c || code === 0x200d || code === 0xfeff;
+
+    if (!isPrefixMarker) {
+      break;
+    }
+
+    start += 1;
+  }
+
+  return start > 0 ? text.slice(start) : text;
+}
+
 /**
  * Generic retry helper with exponential backoff.
  */
@@ -228,7 +244,7 @@ export async function fetchWithTimeout(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(input as any, { ...(init ?? {}), signal: controller.signal });
+    const response = await fetch(input, { ...init, signal: controller.signal });
     return response;
   } finally {
     clearTimeout(timer);

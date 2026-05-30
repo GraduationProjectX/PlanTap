@@ -23,12 +23,7 @@ import { useAiContext } from "@/hooks/useAiContext";
 import { useAuth } from "@clerk/clerk-expo";
 import type { EventSummary, UserContext } from "@/services/ai/types";
 import { JAILBREAK_TEST_SUITE } from "@/services/ai/benchmarking/jailbreakTests";
-import {
-  calculateMetrics,
-  confidenceInterval95,
-} from "@/services/ai/benchmarking/statisticalAnalysis";
 import { generateReport, exportMarkdown } from "@/services/ai/benchmarking/reportGenerator";
-import { requireRNFS } from "@/services/nativeFileSystem";
 
 type BenchPrompt = {
   id: string;
@@ -446,8 +441,6 @@ export default function DevAIBenchScreen() {
         return;
       }
 
-      const RNFS = requireRNFS();
-
       // Extract jailbreak data from aggregated results
       const jailbreakByProvider: Record<
         string,
@@ -456,7 +449,6 @@ export default function DevAIBenchScreen() {
       const providers = new Set(aggregated.map((a: any) => a.provider));
 
       for (const provider of providers) {
-        const providerResults = aggregated.filter((a: any) => a.provider === provider);
         const jailbreakResults = rawRuns.filter(
           (r: any) => r.provider === provider && PROMPTS.slice(2).some((p) => p.id === r.prompt),
         );
@@ -495,7 +487,7 @@ export default function DevAIBenchScreen() {
 
       const path = await chooseLocationAndSave(filename, markdown);
       if (path) setLastExportPath(path);
-    } catch (e) {
+    } catch {
       Alert.alert("Error", "Failed to generate academic report");
     }
   }

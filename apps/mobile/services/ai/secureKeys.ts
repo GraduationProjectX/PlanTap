@@ -6,14 +6,14 @@ export type AiProviderKey = "gemini" | "openai" | "claude";
 const SECURE_KEY_PREFIX = "plantap.ai-key.";
 
 /** Map provider → expo-secure-store key */
-const storeKey = (provider: AiProviderKey) => `${SECURE_KEY_PREFIX}${provider}` as const;
+const storeKey = (provider: AiProviderKey) => `${SECURE_KEY_PREFIX}${provider}`;
 
 /**
  * Env-variable fallback names, checked when SecureStore has no value.
  * These should be set via `EXPO_PUBLIC_*` at build time for dev convenience.
  */
 const ENV_FALLBACK: Record<AiProviderKey, string | undefined> = {
-  gemini: process.env.EXPO_PUBLIC_GEMINI_API_KEY||"AIzaSyBW-XKVM6jL28qMkf3NPyprVvtJOGW1_MA",
+  gemini: process.env.EXPO_PUBLIC_GEMINI_API_KEY,
   openai: process.env.EXPO_PUBLIC_OPENAI_API_KEY,
   claude: process.env.EXPO_PUBLIC_CLAUDE_API_KEY,
 };

@@ -15,12 +15,7 @@ export { getApiKey, setApiKey, clearApiKey } from "./secureKeys";
 export { releaseLocalModel } from "./providers/local";
 
 import { useAiStore } from "@/stores/ai-store";
-import type {
-  AiProvider as IAiProvider,
-  EventSummary,
-  RecommendationResult,
-  UserContext,
-} from "./types";
+import type { AiProvider, EventSummary, RecommendationResult, UserContext } from "./types";
 import { GeminiProvider } from "./providers/gemini";
 import { OpenAIProvider } from "./providers/openai";
 import { ClaudeProvider } from "./providers/claude";
@@ -29,7 +24,7 @@ import { LocalProvider } from "./providers/local";
 /**
  * Return the correct provider instance based on the current store selection.
  */
-export function getProvider(): IAiProvider {
+export function getProvider(): AiProvider {
   const { provider, localModelPath } = useAiStore.getState();
 
   switch (provider) {

@@ -9,7 +9,6 @@ export function getRNFS(): RNFSModule | null {
     return cachedRNFS ?? null;
   }
 
-  // Never attempt to load RNFS in Expo Go (no native module available)
   if (isRunningInExpoGo()) {
     cachedRNFS = null;
     return null;
@@ -17,15 +16,9 @@ export function getRNFS(): RNFSModule | null {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const mod = require("react-native-fs");
-    // Verify the module has the expected API to catch partial/broken loads
-    if (mod && typeof mod === "object") {
-      cachedRNFS = mod;
-    } else {
-      cachedRNFS = null;
-    }
-  } catch (error) {
-    // Silently fail; RNFS is not available in this runtime
+    const mod: RNFSModule = require("react-native-fs");
+    cachedRNFS = mod;
+  } catch {
     cachedRNFS = null;
   }
 

@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAiStore } from "@/stores";
-import { setApiKey,getApiKey } from "@/services/ai/secureKeys";
+import { setApiKey, getApiKey } from "@/services/ai/secureKeys";
 import { releaseLocalModel } from "@/services/ai/providers/local";
 import {
   AVAILABLE_MODELS,
@@ -35,7 +35,7 @@ export function AiModelSelector() {
   const inExpoGo = isRunningInExpoGo();
   const rnfs = getRNFS();
   const [tab, setTab] = useState<TabMode>("api");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const apiProviders: Array<"gemini" | "openai" | "claude"> = ["gemini", "openai", "claude"];
 
   const setProvider = useAiStore((s) => s.setProvider);
@@ -68,7 +68,7 @@ export function AiModelSelector() {
         const storedKey = await getApiKey(selectedApi);
         if (isMounted) {
           // If the key is your default fallback "KY", keep the input clear for the user
-          setApiKeyInput(storedKey === "KY" ? "" : (storedKey || ""));
+          setApiKeyInput(storedKey === "KY" ? "" : storedKey || "");
         }
       } catch (error) {
         console.error("Failed to fetch secure key for:", selectedApi, error);
@@ -134,21 +134,22 @@ export function AiModelSelector() {
     setProvider("local");
   };
 
-  const refreshDownloaded = async () => {
-    if (!rnfs) {
-      setDownloadedById({});
-      return;
-    }
-
-    const entries: Record<string, boolean> = {};
-    for (const model of AVAILABLE_MODELS) {
-      entries[model.id] = await isModelDownloaded(model.filename);
-    }
-    setDownloadedById(entries);
-  };
-
   useEffect(() => {
     if (!isExpanded) return;
+
+    const refreshDownloaded = async () => {
+      if (!rnfs) {
+        setDownloadedById({});
+        return;
+      }
+
+      const entries: Record<string, boolean> = {};
+      for (const model of AVAILABLE_MODELS) {
+        entries[model.id] = await isModelDownloaded(model.filename);
+      }
+      setDownloadedById(entries);
+    };
+
     void refreshDownloaded();
   }, [isExpanded, aiStoreIsDownloading, downloadStatus, localModelPath, rnfs]);
 
@@ -197,7 +198,9 @@ export function AiModelSelector() {
                     onPress={() => setSelectedApi(p)}
                     style={[styles.provider, selectedApi === p && styles.providerActive]}
                   >
-                    <Text style={styles.providerText}>
+                    <Text
+                      style={[styles.providerText, selectedApi === p && styles.providerTextActive]}
+                    >
                       {p.charAt(0).toUpperCase() + p.slice(1)}
                     </Text>
                   </Pressable>
@@ -236,6 +239,7 @@ export function AiModelSelector() {
                   const isPausedThisModel =
                     downloadStatus === "paused" && downloadModelId === model.id;
                   const isActive = localModelPath === modelFilePath(model.filename);
+                  const isLocalProvider = provider === "local";
                   const isDownloaded = isActive || downloadedById[model.id] === true;
                   const isBusy = downloadStatus === "downloading" || downloadStatus === "paused";
 
@@ -288,7 +292,16 @@ export function AiModelSelector() {
 
                       {!isDownloadingThisModel && !isPausedThisModel && isActive && (
                         <View style={styles.actionRow}>
-                          <Text style={styles.activeText}>{t("ai.active")}</Text>
+                          {isLocalProvider ? (
+                            <Text style={styles.activeText}>{t("ai.active")}</Text>
+                          ) : (
+                            <Pressable
+                              onPress={() => handleUseLocalModel(model.filename)}
+                              style={styles.smallBtn}
+                            >
+                              <Text style={styles.smallBtnText}>{t("ai.use")}</Text>
+                            </Pressable>
+                          )}
                           <Pressable
                             onPress={() => deleteModel(model.filename)}
                             style={[styles.smallBtn, styles.deleteBtn]}
@@ -440,11 +453,15 @@ const styles = StyleSheet.create((theme) => ({
   providerActive: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
+    color: "white"
   },
   providerText: {
     fontSize: theme.font.size.sm,
     fontFamily: theme.font.family.medium,
     color: theme.colors.text,
+  },
+  providerTextActive: {
+    color: theme.colors.primaryForeground,
   },
   input: {
     borderWidth: 1,

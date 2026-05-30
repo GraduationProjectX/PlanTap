@@ -30,7 +30,6 @@ type GoogleTextSearchPlace = {
       lng?: number;
     };
   };
-  photos?: Array<{ photo_reference?: string }>;
 };
 
 export const ingestKhobar = internalAction({
@@ -77,17 +76,6 @@ export const ingestKhobar = internalAction({
       const typesRaw = place.types ?? [];
       const tags = typesRaw.filter((t) => isString(t)).slice(0, 10);
 
-      const images: string[] = [];
-      for (const photo of place.photos ?? []) {
-        const ref = toNullableString(photo.photo_reference);
-        if (!ref) continue;
-        const photoUrl = new URL("https://maps.googleapis.com/maps/api/place/photo");
-        photoUrl.searchParams.set("maxwidth", "1600");
-        photoUrl.searchParams.set("photo_reference", ref);
-        photoUrl.searchParams.set("key", apiKey);
-        images.push(photoUrl.toString());
-      }
-
       const rating = place.rating;
 
       const id = await ctx.runMutation(internal.ingest.ingestEvent, {
@@ -112,7 +100,7 @@ export const ingestKhobar = internalAction({
           priceMax: null,
           indoorOutdoor: "unknown",
           familyFriendly: null,
-          images,
+          images: [],
           favoritesCount: 0,
           status: "approved",
           rating: isNumber(rating) ? rating : null,

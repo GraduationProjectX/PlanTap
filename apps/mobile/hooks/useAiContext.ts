@@ -1,51 +1,31 @@
-/**
- * Builds a real UserContext + EventSummary[] from Convex data
- * so the AI suggestion engine works with live data.
- *
- * NOTE: The `backend` workspace package is not yet linked as a dependency of
- * mobile — see use-events.ts for the same issue. Once it is wired up, swap
- * the fallback logic below for proper type-safe API calls.
- */
-
 import { useQuery } from "convex/react";
+import { api } from "backend/convex/_generated/api";
+import type { Doc } from "backend/convex/_generated/dataModel";
 import type { EventSummary, UserContext } from "@/services/ai/types";
 
-let api: any;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  api = require("@/convex/_generated/api").api;
-} catch {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    api = require("backend/convex/_generated/api").api;
-  } catch {
-    api = null;
+type EventDoc = Doc<"events">;
+
+function normalizeGroupType(
+  groupType: "any" | "solo" | "group" | "kids" | null | undefined,
+): UserContext["groupType"] {
+  if (groupType === "solo" || groupType === "group" || groupType === "kids") {
+    return groupType;
   }
+  return undefined;
 }
 
-const UNAVAILABLE_RESULT = {
-  isLoading: false as const,
-  userContext: null,
-  events: null,
-  unavailable: true as const,
-} as const;
-
-/**
- * Inner hook — only called when `api` is available so the useQuery calls
- * always receive a valid function reference.
- */
-function useAiContextInner(city: string | undefined, enabled: boolean) {
+export function useAiContext(city?: string, enabled: boolean = true) {
   const user = useQuery(api.users.current, enabled ? {} : "skip");
-  const events = useQuery(api.events.list, city ? { city } : {});
+  const events = useQuery(api.events.list, enabled ? (city ? { city } : {}) : "skip");
 
   const isLoading = (enabled && user === undefined) || events === undefined;
 
   if (isLoading) {
     return {
-      isLoading: true as const,
+      isLoading: true,
       userContext: null,
       events: null,
-      unavailable: false as const,
+      unavailable: false,
     };
   }
 
@@ -54,38 +34,29 @@ function useAiContextInner(city: string | undefined, enabled: boolean) {
         locale: user?.locale ?? "en",
         interests: user?.preferences?.likedTags ?? [],
         dislikedTags: user?.preferences?.dislikedTags ?? [],
-        city: city ?? user?.city,
-        groupType: user?.defaults?.groupType,
+        city: city ?? user?.city ?? undefined,
+        groupType: normalizeGroupType(user?.defaults?.groupType),
         indoorOutdoor: user?.defaults?.indoorOutdoor,
-        budgetMin: user?.defaults?.budgetMin,
-        budgetMax: user?.defaults?.budgetMax,
+        budgetMin: user?.defaults?.budgetMin ?? undefined,
+        budgetMax: user?.defaults?.budgetMax ?? undefined,
         pastEventTags: [],
       }
     : null;
 
-  const eventSummaries: EventSummary[] = (events ?? []).slice(0, 100).map((e: any) => ({
-    id: e._id,
-    title: e.title,
-    categories: e.categories,
-    tags: e.tags,
-    location: e.location?.address ?? e.city,
-    date: e.startAt ? new Date(e.startAt).toISOString().slice(0, 10) : undefined,
-    description: e.descriptionShort ?? undefined,
+  const eventSummaries: EventSummary[] = (events ?? []).slice(0, 100).map((event: EventDoc) => ({
+    id: event._id,
+    title: event.title,
+    categories: event.categories,
+    tags: event.tags,
+    location: event.locationAddress ?? event.city,
+    date: event.startAt ? new Date(event.startAt).toISOString().slice(0, 10) : undefined,
+    description: event.descriptionShort ?? undefined,
   }));
 
   return {
-    isLoading: false as const,
+    isLoading: false,
     userContext,
     events: eventSummaries,
-    unavailable: false as const,
+    unavailable: false,
   };
-}
-
-/**
- * Public hook. When the backend package isn't linked, returns an
- * `unavailable` result without calling any Convex hooks.
- */
-export function useAiContext(city?: string, enabled: boolean = true) {
-  if (!api) return UNAVAILABLE_RESULT;
-  return useAiContextInner(city, enabled);
 }
