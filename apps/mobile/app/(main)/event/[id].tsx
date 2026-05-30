@@ -233,7 +233,8 @@ export default function EventDetailsScreen() {
     event.startAt != null ? formatDateLabel(event.startAt, locale, t("home.tonight")) : null;
   const timeLabel = event.startAt != null ? formatTimeLabel(event.startAt, locale) : null;
   const isLive = event.type === "event" && isEventLiveNow(event);
-  const bookmarkLabel = isBookmarked
+  const hasBookmark = isBookmarked === true;
+  const bookmarkLabel = hasBookmark
     ? t("eventDetail.savedToBookmarks")
     : t("eventDetail.addToBookmarks");
 
@@ -334,7 +335,7 @@ export default function EventDetailsScreen() {
               style={styles.primaryAction}
             >
               <FontAwesome
-                name={isBookmarked ? "bookmark-o" : "bookmark"}
+                name={hasBookmark ? "bookmark" : "bookmark-o"}
                 size={16}
                 color={theme.colors.primaryForeground}
               />
@@ -437,7 +438,7 @@ export default function EventDetailsScreen() {
             accessibilityLabel={bookmarkLabel}
           >
             <Fontisto
-              name={isBookmarked ? "bookmark" : "bookmark-alt"}
+              name={hasBookmark ? "bookmark-alt" : "bookmark"}
               size={20}
               color="#FFFFFF"
             />

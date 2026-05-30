@@ -1,6 +1,4 @@
 import { useRef, useState } from "react";
-import { useQuery } from "convex/react";
-import { api } from "backend/convex/_generated/api";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
@@ -28,17 +26,15 @@ export default function HomeScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
-  const currentUser = useQuery(api.users.current, {});
 
   const [searchValue, setSearchValue] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
-  const [selectedCity, setSelectedCity] = useState<string | null | undefined>();
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   const { events, collections, isLoading: isEventsLoading } = useEvents();
   const { categories, isLoading: isCategoriesLoading } = useCategories();
   const cityOptions = getCityOptions(events ?? []);
-  const profileCity = currentUser?.city ?? undefined;
-  const activeCity = selectedCity === undefined ? profileCity : (selectedCity ?? undefined);
+  const activeCity = selectedCity ?? undefined;
   const activeCategory = selectedCategory ?? "all";
 
   const handleEventPress = (id: string) => {

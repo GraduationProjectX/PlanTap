@@ -30,6 +30,10 @@ export function ReviewComposerSheet({
   const { t } = useTranslation();
   const { textAlign } = useDirection();
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
       <BottomSheet.Portal>
