@@ -4,6 +4,7 @@ export const STORAGE_KEYS = {
   AUTH_STATE: "plantap.auth-state",
   EVENTS_CACHE: "plantap.cache.events",
   CATEGORIES_CACHE: "plantap.cache.categories",
+  AI_STATE: "plantap.ai-state",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
