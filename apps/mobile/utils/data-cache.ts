@@ -20,9 +20,7 @@ function isValidEnvelope<T>(value: unknown): value is CacheEnvelope<T> {
   }
 
   return (
-    value.version === CACHE_SCHEMA_VERSION &&
-    typeof value.updatedAt === "number" &&
-    "data" in value
+    value.version === CACHE_SCHEMA_VERSION && typeof value.updatedAt === "number" && "data" in value
   );
 }
 
@@ -65,6 +63,5 @@ export function writeCachedData<T>(key: string, data: T) {
 
   try {
     storage.set(key, JSON.stringify(envelope));
-  } catch {
-  }
+  } catch {}
 }

@@ -1,0 +1,3404 @@
+{
+  "url": "https://accomplished-cuttlefish-39.eu-west-1.convex.cloud",
+  "functions": [
+    {
+      "args": {
+        "type": "object",
+        "value": {}
+      },
+      "functionType": "Query",
+      "identifier": "bookmarks.js:listForUser",
+      "returns": {
+        "type": "array",
+        "value": {
+          "type": "object",
+          "value": {
+            "_creationTime": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "_id": {
+              "fieldType": {
+                "tableName": "events",
+                "type": "id"
+              },
+              "optional": false
+            },
+            "bookmarkId": {
+              "fieldType": {
+                "tableName": "bookmarks",
+                "type": "id"
+              },
+              "optional": false
+            },
+            "bookmarkedAt": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "categories": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "city": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "descriptionShort": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "descriptionShortAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "endAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalId": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalSource": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "familyFriendly": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "favoritesCount": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "images": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "indoorOutdoor": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "indoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "outdoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "mixed"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "unknown"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddress": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddressAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationLat": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "locationLng": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "priceMax": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "priceMin": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "rating": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "startAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "status": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "pending"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "approved"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "rejected"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "tags": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "title": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "titleAr": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "type": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "event"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "activity"
+                  }
+                ]
+              },
+              "optional": false
+            }
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "eventId": {
+            "fieldType": {
+              "tableName": "events",
+              "type": "id"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "bookmarks.js:toggle",
+      "returns": {
+        "type": "object",
+        "value": {
+          "bookmarked": {
+            "fieldType": {
+              "type": "boolean"
+            },
+            "optional": false
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "eventId": {
+            "fieldType": {
+              "tableName": "events",
+              "type": "id"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Query",
+      "identifier": "bookmarks.js:isBookmarked",
+      "returns": {
+        "type": "boolean"
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {}
+      },
+      "functionType": "Query",
+      "identifier": "categories.js:categoriesList",
+      "returns": {
+        "type": "array",
+        "value": {
+          "type": "object",
+          "value": {
+            "_creationTime": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "_id": {
+              "fieldType": {
+                "tableName": "categories",
+                "type": "id"
+              },
+              "optional": false
+            },
+            "icon": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "key": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "label": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "labelAr": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "sortOrder": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            }
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "city": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Query",
+      "identifier": "events.js:list",
+      "returns": {
+        "type": "array",
+        "value": {
+          "type": "object",
+          "value": {
+            "_creationTime": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "_id": {
+              "fieldType": {
+                "tableName": "events",
+                "type": "id"
+              },
+              "optional": false
+            },
+            "categories": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "city": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "descriptionShort": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "descriptionShortAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "endAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalId": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalSource": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "familyFriendly": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "favoritesCount": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "images": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "indoorOutdoor": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "indoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "outdoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "mixed"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "unknown"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddress": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddressAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationLat": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "locationLng": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "priceMax": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "priceMin": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "rating": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "startAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "status": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "pending"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "approved"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "rejected"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "tags": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "title": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "titleAr": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "type": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "event"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "activity"
+                  }
+                ]
+              },
+              "optional": false
+            }
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "id": {
+            "fieldType": {
+              "tableName": "events",
+              "type": "id"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Query",
+      "identifier": "events.js:getById",
+      "returns": {
+        "type": "union",
+        "value": [
+          {
+            "type": "object",
+            "value": {
+              "_creationTime": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "_id": {
+                "fieldType": {
+                  "tableName": "events",
+                  "type": "id"
+                },
+                "optional": false
+              },
+              "categories": {
+                "fieldType": {
+                  "type": "array",
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "optional": false
+              },
+              "city": {
+                "fieldType": {
+                  "type": "string"
+                },
+                "optional": false
+              },
+              "descriptionShort": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "descriptionShortAr": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "endAt": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "externalId": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "externalSource": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "familyFriendly": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "favoritesCount": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "images": {
+                "fieldType": {
+                  "type": "array",
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "optional": false
+              },
+              "indoorOutdoor": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "literal",
+                      "value": "indoor"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "outdoor"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "mixed"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "unknown"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "locationAddress": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "locationAddressAr": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "locationLat": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "locationLng": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "priceMax": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "priceMin": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "rating": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "startAt": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "status": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "literal",
+                      "value": "pending"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "approved"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "rejected"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "tags": {
+                "fieldType": {
+                  "type": "array",
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "optional": false
+              },
+              "title": {
+                "fieldType": {
+                  "type": "string"
+                },
+                "optional": false
+              },
+              "titleAr": {
+                "fieldType": {
+                  "type": "string"
+                },
+                "optional": false
+              },
+              "type": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "literal",
+                      "value": "event"
+                    },
+                    {
+                      "type": "literal",
+                      "value": "activity"
+                    }
+                  ]
+                },
+                "optional": false
+              }
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "city": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": true
+          },
+          "limit": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Query",
+      "identifier": "events.js:listApproved",
+      "returns": {
+        "type": "array",
+        "value": {
+          "type": "object",
+          "value": {
+            "_creationTime": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "_id": {
+              "fieldType": {
+                "tableName": "events",
+                "type": "id"
+              },
+              "optional": false
+            },
+            "categories": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "city": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "descriptionShort": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "descriptionShortAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "endAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalId": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "externalSource": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "familyFriendly": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "favoritesCount": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "images": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "indoorOutdoor": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "indoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "outdoor"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "mixed"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "unknown"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddress": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationAddressAr": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "locationLat": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "locationLng": {
+              "fieldType": {
+                "type": "number"
+              },
+              "optional": false
+            },
+            "priceMax": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "priceMin": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "rating": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "startAt": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "status": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "pending"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "approved"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "rejected"
+                  }
+                ]
+              },
+              "optional": false
+            },
+            "tags": {
+              "fieldType": {
+                "type": "array",
+                "value": {
+                  "type": "string"
+                }
+              },
+              "optional": false
+            },
+            "title": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "titleAr": {
+              "fieldType": {
+                "type": "string"
+              },
+              "optional": false
+            },
+            "type": {
+              "fieldType": {
+                "type": "union",
+                "value": [
+                  {
+                    "type": "literal",
+                    "value": "event"
+                  },
+                  {
+                    "type": "literal",
+                    "value": "activity"
+                  }
+                ]
+              },
+              "optional": false
+            }
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "functionType": "HttpAction",
+      "method": "OPTIONS",
+      "path": "/clerk-users-webhook"
+    },
+    {
+      "functionType": "HttpAction",
+      "method": "POST",
+      "path": "/clerk-users-webhook"
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "eventId": {
+            "fieldType": {
+              "tableName": "events",
+              "type": "id"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Query",
+      "identifier": "reviews.js:getForEvent",
+      "returns": {
+        "type": "object",
+        "value": {
+          "averageRating": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "reviewCount": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "reviews": {
+            "fieldType": {
+              "type": "array",
+              "value": {
+                "type": "object",
+                "value": {
+                  "authorImageUrl": {
+                    "fieldType": {
+                      "type": "union",
+                      "value": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "optional": false
+                  },
+                  "authorName": {
+                    "fieldType": {
+                      "type": "string"
+                    },
+                    "optional": false
+                  },
+                  "body": {
+                    "fieldType": {
+                      "type": "string"
+                    },
+                    "optional": false
+                  },
+                  "createdAt": {
+                    "fieldType": {
+                      "type": "number"
+                    },
+                    "optional": false
+                  },
+                  "id": {
+                    "fieldType": {
+                      "tableName": "reviews",
+                      "type": "id"
+                    },
+                    "optional": false
+                  },
+                  "rating": {
+                    "fieldType": {
+                      "type": "union",
+                      "value": [
+                        {
+                          "type": "literal",
+                          "value": 1
+                        },
+                        {
+                          "type": "literal",
+                          "value": 2
+                        },
+                        {
+                          "type": "literal",
+                          "value": 3
+                        },
+                        {
+                          "type": "literal",
+                          "value": 4
+                        },
+                        {
+                          "type": "literal",
+                          "value": 5
+                        }
+                      ]
+                    },
+                    "optional": false
+                  }
+                }
+              }
+            },
+            "optional": false
+          },
+          "viewerReview": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "object",
+                  "value": {
+                    "body": {
+                      "fieldType": {
+                        "type": "string"
+                      },
+                      "optional": false
+                    },
+                    "id": {
+                      "fieldType": {
+                        "tableName": "reviews",
+                        "type": "id"
+                      },
+                      "optional": false
+                    },
+                    "rating": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "literal",
+                            "value": 1
+                          },
+                          {
+                            "type": "literal",
+                            "value": 2
+                          },
+                          {
+                            "type": "literal",
+                            "value": 3
+                          },
+                          {
+                            "type": "literal",
+                            "value": 4
+                          },
+                          {
+                            "type": "literal",
+                            "value": 5
+                          }
+                        ]
+                      },
+                      "optional": false
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "body": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          },
+          "eventId": {
+            "fieldType": {
+              "tableName": "events",
+              "type": "id"
+            },
+            "optional": false
+          },
+          "rating": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "literal",
+                  "value": 1
+                },
+                {
+                  "type": "literal",
+                  "value": 2
+                },
+                {
+                  "type": "literal",
+                  "value": 3
+                },
+                {
+                  "type": "literal",
+                  "value": 4
+                },
+                {
+                  "type": "literal",
+                  "value": 5
+                }
+              ]
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "reviews.js:upsertForEvent",
+      "returns": {
+        "type": "object",
+        "value": {
+          "body": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          },
+          "id": {
+            "fieldType": {
+              "tableName": "reviews",
+              "type": "id"
+            },
+            "optional": false
+          },
+          "rating": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "literal",
+                  "value": 1
+                },
+                {
+                  "type": "literal",
+                  "value": 2
+                },
+                {
+                  "type": "literal",
+                  "value": 3
+                },
+                {
+                  "type": "literal",
+                  "value": 4
+                },
+                {
+                  "type": "literal",
+                  "value": 5
+                }
+              ]
+            },
+            "optional": false
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {}
+      },
+      "functionType": "Mutation",
+      "identifier": "seed.js:seedEvents",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {}
+      },
+      "functionType": "Mutation",
+      "identifier": "seed.js:run",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {}
+      },
+      "functionType": "Query",
+      "identifier": "users.js:current",
+      "returns": {
+        "type": "union",
+        "value": [
+          {
+            "type": "object",
+            "value": {
+              "_creationTime": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "_id": {
+                "fieldType": {
+                  "tableName": "users",
+                  "type": "id"
+                },
+                "optional": false
+              },
+              "city": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": true
+              },
+              "clerkUserId": {
+                "fieldType": {
+                  "type": "string"
+                },
+                "optional": false
+              },
+              "createdAt": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              },
+              "defaults": {
+                "fieldType": {
+                  "type": "object",
+                  "value": {
+                    "budgetMax": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": false
+                    },
+                    "budgetMin": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": false
+                    },
+                    "groupType": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "literal",
+                            "value": "solo"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "group"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "kids"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "any"
+                          }
+                        ]
+                      },
+                      "optional": false
+                    },
+                    "indoorOutdoor": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "literal",
+                            "value": "indoor"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "outdoor"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "any"
+                          }
+                        ]
+                      },
+                      "optional": false
+                    }
+                  }
+                },
+                "optional": true
+              },
+              "email": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "firstName": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "imageUrl": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "lastName": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "locale": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": false
+              },
+              "notificationsEnabled": {
+                "fieldType": {
+                  "type": "boolean"
+                },
+                "optional": true
+              },
+              "onboardingCompletedAt": {
+                "fieldType": {
+                  "type": "union",
+                  "value": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "optional": true
+              },
+              "preferences": {
+                "fieldType": {
+                  "type": "object",
+                  "value": {
+                    "dislikedTags": {
+                      "fieldType": {
+                        "type": "array",
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "optional": false
+                    },
+                    "likedTags": {
+                      "fieldType": {
+                        "type": "array",
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "optional": false
+                    }
+                  }
+                },
+                "optional": true
+              },
+              "updatedAt": {
+                "fieldType": {
+                  "type": "number"
+                },
+                "optional": false
+              }
+            }
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "city": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "defaults": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "budgetMax": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "budgetMin": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "groupType": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "solo"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "group"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "kids"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "indoorOutdoor": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "indoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "outdoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": true
+                }
+              }
+            },
+            "optional": true
+          },
+          "notificationsEnabled": {
+            "fieldType": {
+              "type": "boolean"
+            },
+            "optional": true
+          },
+          "preferences": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "dislikedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": true
+                },
+                "likedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": true
+                }
+              }
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "users.js:completeOnboarding",
+      "returns": {
+        "type": "object",
+        "value": {
+          "_creationTime": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "_id": {
+            "fieldType": {
+              "tableName": "users",
+              "type": "id"
+            },
+            "optional": false
+          },
+          "city": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "clerkUserId": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          },
+          "createdAt": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "defaults": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "budgetMax": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "budgetMin": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "groupType": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "solo"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "group"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "kids"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "indoorOutdoor": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "indoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "outdoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": false
+                }
+              }
+            },
+            "optional": true
+          },
+          "email": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "firstName": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "imageUrl": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "lastName": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "locale": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "notificationsEnabled": {
+            "fieldType": {
+              "type": "boolean"
+            },
+            "optional": true
+          },
+          "onboardingCompletedAt": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "preferences": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "dislikedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                },
+                "likedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                }
+              }
+            },
+            "optional": true
+          },
+          "updatedAt": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "locale": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "literal",
+                  "value": "ar"
+                },
+                {
+                  "type": "literal",
+                  "value": "en"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "notificationsEnabled": {
+            "fieldType": {
+              "type": "boolean"
+            },
+            "optional": true
+          },
+          "preferences": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "dislikedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": true
+                },
+                "likedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": true
+                }
+              }
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "users.js:updateSettings",
+      "returns": {
+        "type": "object",
+        "value": {
+          "_creationTime": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "_id": {
+            "fieldType": {
+              "tableName": "users",
+              "type": "id"
+            },
+            "optional": false
+          },
+          "city": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "clerkUserId": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          },
+          "createdAt": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          },
+          "defaults": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "budgetMax": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "budgetMin": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "groupType": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "solo"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "group"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "kids"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "indoorOutdoor": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "indoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "outdoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "any"
+                      }
+                    ]
+                  },
+                  "optional": false
+                }
+              }
+            },
+            "optional": true
+          },
+          "email": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "firstName": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "imageUrl": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "lastName": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "locale": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "notificationsEnabled": {
+            "fieldType": {
+              "type": "boolean"
+            },
+            "optional": true
+          },
+          "onboardingCompletedAt": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "optional": true
+          },
+          "preferences": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "dislikedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                },
+                "likedTags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                }
+              }
+            },
+            "optional": true
+          },
+          "updatedAt": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          }
+        }
+      },
+      "visibility": {
+        "kind": "public"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "data": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "email_address": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "email_addresses": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "array",
+                        "value": {
+                          "type": "object",
+                          "value": {
+                            "email_address": {
+                              "fieldType": {
+                                "type": "string"
+                              },
+                              "optional": false
+                            },
+                            "id": {
+                              "fieldType": {
+                                "type": "string"
+                              },
+                              "optional": false
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "first_name": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "id": {
+                  "fieldType": {
+                    "type": "string"
+                  },
+                  "optional": false
+                },
+                "image_url": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "last_name": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                },
+                "primary_email_address_id": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                }
+              }
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "usersInternal.js:addOrUpdateUser",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "clerkUserId": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "usersInternal.js:deleteUser",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "data": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "object",
+                  "value": {
+                    "email_address": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "email_addresses": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "array",
+                            "value": {
+                              "type": "object",
+                              "value": {
+                                "email_address": {
+                                  "fieldType": {
+                                    "type": "string"
+                                  },
+                                  "optional": false
+                                },
+                                "id": {
+                                  "fieldType": {
+                                    "type": "string"
+                                  },
+                                  "optional": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "first_name": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "id": {
+                      "fieldType": {
+                        "type": "string"
+                      },
+                      "optional": false
+                    },
+                    "image_url": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "last_name": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "primary_email_address_id": {
+                      "fieldType": {
+                        "type": "union",
+                        "value": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "value": {
+                    "id": {
+                      "fieldType": {
+                        "type": "string"
+                      },
+                      "optional": false
+                    }
+                  }
+                }
+              ]
+            },
+            "optional": false
+          },
+          "eventId": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": false
+          },
+          "eventType": {
+            "fieldType": {
+              "type": "union",
+              "value": [
+                {
+                  "type": "literal",
+                  "value": "user.created"
+                },
+                {
+                  "type": "literal",
+                  "value": "user.updated"
+                },
+                {
+                  "type": "literal",
+                  "value": "user.deleted"
+                }
+              ]
+            },
+            "optional": false
+          },
+          "receivedAt": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "webhooks.js:processClerkEvent",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "limit": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": true
+          },
+          "query": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Action",
+      "identifier": "foursquare.js:ingestKhobar",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "limit": {
+            "fieldType": {
+              "type": "number"
+            },
+            "optional": true
+          },
+          "query": {
+            "fieldType": {
+              "type": "string"
+            },
+            "optional": true
+          }
+        }
+      },
+      "functionType": "Action",
+      "identifier": "googleplaces.js:ingestKhobar",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    },
+    {
+      "args": {
+        "type": "object",
+        "value": {
+          "eventData": {
+            "fieldType": {
+              "type": "object",
+              "value": {
+                "categories": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                },
+                "city": {
+                  "fieldType": {
+                    "type": "string"
+                  },
+                  "optional": false
+                },
+                "descriptionShort": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "descriptionShortAr": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "endAt": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "externalId": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "externalSource": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "familyFriendly": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "favoritesCount": {
+                  "fieldType": {
+                    "type": "number"
+                  },
+                  "optional": false
+                },
+                "images": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                },
+                "indoorOutdoor": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "indoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "outdoor"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "mixed"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "unknown"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "locationAddress": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "locationAddressAr": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "locationLat": {
+                  "fieldType": {
+                    "type": "number"
+                  },
+                  "optional": false
+                },
+                "locationLng": {
+                  "fieldType": {
+                    "type": "number"
+                  },
+                  "optional": false
+                },
+                "priceMax": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "priceMin": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "rating": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "startAt": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "status": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "pending"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "approved"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "rejected"
+                      }
+                    ]
+                  },
+                  "optional": false
+                },
+                "tags": {
+                  "fieldType": {
+                    "type": "array",
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "optional": false
+                },
+                "title": {
+                  "fieldType": {
+                    "type": "string"
+                  },
+                  "optional": false
+                },
+                "titleAr": {
+                  "fieldType": {
+                    "type": "string"
+                  },
+                  "optional": false
+                },
+                "type": {
+                  "fieldType": {
+                    "type": "union",
+                    "value": [
+                      {
+                        "type": "literal",
+                        "value": "event"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "activity"
+                      }
+                    ]
+                  },
+                  "optional": false
+                }
+              }
+            },
+            "optional": false
+          }
+        }
+      },
+      "functionType": "Mutation",
+      "identifier": "ingest.js:ingestEvent",
+      "returns": null,
+      "visibility": {
+        "kind": "internal"
+      }
+    }
+  ]
+}
