@@ -20,7 +20,6 @@ config.resolver.blockList =
 
 config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
-  path.resolve(projectRoot, "node_modules"),
 ];
 
 config.resolver.extraNodeModules = {
