@@ -1,6 +1,6 @@
 import { storage } from "@/storage/mmkv";
 
-const CACHE_SCHEMA_VERSION = 1;
+const CACHE_SCHEMA_VERSION = 2;
 
 type CacheEnvelope<T> = {
   version: number;

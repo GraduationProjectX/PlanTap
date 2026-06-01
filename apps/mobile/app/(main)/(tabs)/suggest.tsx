@@ -173,7 +173,7 @@ export default function SuggestScreen() {
             </View>
           </View>
 
-          <Text style={[styles.subtitle, { textAlign }]}>{recommendationStatus}</Text>
+          {/* <Text style={[styles.subtitle, { textAlign }]}>{recommendationStatus}</Text> */}
 
           <Select
             presentation="bottom-sheet"
