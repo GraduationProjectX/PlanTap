@@ -97,6 +97,7 @@ export const eventFields = {
   favoritesCount: v.number(),
   status: eventStatusValidator,
   rating: nullableNumber,
+  externalId: v.optional(v.string()) // for duplicates.
 };
 
 export const categoryFields = {
