@@ -16,6 +16,7 @@ import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransiti
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents, type EventDoc, type EventCollections } from "@/hooks/use-events";
 import {
+  DISCOVERY_EVENTS_LIMIT,
   applyEventFilters,
   isDefaultEventFilters,
   normalizeEventListType,
@@ -73,7 +74,7 @@ export default function ViewAllEventsScreen() {
     true,
     {
       type: eventQueryType,
-      limit: 1000,
+      limit: DISCOVERY_EVENTS_LIMIT,
     },
   );
   const { categories } = useCategories();

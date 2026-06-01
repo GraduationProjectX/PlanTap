@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { api } from "backend/convex/_generated/api";
 import type { Doc } from "backend/convex/_generated/dataModel";
 
+import { DISCOVERY_EVENTS_LIMIT, isEventLiveNow } from "@/features/events/data";
 import { readCachedData, writeCachedData } from "@/utils/data-cache";
 import { STORAGE_KEYS } from "@/storage/keys";
 
@@ -22,17 +23,11 @@ type UseEventsOptions = {
 
 const EVENTS_CACHE_TTL_MS = 10 * 60 * 1000;
 
+export { DISCOVERY_EVENTS_LIMIT };
+
 function buildCollections(events: EventDoc[]): EventCollections {
   const now = Date.now();
-
-  const ongoing = events.filter(
-    (e) =>
-      e.type === "event" &&
-      e.startAt != null &&
-      e.endAt != null &&
-      e.startAt <= now &&
-      e.endAt > now,
-  );
+  const ongoing = events.filter((e) => e.type === "event" && isEventLiveNow(e));
 
   const upcoming = events
     .filter((e) => e.type === "event" && e.startAt != null && e.startAt > now)

@@ -101,7 +101,7 @@ export const fetchVisitSaudi = internalAction({
           type: "event" as const, 
           categories: smartCategories, 
           tags: [itemEn.type || "Attractions"], 
-          startAt: Date.now(), 
+          startAt: null, 
           endAt: null,
           city: itemEn.destination || "Eastern Province", 
           locationLat: itemEn.lat || 26.4207, 

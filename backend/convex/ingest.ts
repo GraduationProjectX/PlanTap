@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { internalMutation } from "./_generated/server";
+import { isLegacyCatalogEventInvalid } from "./lib/eventCatalog";
 import { normalizeEventCategories, normalizeEventCity } from "./lib/eventTaxonomy";
 import { eventDataValidator, eventFields, type EventData } from "./schema";
 
@@ -12,6 +13,14 @@ function normalizeEventData(eventData: EventData) {
       externalSource: eventData.externalSource,
       externalId: eventData.externalId,
       title: eventData.title,
+    });
+    return null;
+  }
+
+  if (isLegacyCatalogEventInvalid(eventData)) {
+    console.warn(`Skipping invalid catalog record "${eventData.title}"`, {
+      externalSource: eventData.externalSource,
+      externalId: eventData.externalId,
     });
     return null;
   }
