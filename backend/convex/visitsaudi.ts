@@ -53,7 +53,7 @@ export const fetchVisitSaudi = internalAction({
   args: {},
   handler: async (ctx): Promise<string> => {
     let offset = 0;
-    const limit = 50; 
+    const limit = 200; 
     const MAX_PAGES = 1; 
     let pagesFetched = 0;
     let totalSynced = 0;

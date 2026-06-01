@@ -76,7 +76,7 @@ export const listApproved = query({
   },
   returns: v.array(eventValidator),
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 50;
+    const limit = args.limit ?? 200;
 
     if (args.city !== undefined) {
       const city = args.city;

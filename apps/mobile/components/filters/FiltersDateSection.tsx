@@ -128,45 +128,43 @@ export function FiltersDateSection({
             </Pressable>
           </BottomSheet.Trigger>
 
-          {calendarOpen ? (
-            <BottomSheet.Portal>
-              <BottomSheet.Overlay animation="disabled" />
-              <BottomSheet.Content snapPoints={["65%"]} animation="disabled">
-                <BottomSheet.Close />
-                <BottomSheet.Title style={styles.sheetTitle}>
-                  {t("filters.chooseDatesTitle")}
-                </BottomSheet.Title>
-                <BottomSheet.Description style={styles.sheetDesc}>
-                  {t("filters.chooseDatesDesc")}
-                </BottomSheet.Description>
+          <BottomSheet.Portal>
+            <BottomSheet.Overlay animation="disabled" />
+            <BottomSheet.Content snapPoints={["65%"]} animation="disabled">
+              <BottomSheet.Close />
+              <BottomSheet.Title style={styles.sheetTitle}>
+                {t("filters.chooseDatesTitle")}
+              </BottomSheet.Title>
+              <BottomSheet.Description style={styles.sheetDesc}>
+                {t("filters.chooseDatesDesc")}
+              </BottomSheet.Description>
 
-                {CalendarComponent ? (
-                  <CalendarComponent
-                    markingType="period"
-                    markedDates={markedDates}
-                    onDayPress={handleDayPress}
-                    minDate={TODAY_STR}
-                    enableSwipeMonths
-                    theme={CALENDAR_THEME}
-                    style={styles.calendar}
-                  />
-                ) : null}
+              {CalendarComponent ? (
+                <CalendarComponent
+                  markingType="period"
+                  markedDates={markedDates}
+                  onDayPress={handleDayPress}
+                  minDate={TODAY_STR}
+                  enableSwipeMonths
+                  theme={CALENDAR_THEME}
+                  style={styles.calendar}
+                />
+              ) : null}
 
-                <View style={styles.sheetActions}>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    feedbackVariant="scale"
-                    onPress={handleConfirmDates}
-                    isDisabled={!rangeStart}
-                    style={styles.confirmBtn}
-                  >
-                    {t("filters.confirmDates")}
-                  </Button>
-                </View>
-              </BottomSheet.Content>
-            </BottomSheet.Portal>
-          ) : null}
+              <View style={styles.sheetActions}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  feedbackVariant="scale"
+                  onPress={handleConfirmDates}
+                  isDisabled={!rangeStart}
+                  style={styles.confirmBtn}
+                >
+                  {t("filters.confirmDates")}
+                </Button>
+              </View>
+            </BottomSheet.Content>
+          </BottomSheet.Portal>
         </BottomSheet>
       </View>
     </FilterSection>

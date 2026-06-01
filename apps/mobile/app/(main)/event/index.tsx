@@ -90,7 +90,6 @@ export default function ViewAllEventsScreen() {
   const cityOptions = getCityOptions(allEvents ?? []);
   const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
   const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
-  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = selectedCity ?? allCitiesLabel;
 
@@ -249,8 +248,6 @@ export default function ViewAllEventsScreen() {
                   value: selectedCity ?? ALL_CITIES_VALUE,
                   label: selectedCityLabel,
                 }}
-                isOpen={isCitySelectorOpen}
-                onOpenChange={setIsCitySelectorOpen}
                 onValueChange={(option) => {
                   setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
                 }}
@@ -271,38 +268,36 @@ export default function ViewAllEventsScreen() {
                   </Select.TriggerIndicator>
                 </Select.Trigger>
 
-                {isCitySelectorOpen ? (
-                  <Select.Portal>
-                    <Select.Overlay
-                      animation={{
-                        opacity: {
-                          value: CITY_OVERLAY_OPACITY_VALUES,
-                        },
-                      }}
-                      style={styles.cityOverlay}
-                    />
-                    <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
-                      <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                      <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                <Select.Portal>
+                  <Select.Overlay
+                    animation={{
+                      opacity: {
+                        value: CITY_OVERLAY_OPACITY_VALUES,
+                      },
+                    }}
+                    style={styles.cityOverlay}
+                  />
+                  <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                    <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                    <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                      <View style={styles.cityOptionInner}>
+                        <FontAwesome name="globe" size={16} />
+                        <Select.ItemLabel />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                    {cityOptions.map((cityOption) => (
+                      <Select.Item key={cityOption} value={cityOption} label={cityOption}>
                         <View style={styles.cityOptionInner}>
-                          <FontAwesome name="globe" size={16} />
+                          <FontAwesome name="building-o" size={16} />
                           <Select.ItemLabel />
                         </View>
                         <Select.ItemIndicator />
                       </Select.Item>
-                      {cityOptions.map((cityOption) => (
-                        <Select.Item key={cityOption} value={cityOption} label={cityOption}>
-                          <View style={styles.cityOptionInner}>
-                            <FontAwesome name="building-o" size={16} />
-                            <Select.ItemLabel />
-                          </View>
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                      <View style={{ height: cityModalBottomSpacer }} />
-                    </Select.Content>
-                  </Select.Portal>
-                ) : null}
+                    ))}
+                    <View style={{ height: cityModalBottomSpacer }} />
+                  </Select.Content>
+                </Select.Portal>
               </Select>
             </View>
           )}

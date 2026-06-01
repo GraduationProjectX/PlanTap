@@ -40,7 +40,7 @@ export const ingestKhobar = internalAction({
     }
 
     const query = args.query ?? "things to do";
-    const limit = args.limit ?? 50;
+    const limit = args.limit ?? 200;
 
     const url = new URL("https://api.foursquare.com/v3/places/search");
     url.searchParams.set("query", query);
