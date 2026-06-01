@@ -22,7 +22,7 @@
 
 ## About
 
-PlanTap is a monorepo for a mobile-first university schedule and campus planning experience. The app combines an Expo React Native client with a Convex backend and shared TypeScript packages.
+The app combines an Expo React Native client with a Convex backend and shared TypeScript packages.
 
 The current workspace is organized around:
 
