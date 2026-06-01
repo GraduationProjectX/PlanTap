@@ -1,5 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Select } from "heroui-native";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -51,6 +52,7 @@ export function FiltersCitySection({
   const { theme } = useUnistyles();
   const { flexDirection } = useDirection();
   const insets = useSafeAreaInsets();
+  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
   const cityModalBottomSpacer =
     (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
 
@@ -65,11 +67,13 @@ export function FiltersCitySection({
       <Select
         presentation="bottom-sheet"
         value={citySelectValue}
+        isOpen={isCitySelectorOpen}
+        onOpenChange={setIsCitySelectorOpen}
         onValueChange={(option) => {
           onSelectCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
         }}
       >
-        <Select.Trigger style={styles.selectTrigger}>
+        <Select.Trigger asChild={false} style={styles.selectTrigger}>
           <View style={[styles.selectInner, { flexDirection }]}>
             <FontAwesome name="building-o" size={16} />
             <Select.Value placeholder={t("filters.selectCity")} />
@@ -83,35 +87,37 @@ export function FiltersCitySection({
           </Select.TriggerIndicator>
         </Select.Trigger>
 
-        <Select.Portal>
-          <Select.Overlay
-            animation={CITY_SELECT_OVERLAY_ANIMATION}
-            style={CITY_SELECT_OVERLAY_STYLE}
-          />
-          <Select.Content
-            presentation="bottom-sheet"
-            snapPoints={["65%"]}
-          >
-            <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-            <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
-              <View style={styles.selectItemInner}>
-                <FontAwesome name="globe" size={16} />
-                <Select.ItemLabel />
-              </View>
-              <Select.ItemIndicator />
-            </Select.Item>
-            {cityOptions.map((city) => (
-              <Select.Item key={city} value={city} label={city}>
+        {isCitySelectorOpen ? (
+          <Select.Portal>
+            <Select.Overlay
+              animation={CITY_SELECT_OVERLAY_ANIMATION}
+              style={CITY_SELECT_OVERLAY_STYLE}
+            />
+            <Select.Content
+              presentation="bottom-sheet"
+              snapPoints={["65%"]}
+            >
+              <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+              <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
                 <View style={styles.selectItemInner}>
-                  <FontAwesome name="building-o" size={16} />
+                  <FontAwesome name="globe" size={16} />
                   <Select.ItemLabel />
                 </View>
                 <Select.ItemIndicator />
               </Select.Item>
-            ))}
-            <View style={{ height: cityModalBottomSpacer }} />
-          </Select.Content>
-        </Select.Portal>
+              {cityOptions.map((city) => (
+                <Select.Item key={city} value={city} label={city}>
+                  <View style={styles.selectItemInner}>
+                    <FontAwesome name="building-o" size={16} />
+                    <Select.ItemLabel />
+                  </View>
+                  <Select.ItemIndicator />
+                </Select.Item>
+              ))}
+              <View style={{ height: cityModalBottomSpacer }} />
+            </Select.Content>
+          </Select.Portal>
+        ) : null}
       </Select>
     </FilterSection>
   );

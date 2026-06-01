@@ -18,7 +18,7 @@ export type FilterSummaryTag = {
   label: string;
 };
 
-const SUPPORTED_CITIES = [
+export const SUPPORTED_CITIES = [
   "Riyadh",
   "Jeddah",
   "Makkah",

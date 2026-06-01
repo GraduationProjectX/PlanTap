@@ -5,6 +5,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/rtl";
 import { Pressable } from "react-native-gesture-handler";
+import { useState } from "react";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { CategoryChips } from "./CategoryChips";
 import { CategoryChipsSkeleton } from "./CategoryChipsSkeleton";
@@ -43,6 +44,7 @@ export function HomeHeaderTop({
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const { flexDirection, textAlign } = useDirection();
+  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
 
   const allCitiesLabel = t("filters.allCities");
   const selectedCityLabel = city ?? allCitiesLabel;
@@ -58,11 +60,13 @@ export function HomeHeaderTop({
           <Select
             presentation="bottom-sheet"
             value={citySelectValue}
+            isOpen={isCitySelectorOpen}
+            onOpenChange={setIsCitySelectorOpen}
             onValueChange={(option) => {
               onCitySelect(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
             }}
           >
-            <Select.Trigger style={styles.locationTrigger}>
+            <Select.Trigger asChild={false} style={styles.locationTrigger}>
               <Text style={styles.locationLabel}>{t("filters.city").toUpperCase()}</Text>
               <View style={[styles.cityRow, { flexDirection }]}>
                 <View style={[styles.cityValueRow, { flexDirection }]}>
@@ -75,24 +79,26 @@ export function HomeHeaderTop({
               </View>
             </Select.Trigger>
 
-            <Select.Portal>
-              <Select.Overlay
-                animation={{
-                  opacity: {
-                    value: CITY_OVERLAY_OPACITY_VALUES,
-                  },
-                }}
-                style={styles.cityOverlay}
-              />
-              <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
-                <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel} />
-                {cityOptions.map((cityOption) => (
-                  <Select.Item key={cityOption} value={cityOption} label={cityOption} />
-                ))}
-                <View style={{ height: 100 }} />
-              </Select.Content>
-            </Select.Portal>
+            {isCitySelectorOpen ? (
+              <Select.Portal>
+                <Select.Overlay
+                  animation={{
+                    opacity: {
+                      value: CITY_OVERLAY_OPACITY_VALUES,
+                    },
+                  }}
+                  style={styles.cityOverlay}
+                />
+                <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                  <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                  <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel} />
+                  {cityOptions.map((cityOption) => (
+                    <Select.Item key={cityOption} value={cityOption} label={cityOption} />
+                  ))}
+                  <View style={{ height: 100 }} />
+                </Select.Content>
+              </Select.Portal>
+            ) : null}
           </Select>
         </View>
 

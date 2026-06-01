@@ -11,7 +11,10 @@
 import type * as bookmarks from "../bookmarks.js";
 import type * as categories from "../categories.js";
 import type * as events from "../events.js";
+import type * as foursquare from "../foursquare.js";
+import type * as googleplaces from "../googleplaces.js";
 import type * as http from "../http.js";
+import type * as ingest from "../ingest.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
@@ -29,7 +32,10 @@ declare const fullApi: ApiFromModules<{
   bookmarks: typeof bookmarks;
   categories: typeof categories;
   events: typeof events;
+  foursquare: typeof foursquare;
+  googleplaces: typeof googleplaces;
   http: typeof http;
+  ingest: typeof ingest;
   "lib/auth": typeof lib_auth;
   reviews: typeof reviews;
   seed: typeof seed;

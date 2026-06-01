@@ -1,67 +1,129 @@
-import { internalAction } from "./_generated/server";
+import { v } from "convex/values";
+
 import { internal } from "./_generated/api";
+import { internalAction } from "./_generated/server";
 
-export const fetchAndSync = internalAction({
-  args: {},
-  handler: async (ctx) => {
-    const apiKey = process.env.FOURSQUARE_API_KEY?.trim();
-    if (!apiKey) throw new Error("Missing FOURSQUARE_API_KEY");
+function isString(value: unknown): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
+}
 
-    const city = "Khobar,SA"; 
-    const query = "entertainment, cafes, attractions";
-    
-    const url = `https://places-api.foursquare.com/places/search?near=${encodeURIComponent(city)}&query=${encodeURIComponent(query)}&limit=20`;
+function isNumber(value: unknown): value is number {
+  return Object.prototype.toString.call(value) === "[object Number]";
+}
 
-    const response = await fetch(url, {
-      method: 'GET',
+function toNullableString(value: unknown): string | null {
+  if (value === null) return null;
+  if (value === undefined) return null;
+  if (isString(value)) return value;
+  return null;
+}
+
+type FoursquarePlace = {
+  fsq_id?: string;
+  name?: string;
+  categories?: Array<{ name?: string }>;
+  location?: { formatted_address?: string };
+  geocodes?: { main?: { latitude?: number; longitude?: number } };
+  photos?: Array<{ prefix?: string; suffix?: string }>;
+};
+
+export const ingestKhobar = internalAction({
+  args: {
+    query: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const apiKey = process.env.FOURSQUARE_API_KEY;
+    if (!apiKey) {
+      throw new Error("FOURSQUARE_API_KEY is not set");
+    }
+
+    const query = args.query ?? "things to do";
+    const limit = args.limit ?? 50;
+
+    const url = new URL("https://api.foursquare.com/v3/places/search");
+    url.searchParams.set("query", query);
+    url.searchParams.set("near", "Khobar, Saudi Arabia");
+    url.searchParams.set("limit", String(limit));
+
+    const response = await fetch(url.toString(), {
       headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${apiKey}`, 
-        'X-places-api-version': '2025-02-05' 
-      }
+        Accept: "application/json",
+        Authorization: apiKey,
+      },
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Foursquare API failed with status: ${response.status} - ${errorText}`);
+      const body = await response.text();
+      throw new Error(`Foursquare API error: ${response.status} ${body}`);
     }
-    
-    const data = await response.json();
-    let count = 0;
-// mappedevent is very wip, i couldnt get enough info from foursquare
-    for (const place of data.results) {
-      const mappedEvent = {
-        title: place.name,
-        titleAr: place.name, 
-        descriptionShort: place.location?.formatted_address || "Great local spot.",
-        descriptionShortAr: null,
-        type: "activity" as const, 
-        categories: ["Places"], 
-        tags: ["Foursquare Places"], 
-        startAt: Date.now(),
-        endAt: null,
-        city: "Khobar", 
-        locationLat: 26.2144, 
-        locationLng: 50.1971,
-        locationAddress: place.location?.formatted_address || "Unknown Address", 
-        locationAddressAr: null,
-        priceMin: null,
-        priceMax: null,
-        indoorOutdoor: "unknown" as const,
-        familyFriendly: null,
-        images: [], 
-        favoritesCount: 0, 
-        status: "approved" as const, 
-        rating: null,
-      };
 
-      await ctx.runMutation(internal.ingest.ingestEvent, { 
-        eventData: mappedEvent 
+    const text = await response.text();
+    const data = JSON.parse(text);
+    const places: FoursquarePlace[] = Array.isArray(data?.results) ? data.results : [];
+
+    const ids: string[] = [];
+
+    for (const place of places) {
+      const name = toNullableString(place.name);
+      const title = name ?? "Untitled";
+
+      const categories = (place.categories ?? []).map((c) => toNullableString(c.name)).filter((c) => c !== null);
+      const categoryNames: string[] = [];
+      for (const c of categories) {
+        if (c) categoryNames.push(c);
+      }
+
+      const lat = place.geocodes?.main?.latitude;
+      const lng = place.geocodes?.main?.longitude;
+
+      if (!isNumber(lat) || !isNumber(lng)) {
+        continue;
+      }
+
+      const images: string[] = [];
+      for (const photo of place.photos ?? []) {
+        const prefix = toNullableString(photo.prefix);
+        const suffix = toNullableString(photo.suffix);
+        if (prefix && suffix) {
+          images.push(`${prefix}original${suffix}`);
+        }
+      }
+
+      const externalId = toNullableString(place.fsq_id);
+
+      const id = await ctx.runMutation(internal.ingest.ingestEvent, {
+        eventData: {
+          externalSource: "foursquare",
+          externalId,
+          title,
+          titleAr: title,
+          descriptionShort: null,
+          descriptionShortAr: null,
+          type: "activity",
+          categories: categoryNames.length ? categoryNames : ["Places"],
+          tags: [],
+          startAt: null,
+          endAt: null,
+          city: "Khobar",
+          locationLat: lat,
+          locationLng: lng,
+          locationAddress: toNullableString(place.location?.formatted_address),
+          locationAddressAr: null,
+          priceMin: null,
+          priceMax: null,
+          indoorOutdoor: "unknown",
+          familyFriendly: null,
+          images,
+          favoritesCount: 0,
+          status: "approved",
+          rating: null,
+        },
       });
-      
-      count++;
+
+      ids.push(id);
     }
 
-    return `Successfully synced ${count} places from Foursquare.`;
+    return { ingested: ids.length, ids };
   },
 });

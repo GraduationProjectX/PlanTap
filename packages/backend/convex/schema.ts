@@ -73,6 +73,8 @@ export const webhookEventFields = {
 };
 
 export const eventFields = {
+  externalSource: nullableString,
+  externalId: nullableString,
   title: v.string(),
   titleAr: v.string(),
   descriptionShort: nullableString,
@@ -132,6 +134,7 @@ export default defineSchema({
   events: defineTable(eventFields)
     .index("by_type_and_status", ["type", "status"])
     .index("by_city_and_status", ["city", "status"])
+    .index("by_external", ["externalSource", "externalId"])
     .index("by_status", ["status"]),
 
   categories: defineTable(categoryFields)

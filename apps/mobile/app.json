@@ -38,7 +38,8 @@
         {
           "locationWhenInUsePermission": "Allow PlanTap to show your location and sort nearby events on the map."
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
