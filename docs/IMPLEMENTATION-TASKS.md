@@ -42,8 +42,7 @@ That's it. No signing config needed for local testing, Gradle will use the debug
   - [x] `apps/mobile/`
   - [x] `apps/website/`
   - [x] `apps/scraper/`
-  - [x] `packages/backend/`
-  - [x] `packages/shared/`
+  - [x] `backend/`
 - [x] Configure shared TypeScript base config
 - [x] Setup Oxlint (fast linting)
 - [x] Setup Oxfmt (formatting)
@@ -99,8 +98,8 @@ That's it. No signing config needed for local testing, Gradle will use the debug
 - [x] Install convex + @convex-dev/react-native
 - [x] Copy Convex URL to environment
 - [x] Configure ConvexProvider in app entry (with Clerk integration)
-- [x] Create basic schema (packages/backend/convex/schema.ts) - users table with Clerk sync
-- [x] Run `pnpm -C packages/backend dev` and verify connection
+- [x] Create basic schema (backend/convex/schema.ts) - users table with Clerk sync
+- [x] Run `pnpm -C backend dev` and verify connection
 - [x] Test basic query from mobile
 
 ### 1.7 Clerk Setup
@@ -551,7 +550,7 @@ That's it. No signing config needed for local testing, Gradle will use the debug
 
 ---
 
-# 📦 BACKEND TASKS (packages/backend)
+# 📦 BACKEND TASKS (backend)
 
 ## Phase 2: Convex Schema & Functions
 
@@ -655,7 +654,6 @@ That's it. No signing config needed for local testing, Gradle will use the debug
 
 ---
 
-# 📦 SHARED PACKAGE TASKS (packages/shared)
 
 ### Types
 

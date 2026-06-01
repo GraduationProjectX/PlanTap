@@ -15,11 +15,10 @@ const config = getSentryExpoConfig(projectRoot);
 config.watchFolders = [...(config.watchFolders ?? []), workspaceRoot];
 
 config.resolver = config.resolver ?? {};
-config.resolver.blockList =
-  /.*[\\/]android[\\/]build[\\/].*|.*[\\/]ios[\\/]build[\\/].*|.*[\\/]android[\\/]app[\\/]build[\\/].*|.*[\\/]node_modules[\\/].*[\\/]android[\\/]build[\\/].*|.*[\\/]node_modules[\\/].*[\\/]ios[\\/]build[\\/].*/;
 
 config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
+  path.resolve(projectRoot, "node_modules"),
 ];
 
 config.resolver.extraNodeModules = {

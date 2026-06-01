@@ -22,13 +22,12 @@
 
 ## About
 
-The app combines an Expo React Native client with a Convex backend and shared TypeScript packages.
+The app combines an Expo React Native client with a Convex backend.
 
 The current workspace is organized around:
 
 - `apps/mobile`: Expo app, native mobile UI, routing, local storage, auth, maps, onboarding, and AI helpers.
-- `packages/backend`: Convex functions, schema, ingestion, events, users, bookmarks, reviews, and webhook handling.
-- `packages/shared`: shared TypeScript exports used across the workspace.
+- `backend`: Convex functions, schema, ingestion, events, users, bookmarks, reviews, and webhook handling.
 - `docs`: implementation notes, agent guides, and feature planning documents.
 
 ### Built With
@@ -100,7 +99,7 @@ Run commands from the repository root unless noted otherwise.
 | --- | --- |
 | `pnpm install` | Install all workspace dependencies. |
 | `pnpm run dev` | Start all persistent development tasks through Turborepo. |
-| `pnpm run build` | Build all packages that define a build task. |
+| `pnpm run build` | Build all workspace projects that define a build task. |
 | `pnpm run lint` | Lint the workspace. |
 | `pnpm run typecheck` | Type-check the workspace. |
 | `pnpm run format` | Format the workspace with oxfmt. |

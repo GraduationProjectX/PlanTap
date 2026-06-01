@@ -31,7 +31,9 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-  const { events, collections, isLoading: isEventsLoading } = useEvents();
+  const { events, collections, isLoading: isEventsLoading } = useEvents(undefined, true, {
+    limit: 500,
+  });
   const { categories, isLoading: isCategoriesLoading } = useCategories();
   const cityOptions = getCityOptions(events ?? []);
   const activeCity = selectedCity ?? undefined;

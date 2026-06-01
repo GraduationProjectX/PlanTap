@@ -57,10 +57,6 @@ export default function ViewAllEventsScreen() {
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
   const clearAppliedFilters = useEventFiltersStore((state) => state.clearAppliedFilters);
-  const isArabic = i18n.language === "ar";
-  const { events: allEvents, collections, isLoading: isEventsLoading } = useEvents();
-  const { categories } = useCategories();
-
   const { type, source, city, homeCategory, category } = useLocalSearchParams<{
     type?: string | string[];
     source?: string | string[];
@@ -69,6 +65,18 @@ export default function ViewAllEventsScreen() {
     category?: string | string[];
   }>();
   const eventType = normalizeEventListType(Array.isArray(type) ? type[0] : type);
+  const isArabic = i18n.language === "ar";
+  const eventQueryType =
+    eventType === "activity" ? "activity" : eventType === "all" ? undefined : "event";
+  const { events: allEvents, collections, isLoading: isEventsLoading } = useEvents(
+    undefined,
+    true,
+    {
+      type: eventQueryType,
+      limit: 1000,
+    },
+  );
+  const { categories } = useCategories();
   const sourceParam = Array.isArray(source) ? source[0] : source;
   const cityParam = Array.isArray(city) ? city[0] : city;
   const homeCategoryParam = Array.isArray(homeCategory) ? homeCategory[0] : homeCategory;
@@ -247,7 +255,7 @@ export default function ViewAllEventsScreen() {
                   setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
                 }}
               >
-                <Select.Trigger asChild={false} style={styles.citySelectTrigger}>
+                <Select.Trigger style={styles.citySelectTrigger}>
                   <View style={[styles.cityRow, { flexDirection }]}>
                     <FontAwesome name="map-marker" size={14} color="#FFFFFF" />
                     <Text style={styles.cityText} numberOfLines={1}>

@@ -66,7 +66,7 @@ export function HomeHeaderTop({
               onCitySelect(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
             }}
           >
-            <Select.Trigger asChild={false} style={styles.locationTrigger}>
+            <Select.Trigger style={styles.locationTrigger}>
               <Text style={styles.locationLabel}>{t("filters.city").toUpperCase()}</Text>
               <View style={[styles.cityRow, { flexDirection }]}>
                 <View style={[styles.cityValueRow, { flexDirection }]}>

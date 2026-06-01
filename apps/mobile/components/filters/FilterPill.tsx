@@ -1,6 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Chip } from "heroui-native";
-import { Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 type FilterPillProps = {
@@ -19,15 +18,19 @@ export function FilterPill({
   iconSize = 13,
 }: FilterPillProps) {
   return (
-    <Chip
-      size="md"
-      animation="disable-all"
+    <Pressable
       onPress={onPress}
-      style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
+      style={({ pressed }) => [
+        styles.pill,
+        active ? styles.pillActive : styles.pillInactive,
+        pressed && styles.pillPressed,
+      ]}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
     >
       {iconName && <FontAwesome name={iconName} size={iconSize} color={active ? "#FFF" : "#000"} />}
       <Text style={active ? styles.labelActive : styles.labelInactive}>{label}</Text>
-    </Chip>
+    </Pressable>
   );
 }
 
@@ -35,6 +38,12 @@ const styles = StyleSheet.create((theme) => ({
   pill: {
     borderRadius: 999,
     borderCurve: "continuous",
+    minHeight: 40,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   pillActive: {
     backgroundColor: "#000",
@@ -47,6 +56,9 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1.2,
     borderColor: "#E2E2E2",
     gap: 6,
+  },
+  pillPressed: {
+    opacity: 0.72,
   },
   labelActive: {
     color: "#FFF",

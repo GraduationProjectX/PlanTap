@@ -2,6 +2,7 @@ import { v } from "convex/values";
 
 import { internal } from "./_generated/api";
 import { internalAction } from "./_generated/server";
+import type { EventData } from "./schema";
 
 function isString(value: unknown): value is string {
   return Object.prototype.toString.call(value) === "[object String]";
@@ -37,7 +38,7 @@ export const ingestKhobar = internalAction({
     query: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ ingested: number; ids: string[] }> => {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
       throw new Error("GOOGLE_PLACES_API_KEY is not set");
@@ -60,7 +61,7 @@ export const ingestKhobar = internalAction({
     const data = JSON.parse(text);
     const places: GoogleTextSearchPlace[] = Array.isArray(data?.results) ? data.results : [];
 
-    const ids: string[] = [];
+    const eventsData: EventData[] = [];
 
     for (const place of places.slice(0, limit)) {
       const lat = place.geometry?.location?.lat;
@@ -78,37 +79,35 @@ export const ingestKhobar = internalAction({
 
       const rating = place.rating;
 
-      const id = await ctx.runMutation(internal.ingest.ingestEvent, {
-        eventData: {
-          externalSource: "googleplaces",
-          externalId,
-          title,
-          titleAr: title,
-          descriptionShort: null,
-          descriptionShortAr: null,
-          type: "activity",
-          categories: ["Places"],
-          tags,
-          startAt: null,
-          endAt: null,
-          city: "Khobar",
-          locationLat: lat,
-          locationLng: lng,
-          locationAddress: toNullableString(place.formatted_address),
-          locationAddressAr: null,
-          priceMin: null,
-          priceMax: null,
-          indoorOutdoor: "unknown",
-          familyFriendly: null,
-          images: [],
-          favoritesCount: 0,
-          status: "approved",
-          rating: isNumber(rating) ? rating : null,
-        },
+      eventsData.push({
+        externalSource: "googleplaces",
+        externalId,
+        title,
+        titleAr: title,
+        descriptionShort: null,
+        descriptionShortAr: null,
+        type: "activity",
+        categories: ["Places"],
+        tags,
+        startAt: null,
+        endAt: null,
+        city: "Khobar",
+        locationLat: lat,
+        locationLng: lng,
+        locationAddress: toNullableString(place.formatted_address),
+        locationAddressAr: null,
+        priceMin: null,
+        priceMax: null,
+        indoorOutdoor: "unknown",
+        familyFriendly: null,
+        images: [],
+        favoritesCount: 0,
+        status: "approved",
+        rating: isNumber(rating) ? rating : null,
       });
-
-      ids.push(id);
     }
+
+    const ids: string[] = await ctx.runMutation(internal.ingest.ingestEvents, { eventsData });
 
     return { ingested: ids.length, ids };
   },

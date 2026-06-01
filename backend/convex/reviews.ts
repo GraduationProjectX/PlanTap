@@ -47,6 +47,7 @@ function roundAverageRating(total: number, count: number) {
 }
 
 const MAX_REVIEW_BODY_LENGTH = 2000;
+const MAX_EVENT_REVIEWS = 100;
 
 export const getForEvent = query({
   args: { eventId: v.id("events") },
@@ -72,7 +73,7 @@ export const getForEvent = query({
       .query("reviews")
       .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", args.eventId))
       .order("desc")
-      .collect();
+      .take(MAX_EVENT_REVIEWS);
 
     const reviews = await Promise.all(
       eventReviews.map(async (review) => {
@@ -161,7 +162,7 @@ export const upsertForEvent = mutation({
     const eventReviews = await ctx.db
       .query("reviews")
       .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", args.eventId))
-      .collect();
+      .take(MAX_EVENT_REVIEWS);
 
     const ratingTotal = eventReviews.reduce((total, review) => total + review.rating, 0);
     await ctx.db.patch(args.eventId, {

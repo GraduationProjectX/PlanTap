@@ -50,24 +50,22 @@ plantap/
 │   ├── mobile/          # Expo React Native app
 │   ├── admin/           # React admin dashboard
 │   └── scraper/         # Playwright scraper
-├── packages/
 │   ├── backend/         # Convex functions + schema
 │   │   └── convex/      # Convex source files
 │   │       ├── schema.ts
 │   │       ├── _generated/
 │   │       └── ...
-│   └── shared/          # Shared types, utils, constants
 ├── turbo.json
 └── package.json
 ```
 
 ### Convex Workspace Layout
 
-- Convex project root: `packages/backend`
-- Convex source: `packages/backend/convex/`
-- Generated API/types: `packages/backend/convex/_generated/`
-- Run Convex commands from `packages/backend` (or via turbo scripts)
-- Mobile/admin import generated `api` from `@plantap/backend`
+- Convex project root: `backend`
+- Convex source: `backend/convex/`
+- Generated API/types: `backend/convex/_generated/`
+- Run Convex commands from `backend` (or via turbo scripts)
+- Mobile imports generated `api` from `backend`
 
 ---
 
@@ -368,7 +366,7 @@ plantap/
 - Install @convex-dev/react-native
 - Configure Convex client
 - Setup environment variables
-- Create shared types in `packages/shared`
+- Keep shared types near the app or backend code that owns them
 
 ### 1.3 Clerk Authentication
 
@@ -708,16 +706,16 @@ apps/scraper/
 
 ---
 
-# 📦 SHARED PACKAGES
+# BACKEND
 
-## packages/backend (Convex)
+## backend (Convex)
 
 ### Monorepo Layout (Recommended)
 
-- Convex project root: `packages/backend`
-- Convex source: `packages/backend/convex/`
-- Generate API/types in `packages/backend/convex/_generated/`
-- Run Convex commands from `packages/backend` (or via turbo scripts that set `cwd`)
+- Convex project root: `backend`
+- Convex source: `backend/convex/`
+- Generate API/types in `backend/convex/_generated/`
+- Run Convex commands from `backend` (or via turbo scripts that set `cwd`)
 
 ### Schema Implementation
 
@@ -801,7 +799,7 @@ apps/scraper/
 
 ---
 
-## packages/shared
+## shared
 
 ### Types
 
@@ -830,10 +828,10 @@ apps/scraper/
 
 ## Automated Tests
 
-### Convex Functions (packages/backend)
+### Convex Functions (backend)
 
 ```bash
-pnpm -C packages/backend exec convex dev --once  # Type check
+pnpm -C backend exec convex dev --once  # Type check
 ```
 
 - Test suggestion algorithm with mock data

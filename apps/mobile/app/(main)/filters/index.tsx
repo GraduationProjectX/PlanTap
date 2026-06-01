@@ -30,7 +30,9 @@ export default function FiltersScreen() {
 
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
-  const { events, isLoading: isEventsLoading } = useEvents();
+  const { events, isLoading: isEventsLoading } = useEvents(undefined, true, {
+    limit: 1000,
+  });
   const { categories, isLoading: isCategoriesLoading } = useCategories();
 
   const {

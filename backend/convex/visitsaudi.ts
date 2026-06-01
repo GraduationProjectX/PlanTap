@@ -1,5 +1,6 @@
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { EventData } from "./schema";
 
 
 function determineCategories(vsType: string, title: string): string[] {
@@ -33,14 +34,30 @@ function determineCategories(vsType: string, title: string): string[] {
   return Array.from(categories);
 }
 
+type VisitSaudiItem = {
+  id: string;
+  title?: string;
+  destination?: string;
+  currentPrice?: string;
+  type?: string;
+  lat?: number;
+  lng?: number;
+  image?: { fileReference?: string };
+};
+
+type VisitSaudiResponse = {
+  results?: VisitSaudiItem[];
+};
+
 export const fetchVisitSaudi = internalAction({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<string> => {
     let offset = 0;
     const limit = 50; 
     const MAX_PAGES = 1; 
     let pagesFetched = 0;
     let totalSynced = 0;
+    const eventsData: EventData[] = [];
 
     console.log("Starting Scraper...");
 
@@ -57,25 +74,25 @@ export const fetchVisitSaudi = internalAction({
         break; 
       }
 
-      const dataEn = await resEn.json();
-      const dataAr = await resAr.json();
+      const dataEn: VisitSaudiResponse = JSON.parse(await resEn.text());
+      const dataAr: VisitSaudiResponse = JSON.parse(await resAr.text());
       if (!dataEn.results || dataEn.results.length === 0) {
         console.log("Reached the end of the database!");
         break;
       }
 
-      
       for (const itemEn of dataEn.results) {
         const slugEn = itemEn.id.split('/').pop(); // arabic didnt work so we had to trim the entire string and take the last part to match cause otherwise it wouldnt find it cause the links are different
-        const itemAr = dataAr.results.find((ar: any) => ar.id.split('/').pop() === slugEn);
+        const itemAr = (dataAr.results ?? []).find((ar: any) => ar.id.split('/').pop() === slugEn);
         let parsedPrice = null;
         if (itemEn.currentPrice) {
           const match = itemEn.currentPrice.match(/\d+/); 
           if (match) parsedPrice = parseInt(match[0], 10);
         }
 
-        const smartCategories = determineCategories(itemEn.type, itemEn.title);
+        const smartCategories = determineCategories(itemEn.type || "", itemEn.title || "Unknown Event");
         const mappedEvent = {
+          externalSource: "visitsaudi",
           externalId: `vs_${itemEn.id.replace(/\//g, '_')}`,  // for dupes
           title: itemEn.title || "Unknown Event",
           titleAr: itemAr?.title || itemEn.title || "Unknown Event", 
@@ -101,9 +118,7 @@ export const fetchVisitSaudi = internalAction({
           rating: null,
         };
 
-        await ctx.runMutation(internal.ingest.ingestEvent, { 
-          eventData: mappedEvent 
-        });
+        eventsData.push(mappedEvent);
 
         totalSynced++;
       }
@@ -114,6 +129,8 @@ export const fetchVisitSaudi = internalAction({
       pagesFetched++;
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
+
+    await ctx.runMutation(internal.ingest.ingestEvents, { eventsData });
 
     console.log(`Scraping Complete! Successfully synced ${totalSynced} dual-language items.`);
     return `Scraping Complete! Successfully synced ${totalSynced} items from Visit Saudi.`;

@@ -2,6 +2,7 @@ import { internalMutation, type MutationCtx } from "./_generated/server";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+const SEED_LOOKUP_LIMIT = 500;
 
 type SeedEvent = {
   title: string;
@@ -638,9 +639,9 @@ const seedCategories = [
 
 async function seedAllData(ctx: MutationCtx) {
   const [existingEvents, existingCategories, existingUsers] = await Promise.all([
-    ctx.db.query("events").collect(),
-    ctx.db.query("categories").collect(),
-    ctx.db.query("users").collect(),
+    ctx.db.query("events").take(SEED_LOOKUP_LIMIT),
+    ctx.db.query("categories").take(SEED_LOOKUP_LIMIT),
+    ctx.db.query("users").take(SEED_LOOKUP_LIMIT),
   ]);
 
   const now = Date.now();
@@ -734,7 +735,7 @@ async function seedAllData(ctx: MutationCtx) {
     const eventReviews = await ctx.db
       .query("reviews")
       .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", eventId))
-      .collect();
+      .take(SEED_LOOKUP_LIMIT);
     const totals = eventReviews.reduce(
       (result, review) => ({
         total: result.total + review.rating,

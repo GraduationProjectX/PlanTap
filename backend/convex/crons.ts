@@ -1,4 +1,4 @@
-// File: packages/backend/convex/crons.ts
+// File: backend/convex/crons.ts
 import { cronJobs } from "convex/server";
 import { internal } from "./_generated/api";
 
@@ -8,7 +8,7 @@ const crons = cronJobs();
 crons.cron(
   "Harvest Google Places automatically",
   "0 0,12 * * *", // twice at 12
-  internal.googleplaces.fetchAndSync,
+  internal.googleplaces.ingestKhobar,
   {}
 );
 

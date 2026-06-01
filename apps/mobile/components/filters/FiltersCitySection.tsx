@@ -73,7 +73,7 @@ export function FiltersCitySection({
           onSelectCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
         }}
       >
-        <Select.Trigger asChild={false} style={styles.selectTrigger}>
+        <Select.Trigger style={styles.selectTrigger}>
           <View style={[styles.selectInner, { flexDirection }]}>
             <FontAwesome name="building-o" size={16} />
             <Select.Value placeholder={t("filters.selectCity")} />
