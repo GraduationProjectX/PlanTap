@@ -6,7 +6,7 @@
   <h1>PlanTap</h1>
 
   <p>
-    A collaborative university planning app built with Expo, React Native, Convex, Turborepo, and pnpm workspaces.
+    PlanTap is an Events discovery app built with React Native(Expo) and Convex
   </p>
 
   <p>
