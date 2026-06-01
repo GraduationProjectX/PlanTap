@@ -1,99 +1,155 @@
-# 🌱 PlanTap
+<a id="readme-top"></a>
 
-**A Collaborative University Schedule App** built with Expo (React Native), Turborepo, and pnpm workspaces.
+<div align="center">
+  <img src="apps/mobile/assets/images/planTap-icon.png" alt="PlanTap logo" width="120" height="120" />
 
-## 📋 Prerequisites
+  <h1>PlanTap</h1>
 
-Before you begin, ensure you have the following installed:
+  <p>
+    A collaborative university planning app built with Expo, React Native, Convex, Turborepo, and pnpm workspaces.
+  </p>
 
-| Tool               | Version                | Download Link                                                 |
-| ------------------ | ---------------------- | ------------------------------------------------------------- |
-| **Node.js**        | 20.19+ (or 22 LTS)     | [nodejs.org](https://nodejs.org/)                             |
-| **pnpm**           | 10+                    | [pnpm.io](https://pnpm.io/)                                   |
-| **Android Studio** | Latest                 | [developer.android.com](https://developer.android.com/studio) |
-| **Git**            | Latest                 | [git-scm.com](https://git-scm.com/)                           |
+  <p>
+    <a href="#about">About</a>
+    |
+    <a href="#getting-started">Getting Started</a>
+    |
+    <a href="#development">Development</a>
+    |
+    <a href="#troubleshooting">Troubleshooting</a>
+  </p>
+</div>
 
-> If `pnpm` is not installed, run `corepack enable pnpm` once, then use `pnpm ...`.
+## About
 
-### Android Studio Setup
+PlanTap is a monorepo for a mobile-first university schedule and campus planning experience. The app combines an Expo React Native client with a Convex backend and shared TypeScript packages.
 
-1. Install Android Studio
-2. Open **SDK Manager** (Tools → SDK Manager)
-3. Install:
-   - **SDK Platforms**: Android 14 (API 34)
-   - **SDK Tools**: Android SDK Build-Tools, Android Emulator, Android SDK Platform-Tools
-4. Create an emulator (Tools → Device Manager → Create Device)
-5. Add to your system PATH:
-   ```
-   %LOCALAPPDATA%\Android\Sdk\platform-tools
-   ```
+The current workspace is organized around:
 
----
+- `apps/mobile`: Expo app, native mobile UI, routing, local storage, auth, maps, onboarding, and AI helpers.
+- `packages/backend`: Convex functions, schema, ingestion, events, users, bookmarks, reviews, and webhook handling.
+- `packages/shared`: shared TypeScript exports used across the workspace.
+- `docs`: implementation notes, agent guides, and feature planning documents.
 
-## 🚀 Installation
+### Built With
 
-### 1. Clone the Repository
+- [Expo](https://expo.dev/)
+- [React Native](https://reactnative.dev/)
+- [Convex](https://www.convex.dev/)
+- [Turborepo](https://turbo.build/repo)
+- [pnpm](https://pnpm.io/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [HeroUI Native](https://www.heroui.com/)
+
+<p align="right"><a href="#readme-top">Back to top</a></p>
+
+## Getting Started
+
+### Prerequisites
+
+Install these before running the app locally:
+
+| Tool | Version | Notes |
+| --- | --- | --- |
+| Node.js | 20.19+ or 22 LTS | Required by Expo and the workspace tooling. |
+| pnpm | 10+ | The repo is configured with `pnpm@10.28.2`. |
+| Git | Latest | Required to clone and work with the repository. |
+| Android Studio | Latest | Required for Android emulator/device builds. |
+
+If pnpm is not available, enable it through Corepack:
 
 ```bash
-git clone https://github.com/YOUR_ORG/PlanTap.git
+corepack enable pnpm
+```
+
+### Installation
+
+Clone the repository, install dependencies, then start the mobile app:
+
+```bash
+git clone https://github.com/GraduationProjectX/PlanTap.git
 cd PlanTap
-```
-
-### 2. Install Dependencies
-
-```bash
 pnpm install
-```
-
-This installs all dependencies for the entire monorepo (mobile app, backend, shared packages).
-
-### 3. Run the Mobile App
-
-```bash
 pnpm --filter mobile android
 ```
 
-> **First run takes 5-10 minutes** as it builds the native Android project.
+The first Android run can take several minutes because Expo builds the native project.
 
+### Android Setup
 
+1. Install Android Studio.
+2. Open SDK Manager from `Tools > SDK Manager`.
+3. Install Android SDK Platform 34 or newer.
+4. Install Android SDK Build-Tools, Android Emulator, and Android SDK Platform-Tools.
+5. Create and start an emulator from `Tools > Device Manager`.
+6. Add platform tools to your PATH:
 
-## 📜 Available Scripts
+```text
+%LOCALAPPDATA%\Android\Sdk\platform-tools
+```
 
-Run these from the **root** directory:
+<p align="right"><a href="#readme-top">Back to top</a></p>
 
-| Command                       | Description                   |
-| ----------------------------- | ----------------------------- |
-| `pnpm install`       | Install all dependencies      |
-| `pnpm run dev`       | Start all development servers |
-| `pnpm run build`     | Build all packages            |
-| `pnpm run lint`      | Lint all packages             |
-| `pnpm run typecheck` | Type-check all packages       |
+## Development
 
-Run these from `apps/mobile/`:
+Run commands from the repository root unless noted otherwise.
 
-| Command                 | Description                     |
-| ----------------------- | ------------------------------- |
-| `pnpm dev`     | Start Metro for Dev Client      |
-| `pnpm android` | Run on Android emulator/device  |
-| `pnpm ios`     | Run on iOS simulator (Mac only) |
-| `pnpm start`   | Start Metro bundler only        |
+### Workspace Commands
 
----
+| Command | Description |
+| --- | --- |
+| `pnpm install` | Install all workspace dependencies. |
+| `pnpm run dev` | Start all persistent development tasks through Turborepo. |
+| `pnpm run build` | Build all packages that define a build task. |
+| `pnpm run lint` | Lint the workspace. |
+| `pnpm run typecheck` | Type-check the workspace. |
+| `pnpm run format` | Format the workspace with oxfmt. |
+| `pnpm run format:check` | Check formatting without writing changes. |
+| `pnpm android` | Run the mobile app on Android. |
+| `pnpm ios` | Run the mobile app on iOS. |
 
-## 🔧 Troubleshooting
+### Mobile Commands
 
-### pnpm build scripts are blocked
+| Command | Description |
+| --- | --- |
+| `pnpm --filter mobile dev -- -c` | Start Expo for a development client and clear cache. |
+| `pnpm --filter mobile start` | Start the Expo Metro server. |
+| `pnpm --filter mobile android` | Build and run the Android app. |
+| `pnpm --filter mobile ios` | Build and run the iOS app on macOS. |
+| `pnpm --filter mobile web` | Start the Expo web target. |
 
-If `pnpm install` warns about **Ignored build scripts**, run:
+### Backend Commands
+
+| Command | Description |
+| --- | --- |
+| `pnpm --filter backend dev` | Start Convex development mode. |
+| `pnpm --filter backend typecheck` | Type-check the backend package. |
+| `pnpm --filter backend lint` | Lint the backend package. |
+
+<p align="right"><a href="#readme-top">Back to top</a></p>
+
+## Troubleshooting
+
+### pnpm reports ignored build scripts
+
+Approve and rebuild pending scripts:
 
 ```bash
 pnpm approve-builds
 pnpm rebuild --pending
 ```
 
-### "The android project is malformed"
+### Android emulator is not detected
 
-Delete the android folder and regenerate:
+Start an emulator in Android Studio, then confirm that `adb` can see it:
+
+```bash
+adb devices
+```
+
+### Android native project is malformed
+
+Regenerate the native Android project from the Expo app:
 
 ```bash
 cd apps/mobile
@@ -102,12 +158,10 @@ pnpm expo:prebuild -- --platform android
 pnpm android
 ```
 
-### Android emulator not detected
+<p align="right"><a href="#readme-top">Back to top</a></p>
 
-1. Open Android Studio
-2. Start an emulator from Device Manager
-3. Verify with: `adb devices` (should show your emulator)
+## License
 
-## 📝 License
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
-MIT License - see [LICENSE](LICENSE) for details.
+<p align="right"><a href="#readme-top">Back to top</a></p>
