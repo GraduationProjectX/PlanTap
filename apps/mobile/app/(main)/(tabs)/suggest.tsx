@@ -11,13 +11,14 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { AiModelSelector } from "@/components/ui/AiModelSelector";
-import { SUPPORTED_CITIES } from "@/features/filters/utils";
+import { getCityDisplayLabel } from "@/features/filters/utils";
 import { useAiContext } from "@/hooks/useAiContext";
 import { useEventRecommendations } from "@/hooks/useEventRecommendations";
 import { useEvents, type EventDoc } from "@/hooks/use-events";
 import { useDirection } from "@/rtl";
 import type { RecommendationResult } from "@/services/ai/types";
 import { useAiStore } from "@/stores";
+import { SUPPORTED_CITIES } from "@/features/location/cities";
 
 const PROVIDER_LABELS = {
   gemini: "Gemini",
@@ -51,7 +52,7 @@ function isEventDoc(value: EventDoc | undefined): value is EventDoc {
 }
 
 export default function SuggestScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { textAlign, flexDirection, isRTL } = useDirection();
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
@@ -72,7 +73,10 @@ export default function SuggestScreen() {
   const defaultCity = convexData.userContext?.city;
   const fallbackCity = SUPPORTED_CITIES[0];
   const resolvedCity = selectedCity ?? defaultCity ?? fallbackCity;
-  const selectedCityValue = resolvedCity ? { value: resolvedCity, label: resolvedCity } : undefined;
+  const isArabic = i18n.language === "ar";
+  const selectedCityValue = resolvedCity
+    ? { value: resolvedCity, label: getCityDisplayLabel(resolvedCity, isArabic) }
+    : undefined;
   const { events: fullEvents, isLoading: isFullEventsLoading } = useEvents(resolvedCity, true);
   const needsLocalModel = provider === "local" && (!localModelDownloaded || !localModelPath);
   const canRequest = isAuthenticated && !convexData.isLoading && !isLoading && !needsLocalModel;
@@ -185,7 +189,10 @@ export default function SuggestScreen() {
               <View style={[styles.cityRow, { flexDirection }]}>
                 <View style={[styles.cityValueRow, { flexDirection }]}>
                   <FontAwesome name="map-marker" size={18} color={theme.colors.headerForeground} />
-                  <Select.Value style={{color: "white", fontSize: 18}} placeholder={t("ai.cityPlaceholder")} />
+                  <Select.Value
+                    style={{ color: "white", fontSize: 18 }}
+                    placeholder={t("ai.cityPlaceholder")}
+                  />
                 </View>
                 <Select.TriggerIndicator />
               </View>
@@ -199,7 +206,11 @@ export default function SuggestScreen() {
               <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
                 <Select.ListLabel>{t("ai.cityListLabel")}</Select.ListLabel>
                 {SUPPORTED_CITIES.map((city) => (
-                  <Select.Item key={city} value={city} label={city} />
+                  <Select.Item
+                    key={city}
+                    value={city}
+                    label={getCityDisplayLabel(city, isArabic)}
+                  />
                 ))}
                 <View style={styles.sheetBottomSpacer} />
               </Select.Content>

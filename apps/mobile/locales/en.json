@@ -19,6 +19,16 @@
     "suggest": "Suggest",
     "profile": "Profile"
   },
+  "signIn": {
+    "subtitle": "Discover nearby events and activities.",
+    "continueWithGoogle": "Continue with Google",
+    "signInWithApple": "Sign in with Apple",
+    "signingIn": "Signing in...",
+    "termsPrefix": "By continuing, you agree to our",
+    "termsJoiner": "and",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy"
+  },
   "ai": {
     "modelSelector": "AI Model",
     "apiProviders": "API Providers",

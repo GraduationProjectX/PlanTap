@@ -120,6 +120,7 @@ export default function OnboardingScreen() {
       }
 
       await completeOnboarding({
+        locale: i18n.language === "en" ? "en" : "ar",
         city: draft.city,
         preferences: {
           likedTags: draft.preferences.likedTags,

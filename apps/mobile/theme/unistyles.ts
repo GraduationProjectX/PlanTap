@@ -211,75 +211,6 @@ const lightTheme = {
   },
 };
 
-// Dark theme colors
-const darkTheme = {
-  ...tokens,
-  colors: {
-    // Brand
-    primary: "#FFFFFF",
-    primaryForeground: "#000000",
-
-    // Background hierarchy
-    background: "#0A0A0A",
-    surface: "#1A1A1A",
-    surfaceElevated: "#262626",
-
-    // Header (inverted for dark mode)
-    headerBackground: "#1A1A1A",
-    headerForeground: "#FFFFFF",
-    headerMuted: "rgba(255, 255, 255, 0.6)",
-    headerOverlay: "rgba(255, 255, 255, 0.1)",
-    headerBorder: "rgba(255, 255, 255, 0.1)",
-
-    // Text hierarchy
-    text: "#FFFFFF",
-    textSecondary: "#A3A3A3",
-    textMuted: "#737373",
-
-    // Semantic colors
-    success: "#4ADE80",
-    successForeground: "#000000",
-    warning: "#FBBF24",
-    warningForeground: "#000000",
-    error: "#F87171",
-    errorForeground: "#000000",
-    info: "#60A5FA",
-    infoForeground: "#000000",
-
-    // Live/Active indicator
-    live: "#FFFFFF",
-
-    // UI elements
-    border: "#454545",
-    borderStrong: "#757575",
-    divider: "#4A4A4A",
-
-    // Overlays
-    overlay: "rgba(0, 0, 0, 0.7)",
-    overlayDark: "rgba(0, 0, 0, 0.9)",
-    overlayLight: "rgba(30, 30, 30, 0.95)",
-
-    // Input fields
-    inputBackground: "rgba(255, 255, 255, 0.1)",
-    inputBorder: "rgba(255, 255, 255, 0.1)",
-    inputPlaceholder: "rgba(255, 255, 255, 0.5)",
-
-    // Interactive states
-    pressedOverlay: "rgba(255, 255, 255, 0.1)",
-    focusRing: "#FFFFFF",
-
-    // Tab bar
-    tabBar: "#1A1A1A",
-    tabBarBorder: "rgba(255, 255, 255, 0.1)",
-    tabActive: "#FFFFFF",
-    tabInactive: "#737373",
-
-    // Skeleton loading
-    skeleton: "#262626",
-    skeletonHighlight: "#404040",
-  },
-};
-
 // Breakpoints for responsive design (based on common device widths)
 const breakpoints = {
   xs: 0, // Small phones
@@ -291,7 +222,6 @@ const breakpoints = {
 // Define theme types
 type AppThemes = {
   light: typeof lightTheme;
-  dark: typeof darkTheme;
 };
 
 type AppBreakpoints = typeof breakpoints;
@@ -300,11 +230,10 @@ type AppBreakpoints = typeof breakpoints;
 StyleSheet.configure({
   themes: {
     light: lightTheme,
-    dark: darkTheme,
   },
   breakpoints,
   settings: {
-    adaptiveThemes: true, // Follows system theme
+    initialTheme: "light",
   },
 });
 
@@ -321,4 +250,4 @@ export type ThemeSpacing = Theme["spacing"];
 export type ThemeRadius = Theme["radius"];
 export type ThemeShadow = Theme["shadow"];
 
-export { lightTheme, darkTheme, tokens, breakpoints };
+export { lightTheme, tokens, breakpoints };

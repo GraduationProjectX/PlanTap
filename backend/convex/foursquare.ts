@@ -69,7 +69,9 @@ export const ingestKhobar = internalAction({
       const name = toNullableString(place.name);
       const title = name ?? "Untitled";
 
-      const categories = (place.categories ?? []).map((c) => toNullableString(c.name)).filter((c) => c !== null);
+      const categories = (place.categories ?? [])
+        .map((c) => toNullableString(c.name))
+        .filter((c) => c !== null);
       const categoryNames: string[] = [];
       for (const c of categories) {
         if (c) categoryNames.push(c);

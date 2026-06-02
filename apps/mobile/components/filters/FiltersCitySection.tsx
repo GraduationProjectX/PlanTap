@@ -5,6 +5,7 @@ import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { getCityDisplayLabel } from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 
 import { FilterSection } from "./FilterSection";
@@ -47,17 +48,18 @@ export function FiltersCitySection({
   selectedCity,
   onSelectCity,
 }: FiltersCitySectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useUnistyles();
   const { flexDirection } = useDirection();
   const insets = useSafeAreaInsets();
+  const isArabic = i18n.language === "ar";
   const cityModalBottomSpacer =
     (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
 
   const allCitiesLabel = t("filters.allCities");
 
   const citySelectValue: SelectValue = selectedCity
-    ? { value: selectedCity, label: selectedCity }
+    ? { value: selectedCity, label: getCityDisplayLabel(selectedCity, isArabic) }
     : { value: ALL_CITIES_VALUE, label: allCitiesLabel };
 
   return (
@@ -88,10 +90,7 @@ export function FiltersCitySection({
             animation={CITY_SELECT_OVERLAY_ANIMATION}
             style={CITY_SELECT_OVERLAY_STYLE}
           />
-          <Select.Content
-            presentation="bottom-sheet"
-            snapPoints={["65%"]}
-          >
+          <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
             <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
             <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
               <View style={styles.selectItemInner}>
@@ -101,7 +100,7 @@ export function FiltersCitySection({
               <Select.ItemIndicator />
             </Select.Item>
             {cityOptions.map((city) => (
-              <Select.Item key={city} value={city} label={city}>
+              <Select.Item key={city} value={city} label={getCityDisplayLabel(city, isArabic)}>
                 <View style={styles.selectItemInner}>
                   <FontAwesome name="building-o" size={16} />
                   <Select.ItemLabel />

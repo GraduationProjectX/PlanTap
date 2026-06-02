@@ -1,6 +1,7 @@
 import type { CategoryDoc } from "@/hooks/use-categories";
 import type { EventDoc } from "@/hooks/use-events";
 import type { EventFilters, FilterType } from "@/features/events/data";
+import { SUPPORTED_CITIES, getCityLabel } from "@/features/location/cities";
 
 type TranslateFn = (key: string) => string;
 
@@ -18,24 +19,37 @@ export type FilterSummaryTag = {
   label: string;
 };
 
-export const SUPPORTED_CITIES = [
-  "Riyadh",
-  "Jeddah",
-  "Makkah",
-  "Madinah",
-  "Dammam",
-  "Khobar",
-  "Qassim",
-  "Taif",
-  "Abha",
-  "Tabuk",
-  "Hail",
-  "Jazan",
-  "Najran",
-  "Al Ahsa",
-  "Al Jubail",
-  "Yanbu",
-];
+const CATEGORY_LABELS_EN: Record<string, string> = {
+  all: "All",
+  sports: "Sports",
+  adventure: "Adventure",
+  entertainment: "Entertainment",
+  food: "Food",
+  concerts: "Concerts",
+  arts: "Arts",
+  tech: "Tech",
+  wellness: "Wellness",
+  music: "Music",
+  family: "Family",
+  nightlife: "Nightlife",
+  culture: "Culture",
+};
+
+const CATEGORY_LABELS_AR: Record<string, string> = {
+  all: "الكل",
+  sports: "رياضة",
+  adventure: "مغامرة",
+  entertainment: "ترفيه",
+  food: "طعام",
+  concerts: "حفلات",
+  arts: "فنون",
+  tech: "تقنية",
+  wellness: "عافية",
+  music: "موسيقى",
+  family: "عائلة",
+  nightlife: "سهر",
+  culture: "ثقافة",
+};
 
 export const CALENDAR_THEME = {
   backgroundColor: "#FFFFFF",
@@ -59,11 +73,28 @@ function uniqueSorted(values: string[]): string[] {
   return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b));
 }
 
+function formatCategoryKeyLabel(categoryKey: string): string {
+  return categoryKey
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getFallbackCategoryLabel(categoryKey: string, isArabic: boolean): string {
+  const label = isArabic ? CATEGORY_LABELS_AR[categoryKey] : CATEGORY_LABELS_EN[categoryKey];
+  return label ?? formatCategoryKeyLabel(categoryKey);
+}
+
 export function getCategoryLabelByIdMap(
   categories: CategoryDoc[],
   isArabic: boolean,
 ): Record<string, string> {
   const categoryLabelById: Record<string, string> = {};
+
+  for (const categoryKey of Object.keys(isArabic ? CATEGORY_LABELS_AR : CATEGORY_LABELS_EN)) {
+    categoryLabelById[categoryKey] = getFallbackCategoryLabel(categoryKey, isArabic);
+  }
 
   for (const category of categories) {
     if (category.key === "all") {
@@ -84,6 +115,10 @@ export function getCategoryIdsForType(events: EventDoc[], type: FilterType): str
 export function getCityOptions(events: EventDoc[]): string[] {
   const eventCities = uniqueSorted(events.map((e) => e.city));
   return uniqueSorted([...SUPPORTED_CITIES, ...eventCities]);
+}
+
+export function getCityDisplayLabel(city: string, isArabic: boolean): string {
+  return getCityLabel(city, isArabic);
 }
 
 export function toggleValue(values: string[], value: string): string[] {
@@ -160,7 +195,12 @@ export function buildFilterSummaryTags({
   }
 
   if (filters.cities.length > 0) {
-    tags.push(...filters.cities.map((city) => ({ id: `city:${city}`, label: city })));
+    tags.push(
+      ...filters.cities.map((city) => ({
+        id: `city:${city}`,
+        label: getCityDisplayLabel(city, isArabic),
+      })),
+    );
   } else {
     tags.push({ id: "city:all", label: t("filters.allCities") });
   }

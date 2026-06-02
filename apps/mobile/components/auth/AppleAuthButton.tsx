@@ -2,11 +2,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSSO } from "@clerk/clerk-expo";
 import { Button, Spinner } from "heroui-native";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FadeIn, LinearTransition } from "react-native-reanimated";
 
 export default function AppleAuthButton() {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const { startSSOFlow } = useSSO();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +45,7 @@ export default function AppleAuthButton() {
         <Ionicons name="logo-apple" size={20} color={theme.colors.text} />
       )}
       <Button.Label style={styles.label}>
-        {isLoading ? "Signing in..." : "Sign in with Apple"}
+        {isLoading ? t("signIn.signingIn") : t("signIn.signInWithApple")}
       </Button.Label>
     </Button>
   );

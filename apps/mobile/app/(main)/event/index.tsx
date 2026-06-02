@@ -22,7 +22,12 @@ import {
   normalizeEventListType,
   type EventListType,
 } from "@/features/events/data";
-import { buildFilterSummaryTags, getCityOptions, removeFilterBySummaryTag } from "@/features/filters/utils";
+import {
+  buildFilterSummaryTags,
+  getCityDisplayLabel,
+  getCityOptions,
+  removeFilterBySummaryTag,
+} from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
@@ -69,14 +74,14 @@ export default function ViewAllEventsScreen() {
   const isArabic = i18n.language === "ar";
   const eventQueryType =
     eventType === "activity" ? "activity" : eventType === "all" ? undefined : "event";
-  const { events: allEvents, collections, isLoading: isEventsLoading } = useEvents(
-    undefined,
-    true,
-    {
-      type: eventQueryType,
-      limit: DISCOVERY_EVENTS_LIMIT,
-    },
-  );
+  const {
+    events: allEvents,
+    collections,
+    isLoading: isEventsLoading,
+  } = useEvents(undefined, true, {
+    type: eventQueryType,
+    limit: DISCOVERY_EVENTS_LIMIT,
+  });
   const { categories } = useCategories();
   const sourceParam = Array.isArray(source) ? source[0] : source;
   const cityParam = Array.isArray(city) ? city[0] : city;
@@ -92,7 +97,9 @@ export default function ViewAllEventsScreen() {
   const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
   const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
   const allCitiesLabel = t("filters.allCities");
-  const selectedCityLabel = selectedCity ?? allCitiesLabel;
+  const selectedCityLabel = selectedCity
+    ? getCityDisplayLabel(selectedCity, isArabic)
+    : allCitiesLabel;
 
   useEffect(() => {
     setSelectedCity(initialCity);
@@ -288,7 +295,11 @@ export default function ViewAllEventsScreen() {
                       <Select.ItemIndicator />
                     </Select.Item>
                     {cityOptions.map((cityOption) => (
-                      <Select.Item key={cityOption} value={cityOption} label={cityOption}>
+                      <Select.Item
+                        key={cityOption}
+                        value={cityOption}
+                        label={getCityDisplayLabel(cityOption, isArabic)}
+                      >
                         <View style={styles.cityOptionInner}>
                           <FontAwesome name="building-o" size={16} />
                           <Select.ItemLabel />

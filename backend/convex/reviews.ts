@@ -26,10 +26,7 @@ const eventReviewsValidator = v.object({
   viewerReview: v.union(viewerReviewValidator, v.null()),
 });
 
-function getAuthorName(user: {
-  firstName: string | null;
-  lastName: string | null;
-}) {
+function getAuthorName(user: { firstName: string | null; lastName: string | null }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
   if (fullName.length > 0) {
     return fullName;
@@ -91,7 +88,7 @@ export const getForEvent = query({
 
     const ratingTotal = eventReviews.reduce((total, review) => total + review.rating, 0);
     const currentUserReview = currentUser
-      ? eventReviews.find((review) => review.userId === currentUser._id) ?? null
+      ? (eventReviews.find((review) => review.userId === currentUser._id) ?? null)
       : null;
 
     return {

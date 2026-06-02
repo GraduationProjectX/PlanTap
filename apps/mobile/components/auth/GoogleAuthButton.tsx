@@ -2,11 +2,13 @@ import { useSSO } from "@clerk/clerk-expo";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { Button, Spinner } from "heroui-native";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FadeIn, LinearTransition } from "react-native-reanimated";
 
 export default function GoogleAuthButton() {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const { startSSOFlow } = useSSO();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,10 +42,10 @@ export default function GoogleAuthButton() {
       {isLoading ? (
         <Spinner entering={FadeIn.delay(50)} color={theme.colors.text} size="sm" />
       ) : (
-        <GoogleIcon/>
+        <GoogleIcon />
       )}
       <Button.Label style={styles.label}>
-        {isLoading ? "Signing in..." : "Continue with Google"}
+        {isLoading ? t("signIn.signingIn") : t("signIn.continueWithGoogle")}
       </Button.Label>
     </Button>
   );
