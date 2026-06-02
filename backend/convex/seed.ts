@@ -627,7 +627,7 @@ function roundAverageRating(total: number, count: number) {
 
 const seedCategories = [
   { key: "all", label: "All", labelAr: "الكل", icon: "grid", sortOrder: 0 },
-  { key: "sports", label: "Sports", labelAr: "رياضة", icon: "sports", sortOrder: 1 },
+  { key: "sports", label: "Sports", labelAr: "رياضة", icon: "sports", sortOrder: 9 },
   { key: "adventure", label: "Adventure", labelAr: "مغامرة", icon: "adventure", sortOrder: 2 },
   {
     key: "entertainment",

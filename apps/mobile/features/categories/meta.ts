@@ -17,7 +17,6 @@ const CATEGORY_ICON_NAME_BY_TOKEN: Record<string, React.ComponentProps<typeof Fo
 };
 
 export const ONBOARDING_FALLBACK_TAG_OPTIONS: OnboardingTagOption[] = [
-  { id: "sports", label: "Sports", icon: "sports" },
   { id: "adventure", label: "Adventure", icon: "adventure" },
   { id: "entertainment", label: "Entertainment", icon: "entertainment" },
   { id: "food", label: "Food", icon: "food" },
@@ -25,6 +24,7 @@ export const ONBOARDING_FALLBACK_TAG_OPTIONS: OnboardingTagOption[] = [
   { id: "arts", label: "Arts", icon: "arts" },
   { id: "tech", label: "Tech", icon: "tech" },
   { id: "wellness", label: "Wellness", icon: "wellness" },
+  { id: "sports", label: "Sports", icon: "sports" },
 ];
 
 export function getCategoryIconName(categoryKey: string, categoryIcon?: string) {
