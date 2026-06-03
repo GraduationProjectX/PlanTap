@@ -27,8 +27,7 @@ The app combines an Expo React Native client with a Convex backend and shared Ty
 The current workspace is organized around:
 
 - `apps/mobile`: Expo app, native mobile UI, routing, local storage, auth, maps, onboarding, and AI helpers.
-- `packages/backend`: Convex functions, schema, ingestion, events, users, bookmarks, reviews, and webhook handling.
-- `packages/shared`: shared TypeScript exports used across the workspace.
+- `backend`: Convex functions, schema, ingestion, events, users, bookmarks, reviews, and webhook handling.
 - `docs`: implementation notes, agent guides, and feature planning documents.
 
 ### Built With
