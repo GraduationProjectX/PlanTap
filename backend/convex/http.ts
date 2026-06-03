@@ -38,7 +38,9 @@ const webhookCorsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, svix-id, svix-timestamp, svix-signature",
 };
 
-function parseEmailAddresses(value: ClerkWebhookEventData["email_addresses"]): ClerkUserWebhookData["email_addresses"] {
+function parseEmailAddresses(
+  value: ClerkWebhookEventData["email_addresses"],
+): ClerkUserWebhookData["email_addresses"] {
   if (!Array.isArray(value)) {
     return null;
   }

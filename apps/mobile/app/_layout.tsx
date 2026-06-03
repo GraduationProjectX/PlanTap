@@ -13,7 +13,6 @@ initializeRTL();
 
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
-  DarkTheme,
   DefaultTheme,
   ThemeProvider,
   type Theme as NavigationTheme,
@@ -24,7 +23,6 @@ import { Stack, useNavigationContainerRef } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { HeroUINativeProvider } from "heroui-native";
 import { UnistylesRuntime } from "react-native-unistyles";
@@ -34,8 +32,7 @@ import { useQuery } from "convex/react";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { AppLoadingSplash } from "@/components/app-loading-splash";
 import { convex } from "@/services/convex";
-import { useUIStore } from "@/stores/ui-store";
-import { darkTheme, lightTheme } from "@/theme/unistyles";
+import { lightTheme } from "@/theme/unistyles";
 import { api } from "backend/convex/_generated/api";
 import * as Sentry from "@sentry/react-native";
 
@@ -80,23 +77,9 @@ const navigationLightTheme: NavigationTheme = {
   },
 };
 
-const navigationDarkTheme: NavigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: darkTheme.colors.primary,
-    background: darkTheme.colors.background,
-    card: darkTheme.colors.surface,
-    text: darkTheme.colors.text,
-    border: darkTheme.colors.border,
-    notification: darkTheme.colors.error,
-  },
-};
+UnistylesRuntime.setRootViewBackgroundColor(lightTheme.colors.background);
 
 function RootLayout() {
-  const systemColorScheme = useColorScheme();
-  const themeMode = useUIStore((state) => state.themeMode);
-
   const [loaded, error] = useFonts({
     ...FontAwesome.font,
   });
@@ -104,25 +87,6 @@ function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  const resolvedThemeName =
-    themeMode === "system" ? (systemColorScheme === "dark" ? "dark" : "light") : themeMode;
-
-  useEffect(() => {
-    if (themeMode === "system") {
-      UnistylesRuntime.setAdaptiveThemes(true);
-      return;
-    }
-
-    UnistylesRuntime.setAdaptiveThemes(false);
-    UnistylesRuntime.setTheme(themeMode);
-  }, [themeMode]);
-
-  useEffect(() => {
-    UnistylesRuntime.setRootViewBackgroundColor(
-      resolvedThemeName === "dark" ? darkTheme.colors.background : lightTheme.colors.background,
-    );
-  }, [resolvedThemeName]);
 
   if (!loaded) {
     return <AppLoadingSplash />;
@@ -135,9 +99,7 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider
-        value={resolvedThemeName === "dark" ? navigationDarkTheme : navigationLightTheme}
-      >
+      <ThemeProvider value={navigationLightTheme}>
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             <HeroUINativeProvider>

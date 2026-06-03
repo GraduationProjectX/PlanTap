@@ -1,11 +1,14 @@
 import AppleAuthButton from "@/components/auth/AppleAuthButton";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 import { Separator } from "heroui-native";
+import { useTranslation } from "react-i18next";
 import { Image, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -17,7 +20,7 @@ export default function SignInScreen() {
             <Image source={require("@/assets/images/planTap-icon.png")} style={styles.logo} />
           </View>
           <Text style={styles.title}>PlanTap</Text>
-          <Text style={styles.subtitle}>Discover nearby events and activities.</Text>
+          <Text style={styles.subtitle}>{t("signIn.subtitle")}</Text>
         </Animated.View>
 
         <View style={styles.buttons}>
@@ -37,8 +40,10 @@ export default function SignInScreen() {
 
         <Animated.View entering={FadeInUp.delay(500).duration(500)}>
           <Text style={styles.terms}>
-            By continuing, you agree to our <Text style={styles.termsLink}>Terms of Service</Text>{" "}
-            and <Text style={styles.termsLink}>Privacy Policy</Text>
+            {t("signIn.termsPrefix")}{" "}
+            <Text style={styles.termsLink}>{t("signIn.termsOfService")}</Text>{" "}
+            {t("signIn.termsJoiner")}{" "}
+            <Text style={styles.termsLink}>{t("signIn.privacyPolicy")}</Text>
           </Text>
         </Animated.View>
       </View>

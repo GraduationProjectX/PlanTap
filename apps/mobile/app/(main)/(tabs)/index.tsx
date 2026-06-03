@@ -11,9 +11,9 @@ import { SectionHeader } from "@/components/home/SectionHeader";
 import { OngoingEventsCarousel } from "@/components/home/OngoingEventsCarousel";
 import { UpcomingEventsList } from "@/components/home/UpcomingEventsList";
 import { EventCard } from "@/components/events/EventCard";
-import { useEvents, type EventDoc } from "@/hooks/use-events";
+import { DISCOVERY_EVENTS_LIMIT, useEvents, type EventDoc } from "@/hooks/use-events";
 import { useCategories } from "@/hooks/use-categories";
-import { getCityOptions } from "@/features/filters/utils";
+import { getCityDisplayLabel, getCityOptions } from "@/features/filters/utils";
 
 type ViewAllEventType = "ongoing" | "upcoming" | "activity" | "all";
 
@@ -21,7 +21,7 @@ const HORIZONTAL_PADDING = 16;
 const COLUMN_GAP = 12;
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const insets = useSafeAreaInsets();
@@ -31,11 +31,27 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-  const { events, collections, isLoading: isEventsLoading } = useEvents();
+  const { collections: eventCollections, isLoading: isEventsLoading } = useEvents(undefined, true, {
+    type: "event",
+    limit: DISCOVERY_EVENTS_LIMIT,
+  });
+  const { events: activitySourceEvents, isLoading: isActivitiesLoading } = useEvents(
+    undefined,
+    true,
+    {
+      type: "activity",
+      limit: DISCOVERY_EVENTS_LIMIT,
+    },
+  );
   const { categories, isLoading: isCategoriesLoading } = useCategories();
+  const events = [...(eventCollections?.all ?? []), ...(activitySourceEvents ?? [])];
   const cityOptions = getCityOptions(events ?? []);
   const activeCity = selectedCity ?? undefined;
+  const activeCityLabel = activeCity
+    ? getCityDisplayLabel(activeCity, i18n.language === "ar")
+    : undefined;
   const activeCategory = selectedCategory ?? "all";
+  const isHomeLoading = isEventsLoading || isActivitiesLoading;
 
   const handleEventPress = (id: string) => {
     router.push({ pathname: "/event/[id]", params: { id } });
@@ -102,28 +118,28 @@ export default function HomeScreen() {
 
   const activityCardWidth = (screenWidth - HORIZONTAL_PADDING * 2 - COLUMN_GAP) / 2;
 
-  const ongoingEvents = (collections?.ongoing ?? []).filter(matchesHomeHeaderFilters);
-  const upcomingEvents = (collections?.upcoming ?? []).filter(matchesHomeHeaderFilters);
-  const activityEvents = (collections?.activity ?? []).filter(matchesHomeHeaderFilters);
+  const ongoingEvents = (eventCollections?.ongoing ?? []).filter(matchesHomeHeaderFilters);
+  const upcomingEvents = (eventCollections?.upcoming ?? []).filter(matchesHomeHeaderFilters);
+  const activityEvents = (activitySourceEvents ?? []).filter(matchesHomeHeaderFilters);
 
   const hasAnyVisibleEvents =
     ongoingEvents.length > 0 || upcomingEvents.length > 0 || activityEvents.length > 0;
   const hasSearchOrCategoryFilter = query.length > 0 || activeCategory !== "all";
 
   const emptyStateMessage =
-    activeCity && !hasSearchOrCategoryFilter
-      ? t("home.noEventsInCity", { city: activeCity })
+    activeCityLabel && !hasSearchOrCategoryFilter
+      ? t("home.noEventsInCity", { city: activeCityLabel })
       : t("home.noResultsFound");
-  const showTryAnotherCity = activeCity && !hasSearchOrCategoryFilter;
+  const showTryAnotherCity = activeCityLabel && !hasSearchOrCategoryFilter;
 
-  const ongoingTitle = activeCity
-    ? t("home.ongoingEventsInCity", { city: activeCity })
+  const ongoingTitle = activeCityLabel
+    ? t("home.ongoingEventsInCity", { city: activeCityLabel })
     : t("home.ongoingEvents");
-  const upcomingTitle = activeCity
-    ? t("home.upcomingInCity", { city: activeCity })
+  const upcomingTitle = activeCityLabel
+    ? t("home.upcomingInCity", { city: activeCityLabel })
     : t("home.upcoming");
-  const activitiesTitle = activeCity
-    ? t("home.activitiesInCity", { city: activeCity })
+  const activitiesTitle = activeCityLabel
+    ? t("home.activitiesInCity", { city: activeCityLabel })
     : t("home.activities");
 
   return (
@@ -159,7 +175,7 @@ export default function HomeScreen() {
           isCategoriesLoading={isCategoriesLoading}
         />
 
-        {isEventsLoading ? (
+        {isHomeLoading ? (
           <HomeSkeleton />
         ) : (
           <>

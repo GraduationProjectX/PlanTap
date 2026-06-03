@@ -2,17 +2,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { RadioGroup } from "heroui-native";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TextInput, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-const CITY_IMAGES: Record<string, string> = {
-  Riyadh: "https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?w=200&h=200&fit=crop",
-  Jeddah: "https://images.unsplash.com/photo-1578895101408-1a36b834405b?w=200&h=200&fit=crop",
-  Dammam: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=200&h=200&fit=crop",
-  Makkah: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=200&h=200&fit=crop",
-  Madinah: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=200&h=200&fit=crop",
-};
+import { getCityDisplayLabel } from "@/features/filters/utils";
+import { getCityImage } from "@/features/location/cities";
 
 type CityStepProps = {
   title: string;
@@ -34,12 +29,19 @@ export default function CityStep({
   onSelectCity,
 }: CityStepProps) {
   const { theme } = useUnistyles();
+  const { i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
-  const query = searchQuery.toLowerCase();
+  const isArabic = i18n.language === "ar";
+  const query = searchQuery.trim().toLowerCase();
 
-  const displayedCities = cityOptions.filter((city) =>
-    query.length === 0 ? true : city.toLowerCase().includes(query),
-  );
+  const displayedCities = cityOptions.filter((city) => {
+    if (query.length === 0) {
+      return true;
+    }
+
+    const localizedCity = getCityDisplayLabel(city, isArabic).toLowerCase();
+    return city.toLowerCase().includes(query) || localizedCity.includes(query);
+  });
 
   return (
     <View style={styles.container}>
@@ -74,11 +76,11 @@ export default function CityStep({
               {({ isSelected }) => (
                 <View style={styles.cityRow}>
                   <Image
-                    source={{ uri: CITY_IMAGES[city] ?? CITY_IMAGES.Riyadh }}
+                    source={{ uri: getCityImage(city) }}
                     style={styles.cityImage}
                     contentFit="cover"
                   />
-                  <Text style={styles.cityName}>{city}</Text>
+                  <Text style={styles.cityName}>{getCityDisplayLabel(city, isArabic)}</Text>
                   <View
                     style={[styles.radioIndicator, isSelected && styles.radioIndicatorSelected]}
                   >

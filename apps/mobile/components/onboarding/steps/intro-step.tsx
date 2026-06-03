@@ -1,11 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Image } from "expo-image";
 import { Button, Select } from "heroui-native";
-import { Text, View, useWindowDimensions } from "react-native";
+import { Alert, Text, View, useWindowDimensions } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "react-i18next";
+import { configureRTL } from "@/rtl";
+import { useUIStore } from "@/stores/ui-store";
 
 type IntroStepProps = {
   titleLine1: string;
@@ -25,7 +27,8 @@ export default function IntroStep({
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const { i18n } = useTranslation();
+  const setLanguageOverride = useUIStore((state) => state.setLanguageOverride);
+  const { i18n, t } = useTranslation();
   const isArabic = i18n.language.startsWith("ar");
   const languageValue = isArabic ? { value: "ar", label: "العربية" } : { value: "en", label: "EN" };
 
@@ -61,10 +64,23 @@ export default function IntroStep({
 
       <Select
         value={languageValue}
-        onValueChange={(language) => {
+        onValueChange={async (language) => {
           const nextLanguage = language?.value === "ar" ? "ar" : "en";
-          if (nextLanguage !== languageValue.value) {
-            void i18n.changeLanguage(nextLanguage);
+          if (nextLanguage === languageValue.value) {
+            return;
+          }
+
+          try {
+            await i18n.changeLanguage(nextLanguage);
+          } catch (error) {
+            console.error("Failed to apply onboarding language", error);
+            return;
+          }
+
+          setLanguageOverride(nextLanguage);
+
+          if (configureRTL(nextLanguage)) {
+            Alert.alert(t("settings.alerts.restartTitle"), t("settings.alerts.restartDescription"));
           }
         }}
         style={[styles.languageSelect, { top: insets.top + 10 }]}
@@ -107,10 +123,12 @@ const styles = StyleSheet.create((theme) => ({
   languageSelect: {
     position: "absolute",
     right: 14,
+    alignItems: "flex-end",
     zIndex: theme.zIndex.popover,
     elevation: 12,
   },
   languageTrigger: {
+    alignSelf: "flex-end",
     minHeight: 30,
     borderRadius: theme.radius.full,
     borderCurve: "continuous",

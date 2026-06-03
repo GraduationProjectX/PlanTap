@@ -19,5 +19,5 @@ pnpm --filter backend dev
 Or run once for validation/type generation:
 
 ```bash
-pnpm -C packages/backend exec convex dev --once
+pnpm -C backend exec convex dev --once
 ```

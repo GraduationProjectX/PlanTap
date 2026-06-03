@@ -15,15 +15,18 @@ const config = getSentryExpoConfig(projectRoot);
 config.watchFolders = [...(config.watchFolders ?? []), workspaceRoot];
 
 config.resolver = config.resolver ?? {};
-config.resolver.blockList =
-  /.*[\\/]android[\\/]build[\\/].*|.*[\\/]ios[\\/]build[\\/].*|.*[\\/]android[\\/]app[\\/]build[\\/].*|.*[\\/]node_modules[\\/].*[\\/]android[\\/]build[\\/].*|.*[\\/]node_modules[\\/].*[\\/]ios[\\/]build[\\/].*/;
 
 config.resolver.nodeModulesPaths = [
-  path.resolve(workspaceRoot, "node_modules"),
+  ...new Set([
+    ...(config.resolver.nodeModulesPaths ?? []),
+    path.resolve(projectRoot, "node_modules"),
+    path.resolve(workspaceRoot, "node_modules"),
+  ]),
 ];
 
 config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
+  "expo-router": path.resolve(workspaceRoot, "node_modules/expo-router"),
   react: path.resolve(workspaceRoot, "node_modules/react"),
   "react-dom": path.resolve(workspaceRoot, "node_modules/react-dom"),
   "react-native": path.resolve(workspaceRoot, "node_modules/react-native"),

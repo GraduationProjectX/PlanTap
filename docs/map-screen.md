@@ -51,8 +51,8 @@ Use Google Maps only for external directions from the existing event detail scre
 - reusable event UI already exists in `apps/mobile/components/events/EventCard.tsx`
 - horizontal carousel behavior already exists in `apps/mobile/components/home/OngoingEventsCarousel.tsx`
 - user location utilities currently stop at city detection in `apps/mobile/services/location.ts`
-- backend event queries currently support only all-events or city-filtered reads in `packages/backend/convex/events.ts`
-- schema already includes `locationLat` and `locationLng` in `packages/backend/convex/schema.ts`
+- backend event queries currently support only all-events or city-filtered reads in `backend/convex/events.ts`
+- schema already includes `locationLat` and `locationLng` in `backend/convex/schema.ts`
 - repo planning docs already chose Mapbox and city + `cellId` geo prefiltering
 
 ---
@@ -200,8 +200,8 @@ The map screen should own:
 - `apps/mobile/services/location.ts`
 - `apps/mobile/locales/en.json`
 - `apps/mobile/locales/ar.json`
-- `packages/backend/convex/schema.ts`
-- `packages/backend/convex/events.ts`
+- `backend/convex/schema.ts`
+- `backend/convex/events.ts`
 
 ### Add
 
@@ -216,7 +216,7 @@ The map screen should own:
 - `apps/mobile/lib/map-camera.ts`
 - `apps/mobile/lib/map-bounds.ts`
 - `apps/mobile/lib/map-selection.ts`
-- `packages/shared/src/geo/grid.ts` or a nearby shared geo helper file if reused across ingest and backend
+- a nearby a nearby shared geo helper file if reused across ingest and backend
 
 The exact split can stay smaller if the screen remains manageable, but the data and marker logic should not all live inline in `map.tsx`.
 

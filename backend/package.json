@@ -5,8 +5,8 @@
   "module": "index.ts",
   "scripts": {
     "dev": "pnpm exec convex dev",
-    "build": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/.turbo-stamp','');console.log('No build step configured for packages/backend yet')\"",
-    "lint": "oxlint --deny-warnings -c ../../.oxlintrc.json --ignore-path ../../.eslintignore .",
+    "build": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/.turbo-stamp','');console.log('No build step configured for backend yet')\"",
+    "lint": "oxlint --deny-warnings -c ../.oxlintrc.json --ignore-path ../.eslintignore .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "typecheck": "tsc -p tsconfig.json --noEmit"

@@ -5,15 +5,12 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 type AppLanguage = "ar" | "en";
-export type AppThemeMode = "system" | "light" | "dark";
 
 type UIState = {
   languageOverride: AppLanguage | null;
-  themeMode: AppThemeMode;
   homeSearch: string;
   selectedCategories: string[];
   setLanguageOverride: (value: AppLanguage | null) => void;
-  setThemeMode: (value: AppThemeMode) => void;
   setHomeSearch: (value: string) => void;
   setSelectedCategories: (value: string[]) => void;
   toggleCategory: (category: string) => void;
@@ -22,7 +19,6 @@ type UIState = {
 
 type PersistedUIState = Partial<{
   languageOverride: AppLanguage | null;
-  themeMode: AppThemeMode;
   homeSearch: string;
   selectedCategories: string[];
 }>;
@@ -35,12 +31,10 @@ function isPersistedUIState(value: unknown): value is PersistedUIState {
 
 const initialState: {
   languageOverride: AppLanguage | null;
-  themeMode: AppThemeMode;
   homeSearch: string;
   selectedCategories: string[];
 } = {
   languageOverride: null,
-  themeMode: "system",
   homeSearch: "",
   selectedCategories: [],
 };
@@ -59,7 +53,6 @@ export const useUIStore = create<UIState>()(
 
           return { languageOverride: value };
         }),
-      setThemeMode: (value) => set({ themeMode: value }),
       setHomeSearch: (value) => set({ homeSearch: value }),
       setSelectedCategories: (value) => set({ selectedCategories: value }),
       toggleCategory: (category) =>
@@ -77,14 +70,13 @@ export const useUIStore = create<UIState>()(
     {
       name: STORAGE_KEYS.UI_STATE,
       storage: createJSONStorage(() => zustandMMKVStorage),
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         languageOverride: state.languageOverride,
-        themeMode: state.themeMode,
         homeSearch: state.homeSearch,
         selectedCategories: state.selectedCategories,
       }),
-      migrate: (persistedState, version) => {
+      migrate: (persistedState) => {
         if (!isPersistedUIState(persistedState)) {
           return {
             ...initialState,
@@ -92,21 +84,8 @@ export const useUIStore = create<UIState>()(
         }
 
         const state = persistedState;
-        const hasValidThemeMode =
-          state.themeMode === "system" || state.themeMode === "light" || state.themeMode === "dark";
-
-        if (version < 2 || !hasValidThemeMode) {
-          return {
-            languageOverride: state.languageOverride ?? initialState.languageOverride,
-            themeMode: "system",
-            homeSearch: state.homeSearch ?? initialState.homeSearch,
-            selectedCategories: state.selectedCategories ?? initialState.selectedCategories,
-          };
-        }
-
         return {
           languageOverride: state.languageOverride ?? initialState.languageOverride,
-          themeMode: state.themeMode ?? initialState.themeMode,
           homeSearch: state.homeSearch ?? initialState.homeSearch,
           selectedCategories: state.selectedCategories ?? initialState.selectedCategories,
         };

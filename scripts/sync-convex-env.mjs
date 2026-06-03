@@ -65,7 +65,7 @@ function setEnvKeysKeepingFormatting(original, updates) {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, "..");
 
-const backendEnvPath = path.join(repoRoot, "packages", "backend", ".env.local");
+const backendEnvPath = path.join(repoRoot, "backend", ".env.local");
 const mobileEnvPath = path.join(repoRoot, "apps", "mobile", ".env.local");
 
 const backendEnv = readFileIfExists(backendEnvPath);
@@ -96,5 +96,5 @@ if (mobileNext !== (mobileOriginal.endsWith("\n") ? mobileOriginal : `${mobileOr
   fs.writeFileSync(mobileEnvPath, mobileNext, "utf8");
   // Only log when we actually changed something to avoid noisy dev output.
   // eslint-disable-next-line no-console
-  console.log("Synced apps/mobile/.env.local Convex settings from packages/backend/.env.local");
+  console.log("Synced apps/mobile/.env.local Convex settings from backend/.env.local");
 }

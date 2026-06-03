@@ -34,6 +34,8 @@ const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
+export const DISCOVERY_EVENTS_LIMIT = 1000;
+
 export const DEFAULT_EVENT_FILTERS: EventFilters = {
   type: "both",
   categories: [],
@@ -63,7 +65,11 @@ export function isDefaultEventFilters(filters: EventFilters): boolean {
 
 export function isEventLiveNow(event: EventTimeFields): boolean {
   const now = Date.now();
-  return !!(event.startAt != null && event.endAt != null && event.startAt <= now && event.endAt > now);
+  if (event.startAt == null || event.startAt > now) {
+    return false;
+  }
+
+  return event.endAt == null || event.endAt > now;
 }
 
 export function toTagLabel(tag: string): string {
@@ -162,7 +168,11 @@ export function getTimeRemainingLabel(endAt: number | null): string | null {
 }
 
 function isEventOngoing(event: EventDoc, now: number): boolean {
-  return !!(event.startAt && event.endAt && event.startAt <= now && event.endAt > now);
+  if (event.startAt == null || event.startAt > now) {
+    return false;
+  }
+
+  return event.endAt == null || event.endAt > now;
 }
 
 function isEventUpcoming(event: EventDoc, now: number): boolean {

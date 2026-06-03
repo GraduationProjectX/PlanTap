@@ -13,12 +13,11 @@ If you see "Invalid hook call" on mobile, it is usually Metro resolving multiple
 - The repo pins React to a single version and uses `apps/mobile/metro.config.js` to resolve `react` from the workspace root.
 - After dependency changes, restart Metro with cache cleared: `pnpm --filter mobile dev -- -c`
 
-## Theme preference flow
+## Theme
 
-- Persisted UI preference lives in `apps/mobile/stores/ui-store.ts` as `themeMode: system | light | dark`.
-- Root theme wiring happens in `apps/mobile/app/_layout.tsx`; this applies both React Navigation theme and Unistyles runtime mode.
-- Settings UI for changing theme mode lives in `apps/mobile/app/(main)/settings/index.tsx`.
-- To add new appearance modes later, update the `AppThemeMode` type, persisted migration, and settings options in one pass.
+- The mobile app uses the light theme only.
+- Root theme wiring lives in `apps/mobile/app/_layout.tsx`.
+- Unistyles theme configuration lives in `apps/mobile/theme/unistyles.ts`.
 
 ## Screen transitions
 

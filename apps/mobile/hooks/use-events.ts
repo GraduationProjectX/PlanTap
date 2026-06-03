@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { api } from "backend/convex/_generated/api";
 import type { Doc } from "backend/convex/_generated/dataModel";
 
+import { DISCOVERY_EVENTS_LIMIT, isEventLiveNow } from "@/features/events/data";
 import { readCachedData, writeCachedData } from "@/utils/data-cache";
 import { STORAGE_KEYS } from "@/storage/keys";
 
@@ -15,19 +16,18 @@ export type EventCollections = {
   activity: EventDoc[];
 };
 
+type UseEventsOptions = {
+  type?: "event" | "activity";
+  limit?: number;
+};
+
 const EVENTS_CACHE_TTL_MS = 10 * 60 * 1000;
+
+export { DISCOVERY_EVENTS_LIMIT };
 
 function buildCollections(events: EventDoc[]): EventCollections {
   const now = Date.now();
-
-  const ongoing = events.filter(
-    (e) =>
-      e.type === "event" &&
-      e.startAt != null &&
-      e.endAt != null &&
-      e.startAt <= now &&
-      e.endAt > now,
-  );
+  const ongoing = events.filter((e) => e.type === "event" && isEventLiveNow(e));
 
   const upcoming = events
     .filter((e) => e.type === "event" && e.startAt != null && e.startAt > now)
@@ -44,8 +44,11 @@ function buildCollections(events: EventDoc[]): EventCollections {
   return { all: events, ongoing, upcoming, activity };
 }
 
-export function useEvents(city?: string, enabled = true) {
-  const cacheKey = city ? `${STORAGE_KEYS.EVENTS_CACHE}:${city}` : STORAGE_KEYS.EVENTS_CACHE;
+export function useEvents(city?: string, enabled = true, options: UseEventsOptions = {}) {
+  const typeKey = options.type ?? "all";
+  const limitKey = options.limit ?? "default";
+  const cityKey = city ?? "all";
+  const cacheKey = `${STORAGE_KEYS.EVENTS_CACHE}:${cityKey}:${typeKey}:${limitKey}`;
   const cacheKeyRef = useRef<string | null>(null);
   const cachedEventsRef = useRef<EventDoc[] | null>(null);
 
@@ -54,7 +57,14 @@ export function useEvents(city?: string, enabled = true) {
     cachedEventsRef.current = readCachedData<EventDoc[]>(cacheKey, EVENTS_CACHE_TTL_MS);
   }
 
-  const liveEvents = useQuery(api.events.list, enabled ? (city ? { city } : {}) : "skip");
+  const queryArgs = enabled
+    ? {
+        ...(city ? { city } : {}),
+        ...(options.type ? { type: options.type } : {}),
+        ...(options.limit ? { limit: options.limit } : {}),
+      }
+    : "skip";
+  const liveEvents = useQuery(api.events.list, queryArgs);
 
   useEffect(() => {
     if (liveEvents === undefined) {

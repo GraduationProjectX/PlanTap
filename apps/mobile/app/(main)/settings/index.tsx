@@ -17,7 +17,7 @@ import { getCategoryIconName } from "@/features/categories/meta";
 import { useCategories } from "@/hooks/use-categories";
 import { useMountEffect } from "@/hooks/use-mount-effect";
 import { configureRTL, useDirection } from "@/rtl";
-import { useUIStore, type AppThemeMode } from "@/stores/ui-store";
+import { useUIStore } from "@/stores/ui-store";
 
 const APP_VERSION = Constants.expoConfig?.version ?? "1.0.0";
 
@@ -211,9 +211,6 @@ function SettingsContent({ currentUser }: { currentUser: UserDoc }) {
     languageOverride ?? userLocale ?? activeLanguage,
   );
 
-  const themeMode = useUIStore((state) => state.themeMode);
-  const setThemeMode = useUIStore((state) => state.setThemeMode);
-
   useMountEffect(() => {
     let isMounted = true;
 
@@ -324,10 +321,6 @@ function SettingsContent({ currentUser }: { currentUser: UserDoc }) {
     }
 
     void saveLocale(nextLanguage);
-  };
-
-  const handleThemeModeChange = (nextThemeMode: AppThemeMode) => {
-    setThemeMode(nextThemeMode);
   };
 
   const handleNotificationsToggle = async (nextEnabled: boolean) => {
@@ -463,23 +456,6 @@ function SettingsContent({ currentUser }: { currentUser: UserDoc }) {
 
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <SectionHeader number={1} title={t("settings.sections.preferences").toUpperCase()} />
-
-        <SettingRow
-          icon="adjust"
-          title={t("settings.theme.label")}
-          description={t("settings.theme.description")}
-          rightContent={
-            <SegmentedControl
-              options={[
-                { value: "system", label: t("settings.theme.options.system") },
-                { value: "light", label: t("settings.theme.options.light") },
-                { value: "dark", label: t("settings.theme.options.dark") },
-              ]}
-              selectedValue={themeMode}
-              onValueChange={handleThemeModeChange}
-            />
-          }
-        />
 
         <SettingRow
           icon="globe"

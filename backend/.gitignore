@@ -5,6 +5,7 @@ node_modules
 out
 dist
 *.tgz
+convex/_generated
 
 # code coverage
 coverage

@@ -19,6 +19,16 @@
     "suggest": "اقتراحات",
     "profile": "الملف الشخصي"
   },
+  "signIn": {
+    "subtitle": "اكتشف الفعاليات والأنشطة القريبة.",
+    "continueWithGoogle": "المتابعة باستخدام Google",
+    "signInWithApple": "تسجيل الدخول باستخدام Apple",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "termsPrefix": "بالمتابعة، أنت توافق على",
+    "termsJoiner": "و",
+    "termsOfService": "شروط الخدمة",
+    "privacyPolicy": "سياسة الخصوصية"
+  },
   "ai": {
     "modelSelector": "نموذج الذكاء",
     "apiProviders": "مزودات API",

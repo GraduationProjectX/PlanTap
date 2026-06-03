@@ -2,7 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Button, Separator } from "heroui-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ReviewCard } from "@/components/events/review-card";
@@ -64,20 +64,24 @@ export function ReviewsSection({
             {t("eventDetail.noReviewsTitle")}
           </Text>
         )}
-        <Button
-          feedbackVariant="scale"
+        <Pressable
+          accessibilityRole="button"
+          hitSlop={8}
           onPress={onWriteReview}
-          style={sectionStyles.writeButton}
+          style={({ pressed }) => [
+            sectionStyles.writeButton,
+            pressed ? sectionStyles.writeButtonPressed : null,
+          ]}
         >
           <FontAwesome
             name="pencil"
             size={14}
             color={theme.colors.primaryForeground}
           />
-          <Button.Label style={sectionStyles.writeButtonLabel}>
+          <Text style={sectionStyles.writeButtonLabel}>
             {t("eventDetail.writeReview")}
-          </Button.Label>
-        </Button>
+          </Text>
+        </Pressable>
       </View>
 
       {reviewCount > 0 ? (
@@ -150,12 +154,19 @@ const sectionStyles = StyleSheet.create((theme) => ({
     color: theme.colors.text,
   },
   writeButton: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexShrink: 0,
+    justifyContent: "center",
     minHeight: 40,
     paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radius.md,
     borderCurve: "continuous",
     backgroundColor: theme.colors.primary,
     gap: theme.spacing.sm,
+  },
+  writeButtonPressed: {
+    opacity: 0.85,
   },
   writeButtonLabel: {
     color: theme.colors.primaryForeground,

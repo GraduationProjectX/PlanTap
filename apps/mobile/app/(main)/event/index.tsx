@@ -16,12 +16,18 @@ import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransiti
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents, type EventDoc, type EventCollections } from "@/hooks/use-events";
 import {
+  DISCOVERY_EVENTS_LIMIT,
   applyEventFilters,
   isDefaultEventFilters,
   normalizeEventListType,
   type EventListType,
 } from "@/features/events/data";
-import { buildFilterSummaryTags, getCityOptions, removeFilterBySummaryTag } from "@/features/filters/utils";
+import {
+  buildFilterSummaryTags,
+  getCityDisplayLabel,
+  getCityOptions,
+  removeFilterBySummaryTag,
+} from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
@@ -57,10 +63,6 @@ export default function ViewAllEventsScreen() {
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
   const clearAppliedFilters = useEventFiltersStore((state) => state.clearAppliedFilters);
-  const isArabic = i18n.language === "ar";
-  const { events: allEvents, collections, isLoading: isEventsLoading } = useEvents();
-  const { categories } = useCategories();
-
   const { type, source, city, homeCategory, category } = useLocalSearchParams<{
     type?: string | string[];
     source?: string | string[];
@@ -69,6 +71,18 @@ export default function ViewAllEventsScreen() {
     category?: string | string[];
   }>();
   const eventType = normalizeEventListType(Array.isArray(type) ? type[0] : type);
+  const isArabic = i18n.language === "ar";
+  const eventQueryType =
+    eventType === "activity" ? "activity" : eventType === "all" ? undefined : "event";
+  const {
+    events: allEvents,
+    collections,
+    isLoading: isEventsLoading,
+  } = useEvents(undefined, true, {
+    type: eventQueryType,
+    limit: DISCOVERY_EVENTS_LIMIT,
+  });
+  const { categories } = useCategories();
   const sourceParam = Array.isArray(source) ? source[0] : source;
   const cityParam = Array.isArray(city) ? city[0] : city;
   const homeCategoryParam = Array.isArray(homeCategory) ? homeCategory[0] : homeCategory;
@@ -82,9 +96,10 @@ export default function ViewAllEventsScreen() {
   const cityOptions = getCityOptions(allEvents ?? []);
   const initialCity = cityParam && cityOptions.includes(cityParam) ? cityParam : undefined;
   const [selectedCity, setSelectedCity] = useState<string | undefined>(initialCity);
-  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
   const allCitiesLabel = t("filters.allCities");
-  const selectedCityLabel = selectedCity ?? allCitiesLabel;
+  const selectedCityLabel = selectedCity
+    ? getCityDisplayLabel(selectedCity, isArabic)
+    : allCitiesLabel;
 
   useEffect(() => {
     setSelectedCity(initialCity);
@@ -241,13 +256,11 @@ export default function ViewAllEventsScreen() {
                   value: selectedCity ?? ALL_CITIES_VALUE,
                   label: selectedCityLabel,
                 }}
-                isOpen={isCitySelectorOpen}
-                onOpenChange={setIsCitySelectorOpen}
                 onValueChange={(option) => {
                   setSelectedCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
                 }}
               >
-                <Select.Trigger asChild={false} style={styles.citySelectTrigger}>
+                <Select.Trigger style={styles.citySelectTrigger}>
                   <View style={[styles.cityRow, { flexDirection }]}>
                     <FontAwesome name="map-marker" size={14} color="#FFFFFF" />
                     <Text style={styles.cityText} numberOfLines={1}>
@@ -263,38 +276,40 @@ export default function ViewAllEventsScreen() {
                   </Select.TriggerIndicator>
                 </Select.Trigger>
 
-                {isCitySelectorOpen ? (
-                  <Select.Portal>
-                    <Select.Overlay
-                      animation={{
-                        opacity: {
-                          value: CITY_OVERLAY_OPACITY_VALUES,
-                        },
-                      }}
-                      style={styles.cityOverlay}
-                    />
-                    <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
-                      <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-                      <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                <Select.Portal>
+                  <Select.Overlay
+                    animation={{
+                      opacity: {
+                        value: CITY_OVERLAY_OPACITY_VALUES,
+                      },
+                    }}
+                    style={styles.cityOverlay}
+                  />
+                  <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+                    <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+                    <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+                      <View style={styles.cityOptionInner}>
+                        <FontAwesome name="globe" size={16} />
+                        <Select.ItemLabel />
+                      </View>
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                    {cityOptions.map((cityOption) => (
+                      <Select.Item
+                        key={cityOption}
+                        value={cityOption}
+                        label={getCityDisplayLabel(cityOption, isArabic)}
+                      >
                         <View style={styles.cityOptionInner}>
-                          <FontAwesome name="globe" size={16} />
+                          <FontAwesome name="building-o" size={16} />
                           <Select.ItemLabel />
                         </View>
                         <Select.ItemIndicator />
                       </Select.Item>
-                      {cityOptions.map((cityOption) => (
-                        <Select.Item key={cityOption} value={cityOption} label={cityOption}>
-                          <View style={styles.cityOptionInner}>
-                            <FontAwesome name="building-o" size={16} />
-                            <Select.ItemLabel />
-                          </View>
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                      <View style={{ height: cityModalBottomSpacer }} />
-                    </Select.Content>
-                  </Select.Portal>
-                ) : null}
+                    ))}
+                    <View style={{ height: cityModalBottomSpacer }} />
+                  </Select.Content>
+                </Select.Portal>
               </Select>
             </View>
           )}

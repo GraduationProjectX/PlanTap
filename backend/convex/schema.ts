@@ -1,5 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { v, type Infer } from "convex/values";
 
 export const nullableString = v.union(v.string(), v.null());
 export const nullableNumber = v.union(v.number(), v.null());
@@ -98,6 +98,8 @@ export const eventFields = {
   status: eventStatusValidator,
   rating: nullableNumber,
 };
+export const eventDataValidator = v.object(eventFields);
+export type EventData = Infer<typeof eventDataValidator>;
 
 export const categoryFields = {
   key: v.string(),

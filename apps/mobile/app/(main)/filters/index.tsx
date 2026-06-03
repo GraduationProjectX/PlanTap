@@ -15,7 +15,7 @@ import { SkeletonScreenTransition } from "@/components/ui/SkeletonScreenTransiti
 import { useCategories } from "@/hooks/use-categories";
 import { useEvents } from "@/hooks/use-events";
 import { useFiltersDraft } from "@/hooks/use-filters-draft";
-import { normalizeEventListType } from "@/features/events/data";
+import { DISCOVERY_EVENTS_LIMIT, normalizeEventListType } from "@/features/events/data";
 import { useEventFiltersStore } from "@/stores/event-filters-store";
 
 export default function FiltersScreen() {
@@ -30,7 +30,9 @@ export default function FiltersScreen() {
 
   const appliedFilters = useEventFiltersStore((state) => state.appliedFilters);
   const setAppliedFilters = useEventFiltersStore((state) => state.setAppliedFilters);
-  const { events, isLoading: isEventsLoading } = useEvents();
+  const { events, isLoading: isEventsLoading } = useEvents(undefined, true, {
+    limit: DISCOVERY_EVENTS_LIMIT,
+  });
   const { categories, isLoading: isCategoriesLoading } = useCategories();
 
   const {

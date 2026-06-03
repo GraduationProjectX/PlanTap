@@ -17,6 +17,7 @@ const userValidator = v.object({
 });
 
 const completeOnboardingArgsValidator = v.object({
+  locale: v.optional(v.union(v.literal("ar"), v.literal("en"), v.null())),
   city: v.optional(nullableString),
   preferences: v.optional(
     v.object({
@@ -127,6 +128,7 @@ export const completeOnboarding = mutation({
     );
 
     const patch = {
+      locale: normalizeLocale(args.locale),
       city: normalizeCity(args.city),
       preferences: {
         likedTags,
@@ -160,9 +162,14 @@ export const completeOnboarding = mutation({
       firstName: null,
       lastName: null,
       imageUrl: null,
-      locale: null,
       createdAt: now,
-      ...patch,
+      locale: patch.locale,
+      city: patch.city,
+      preferences: patch.preferences,
+      defaults: patch.defaults,
+      notificationsEnabled: patch.notificationsEnabled,
+      onboardingCompletedAt: patch.onboardingCompletedAt,
+      updatedAt: patch.updatedAt,
     });
     const insertedUser = await ctx.db.get(insertedUserId);
     if (!insertedUser) {

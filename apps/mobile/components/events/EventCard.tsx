@@ -43,6 +43,51 @@ type EventCardProps = {
   showCountdown?: boolean;
 };
 
+const FALLBACK_IMAGES = {
+  event: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=900&h=700&fit=crop",
+  food: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&h=700&fit=crop",
+  shopping: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=700&fit=crop",
+  culture: "https://images.unsplash.com/photo-1566127992631-137a642a90f4?w=900&h=700&fit=crop",
+  entertainment: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=900&h=700&fit=crop",
+  outdoors: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900&h=700&fit=crop",
+  default: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&h=700&fit=crop",
+};
+
+const EVENT_IMAGE_PLACEHOLDER = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
+
+function getFallbackImageUri(event: EventDoc) {
+  if (event.type === "event") {
+    return FALLBACK_IMAGES.event;
+  }
+
+  const labels = [...event.categories, ...event.tags].join(" ").toLowerCase();
+
+  if (labels.includes("food") || labels.includes("restaurant") || labels.includes("cafe")) {
+    return FALLBACK_IMAGES.food;
+  }
+
+  if (labels.includes("shopping") || labels.includes("store") || labels.includes("mall")) {
+    return FALLBACK_IMAGES.shopping;
+  }
+
+  if (labels.includes("culture") || labels.includes("museum") || labels.includes("heritage")) {
+    return FALLBACK_IMAGES.culture;
+  }
+
+  if (labels.includes("entertainment") || labels.includes("amusement")) {
+    return FALLBACK_IMAGES.entertainment;
+  }
+
+  if (labels.includes("beach") || labels.includes("outdoor") || labels.includes("park")) {
+    return FALLBACK_IMAGES.outdoors;
+  }
+
+  return FALLBACK_IMAGES.default;
+}
+
+function getEventImageUri(event: EventDoc) {
+  return event.images[0] ?? getFallbackImageUri(event);
+}
 
 function EventCardComponent({
   event,
@@ -60,6 +105,7 @@ function EventCardComponent({
 }: EventCardProps) {
   const { t, i18n } = useTranslation();
   const { isRTL, flexDirection, textAlign } = useDirection();
+  const imageUri = getEventImageUri(event);
 
   const isPreviewVariant = variant === "preview-list" || variant === "preview-grid";
   const meta = getEventCardMeta(event, {
@@ -113,7 +159,8 @@ function EventCardComponent({
               style={styles.previewImageShared}
             >
               <Image
-                source={{ uri: event.images[0] }}
+                source={{ uri: imageUri }}
+                placeholder={EVENT_IMAGE_PLACEHOLDER}
                 style={styles.previewImage}
                 contentFit="cover"
                 transition={120}
@@ -140,7 +187,7 @@ function EventCardComponent({
             <Text style={[styles.previewCategory, { textAlign }]}>{meta.categoryLabel}</Text>
 
             <View style={[styles.previewLocationRow, { flexDirection }]}>
-              <Text style={styles.locationIcon}>📍</Text>
+              <FontAwesome name="map-marker" size={12} color="rgba(0, 0, 0, 0.55)" />
               <Text style={[styles.previewLocationText, { textAlign }]} numberOfLines={2}>
                 {meta.locationLabel}
               </Text>
@@ -165,7 +212,8 @@ function EventCardComponent({
             style={styles.bookmarkGridImageShared}
           >
             <Image
-              source={{ uri: event.images[0] }}
+              source={{ uri: imageUri }}
+              placeholder={EVENT_IMAGE_PLACEHOLDER}
               style={styles.bookmarkGridImage}
               contentFit="cover"
               transition={120}
@@ -201,7 +249,7 @@ function EventCardComponent({
               {event.title}
             </Text>
             <View style={styles.bookmarkGridLocationRow}>
-              <Text style={styles.locationIcon}>📍</Text>
+              <FontAwesome name="map-marker" size={12} color="rgba(255, 255, 255, 0.85)" />
               <Text style={styles.bookmarkGridLocationText} numberOfLines={1}>
                 {meta.locationLabel}
               </Text>
@@ -225,7 +273,8 @@ function EventCardComponent({
           style={styles.bookmarkHeroImageShared}
         >
           <Image
-            source={{ uri: event.images[0] }}
+            source={{ uri: imageUri }}
+            placeholder={EVENT_IMAGE_PLACEHOLDER}
             style={styles.bookmarkHeroImage}
             contentFit="cover"
             transition={160}
@@ -276,7 +325,7 @@ function EventCardComponent({
             {event.title}
           </Text>
           <View style={[styles.heroLocationRow, { flexDirection }]}>
-            <Text style={styles.locationIcon}>📍</Text>
+            <FontAwesome name="map-marker" size={12} color="rgba(255, 255, 255, 0.85)" />
             <Text style={[styles.heroLocationText, { textAlign }]} numberOfLines={1}>
               {meta.locationLabel}
             </Text>
@@ -304,7 +353,8 @@ function EventCardComponent({
             style={styles.mediumMedia}
           >
             <Image
-              source={{ uri: event.images[0] }}
+              source={{ uri: imageUri }}
+              placeholder={EVENT_IMAGE_PLACEHOLDER}
               style={styles.mediumImageFill}
               contentFit="cover"
               transition={120}
@@ -337,7 +387,7 @@ function EventCardComponent({
 
           <Card.Body style={styles.mediumContent}>
             <View style={[styles.mediumLocationRow, { flexDirection }]}> 
-              <Text style={styles.locationIcon}>📍</Text>
+              <FontAwesome name="map-marker" size={12} color="rgba(255, 255, 255, 0.85)" />
               <Text style={[styles.mediumLocationText, { textAlign }]} numberOfLines={1}>
                 {meta.locationLabel}
               </Text>
@@ -405,7 +455,8 @@ function EventCardComponent({
         style={styles.heroImageShared}
       >
         <Image
-          source={{ uri: event.images[0] }}
+          source={{ uri: imageUri }}
+          placeholder={EVENT_IMAGE_PLACEHOLDER}
           style={styles.heroImage}
           contentFit="cover"
           transition={160}
@@ -421,7 +472,7 @@ function EventCardComponent({
 
       <View style={styles.heroContent}>
         <View style={[styles.heroLocationRow, { flexDirection }]}>
-          <Text style={styles.locationIcon}>📍</Text>
+          <FontAwesome name="map-marker" size={12} color="rgba(255, 255, 255, 0.85)" />
           <Text style={[styles.heroLocationText, { textAlign }]} numberOfLines={1}>
             {meta.locationLabel}
           </Text>
@@ -431,7 +482,7 @@ function EventCardComponent({
             {event.title}
           </Text>
           <View style={styles.heroArrowButton}>
-            <Text style={styles.heroArrowText}>{isRTL ? "←" : "→"}</Text>
+            <FontAwesome name={isRTL ? "arrow-left" : "arrow-right"} size={13} color="#000000" />
           </View>
         </View>
 
@@ -452,10 +503,6 @@ function EventCardComponent({
 export const EventCard = EventCardComponent;
 
 const styles = StyleSheet.create((theme) => ({
-  locationIcon: {
-    fontSize: 12,
-  },
-
   heroCard: {
     height: 240,
     borderRadius: theme.radius.xl,
@@ -528,10 +575,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-  },
-  heroArrowText: {
-    fontSize: 16,
-    color: "#000000",
   },
   heroTagsContainer: {
     flexWrap: "wrap",

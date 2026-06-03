@@ -1,11 +1,11 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Select } from "heroui-native";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { getCityDisplayLabel } from "@/features/filters/utils";
 import { useDirection } from "@/rtl";
 
 import { FilterSection } from "./FilterSection";
@@ -48,18 +48,18 @@ export function FiltersCitySection({
   selectedCity,
   onSelectCity,
 }: FiltersCitySectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useUnistyles();
   const { flexDirection } = useDirection();
   const insets = useSafeAreaInsets();
-  const [isCitySelectorOpen, setIsCitySelectorOpen] = useState(false);
+  const isArabic = i18n.language === "ar";
   const cityModalBottomSpacer =
     (Platform.OS === "android" ? Math.max(insets.bottom, 32) : insets.bottom) + 16;
 
   const allCitiesLabel = t("filters.allCities");
 
   const citySelectValue: SelectValue = selectedCity
-    ? { value: selectedCity, label: selectedCity }
+    ? { value: selectedCity, label: getCityDisplayLabel(selectedCity, isArabic) }
     : { value: ALL_CITIES_VALUE, label: allCitiesLabel };
 
   return (
@@ -67,13 +67,11 @@ export function FiltersCitySection({
       <Select
         presentation="bottom-sheet"
         value={citySelectValue}
-        isOpen={isCitySelectorOpen}
-        onOpenChange={setIsCitySelectorOpen}
         onValueChange={(option) => {
           onSelectCity(option?.value === ALL_CITIES_VALUE ? undefined : option?.value);
         }}
       >
-        <Select.Trigger asChild={false} style={styles.selectTrigger}>
+        <Select.Trigger style={styles.selectTrigger}>
           <View style={[styles.selectInner, { flexDirection }]}>
             <FontAwesome name="building-o" size={16} />
             <Select.Value placeholder={t("filters.selectCity")} />
@@ -87,37 +85,32 @@ export function FiltersCitySection({
           </Select.TriggerIndicator>
         </Select.Trigger>
 
-        {isCitySelectorOpen ? (
-          <Select.Portal>
-            <Select.Overlay
-              animation={CITY_SELECT_OVERLAY_ANIMATION}
-              style={CITY_SELECT_OVERLAY_STYLE}
-            />
-            <Select.Content
-              presentation="bottom-sheet"
-              snapPoints={["65%"]}
-            >
-              <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
-              <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+        <Select.Portal>
+          <Select.Overlay
+            animation={CITY_SELECT_OVERLAY_ANIMATION}
+            style={CITY_SELECT_OVERLAY_STYLE}
+          />
+          <Select.Content presentation="bottom-sheet" snapPoints={["65%"]}>
+            <Select.ListLabel>{t("filters.city")}</Select.ListLabel>
+            <Select.Item value={ALL_CITIES_VALUE} label={allCitiesLabel}>
+              <View style={styles.selectItemInner}>
+                <FontAwesome name="globe" size={16} />
+                <Select.ItemLabel />
+              </View>
+              <Select.ItemIndicator />
+            </Select.Item>
+            {cityOptions.map((city) => (
+              <Select.Item key={city} value={city} label={getCityDisplayLabel(city, isArabic)}>
                 <View style={styles.selectItemInner}>
-                  <FontAwesome name="globe" size={16} />
+                  <FontAwesome name="building-o" size={16} />
                   <Select.ItemLabel />
                 </View>
                 <Select.ItemIndicator />
               </Select.Item>
-              {cityOptions.map((city) => (
-                <Select.Item key={city} value={city} label={city}>
-                  <View style={styles.selectItemInner}>
-                    <FontAwesome name="building-o" size={16} />
-                    <Select.ItemLabel />
-                  </View>
-                  <Select.ItemIndicator />
-                </Select.Item>
-              ))}
-              <View style={{ height: cityModalBottomSpacer }} />
-            </Select.Content>
-          </Select.Portal>
-        ) : null}
+            ))}
+            <View style={{ height: cityModalBottomSpacer }} />
+          </Select.Content>
+        </Select.Portal>
       </Select>
     </FilterSection>
   );

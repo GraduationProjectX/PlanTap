@@ -26,10 +26,7 @@ const eventReviewsValidator = v.object({
   viewerReview: v.union(viewerReviewValidator, v.null()),
 });
 
-function getAuthorName(user: {
-  firstName: string | null;
-  lastName: string | null;
-}) {
+function getAuthorName(user: { firstName: string | null; lastName: string | null }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
   if (fullName.length > 0) {
     return fullName;
@@ -47,6 +44,7 @@ function roundAverageRating(total: number, count: number) {
 }
 
 const MAX_REVIEW_BODY_LENGTH = 2000;
+const MAX_EVENT_REVIEWS = 100;
 
 export const getForEvent = query({
   args: { eventId: v.id("events") },
@@ -72,7 +70,7 @@ export const getForEvent = query({
       .query("reviews")
       .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", args.eventId))
       .order("desc")
-      .collect();
+      .take(MAX_EVENT_REVIEWS);
 
     const reviews = await Promise.all(
       eventReviews.map(async (review) => {
@@ -90,7 +88,7 @@ export const getForEvent = query({
 
     const ratingTotal = eventReviews.reduce((total, review) => total + review.rating, 0);
     const currentUserReview = currentUser
-      ? eventReviews.find((review) => review.userId === currentUser._id) ?? null
+      ? (eventReviews.find((review) => review.userId === currentUser._id) ?? null)
       : null;
 
     return {
@@ -161,7 +159,7 @@ export const upsertForEvent = mutation({
     const eventReviews = await ctx.db
       .query("reviews")
       .withIndex("by_eventid_and_createdat", (q) => q.eq("eventId", args.eventId))
-      .collect();
+      .take(MAX_EVENT_REVIEWS);
 
     const ratingTotal = eventReviews.reduce((total, review) => total + review.rating, 0);
     await ctx.db.patch(args.eventId, {

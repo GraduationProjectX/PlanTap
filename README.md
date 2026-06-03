@@ -22,7 +22,7 @@
 
 ## About
 
-The app combines an Expo React Native client with a Convex backend and shared TypeScript packages.
+The app combines an Expo React Native client with a Convex backend.
 
 The current workspace is organized around:
 
@@ -99,7 +99,7 @@ Run commands from the repository root unless noted otherwise.
 | --- | --- |
 | `pnpm install` | Install all workspace dependencies. |
 | `pnpm run dev` | Start all persistent development tasks through Turborepo. |
-| `pnpm run build` | Build all packages that define a build task. |
+| `pnpm run build` | Build all workspace projects that define a build task. |
 | `pnpm run lint` | Lint the workspace. |
 | `pnpm run typecheck` | Type-check the workspace. |
 | `pnpm run format` | Format the workspace with oxfmt. |
