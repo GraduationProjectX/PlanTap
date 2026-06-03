@@ -53,6 +53,8 @@ const FALLBACK_IMAGES = {
   default: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&h=700&fit=crop",
 };
 
+const EVENT_IMAGE_PLACEHOLDER = "L6PZfSi_.AyE_3t7t7R**0o#DgR4";
+
 function getFallbackImageUri(event: EventDoc) {
   if (event.type === "event") {
     return FALLBACK_IMAGES.event;
@@ -104,7 +106,6 @@ function EventCardComponent({
   const { t, i18n } = useTranslation();
   const { isRTL, flexDirection, textAlign } = useDirection();
   const imageUri = getEventImageUri(event);
-  const fallbackImageUri = getFallbackImageUri(event);
 
   const isPreviewVariant = variant === "preview-list" || variant === "preview-grid";
   const meta = getEventCardMeta(event, {
@@ -159,7 +160,7 @@ function EventCardComponent({
             >
               <Image
                 source={{ uri: imageUri }}
-                placeholder={{ uri: fallbackImageUri }}
+                placeholder={EVENT_IMAGE_PLACEHOLDER}
                 style={styles.previewImage}
                 contentFit="cover"
                 transition={120}
@@ -212,7 +213,7 @@ function EventCardComponent({
           >
             <Image
               source={{ uri: imageUri }}
-              placeholder={{ uri: fallbackImageUri }}
+              placeholder={EVENT_IMAGE_PLACEHOLDER}
               style={styles.bookmarkGridImage}
               contentFit="cover"
               transition={120}
@@ -273,7 +274,7 @@ function EventCardComponent({
         >
           <Image
             source={{ uri: imageUri }}
-            placeholder={{ uri: fallbackImageUri }}
+            placeholder={EVENT_IMAGE_PLACEHOLDER}
             style={styles.bookmarkHeroImage}
             contentFit="cover"
             transition={160}
@@ -353,7 +354,7 @@ function EventCardComponent({
           >
             <Image
               source={{ uri: imageUri }}
-              placeholder={{ uri: fallbackImageUri }}
+              placeholder={EVENT_IMAGE_PLACEHOLDER}
               style={styles.mediumImageFill}
               contentFit="cover"
               transition={120}
@@ -455,7 +456,7 @@ function EventCardComponent({
       >
         <Image
           source={{ uri: imageUri }}
-          placeholder={{ uri: fallbackImageUri }}
+          placeholder={EVENT_IMAGE_PLACEHOLDER}
           style={styles.heroImage}
           contentFit="cover"
           transition={160}

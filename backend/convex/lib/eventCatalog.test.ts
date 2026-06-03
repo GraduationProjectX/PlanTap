@@ -17,6 +17,7 @@ test("isPlaceSourceRecord flags generic place ingestors", () => {
 test("isHotelLikeText detects obvious hotel content", () => {
   assert.equal(isHotelLikeText("Luxury Hotel & Resort"), true);
   assert.equal(isHotelLikeText("Boutique Suites by the sea"), true);
+  assert.equal(isHotelLikeText("Dinner and winning trivia"), false);
   assert.equal(isHotelLikeText("Live Concert Night"), false);
 });
 

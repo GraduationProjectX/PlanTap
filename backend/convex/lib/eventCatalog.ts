@@ -43,7 +43,9 @@ export function isHotelLikeText(text: string) {
     return false;
   }
 
-  return HOTEL_LIKE_TOKENS.some((token) => normalizedText.includes(token));
+  const tokens = normalizedText.split(/[^a-z0-9]+/);
+
+  return HOTEL_LIKE_TOKENS.some((token) => tokens.includes(token));
 }
 
 function hasHotelLikeMetadata(record: LegacyCatalogEventRecord) {

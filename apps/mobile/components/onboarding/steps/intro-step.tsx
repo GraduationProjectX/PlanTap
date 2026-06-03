@@ -70,13 +70,14 @@ export default function IntroStep({
             return;
           }
 
-          setLanguageOverride(nextLanguage);
-
           try {
             await i18n.changeLanguage(nextLanguage);
           } catch (error) {
             console.error("Failed to apply onboarding language", error);
+            return;
           }
+
+          setLanguageOverride(nextLanguage);
 
           if (configureRTL(nextLanguage)) {
             Alert.alert(t("settings.alerts.restartTitle"), t("settings.alerts.restartDescription"));
